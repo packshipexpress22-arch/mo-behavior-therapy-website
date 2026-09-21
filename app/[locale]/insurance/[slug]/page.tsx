@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import PageHero from "@/components/ui/PageHero";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
@@ -7,10 +7,6 @@ import JsonLd from "@/components/seo/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
 import { insurancePlans, insuranceDisclaimer } from "@/data/insurance";
 import type { Locale } from "@/i18n";
-
-export function generateStaticParams() {
-  return insurancePlans.map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const plan = insurancePlans.find((p) => p.slug === params.slug);
@@ -26,13 +22,21 @@ export async function generateMetadata({ params }: { params: { slug: string } })
  * spec: "unique useful pages rather than duplicate city/insurance pages
  * where only the name changes." Content still comes from data/insurance.ts
  * so adding a payer later doesn't require hand-writing a new route.
+ *
+ * Note: generateStaticParams is intentionally omitted (see app/[locale]/layout.tsx
+ * for why) — locale comes straight from params instead of next-intl's getLocale(),
+ * which depends on headers() and would force a dynamic-rendering conflict.
  */
-export default async function InsurancePlanPage({ params }: { params: { slug: string } }) {
+export default async function InsurancePlanPage({
+  params,
+}: {
+  params: { slug: string; locale: string };
+}) {
   const plan = insurancePlans.find((p) => p.slug === params.slug);
   if (!plan) notFound();
 
   const t = await getTranslations("pages.insurance");
-  const locale = (await getLocale()) as Locale;
+  const locale = params.locale as Locale;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
 
   return (
@@ -69,4 +73,3 @@ export default async function InsurancePlanPage({ params }: { params: { slug: st
     </>
   );
 }
-

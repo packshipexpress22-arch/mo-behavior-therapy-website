@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Inter", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-ink-900 antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Visible, high-contrast focus ring for keyboard users — required for the
+   WCAG 2.2 AA target (see /accessibility page). Never remove outline
+   without replacing it. */
+:focus-visible {
+  outline: 3px solid theme("colors.brand.blue");
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  @apply sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:shadow-soft;
+}
+
+.wave-divider {
+  background: linear-gradient(
+    135deg,
+    theme("colors.brand.blue-light") 0%,
+    theme("colors.brand.green-light") 100%
+  );
+}
+

@@ -10,10 +10,13 @@ import JsonLd from "@/components/seo/JsonLd";
 import { organizationSchema, localBusinessSchema } from "@/lib/schema";
 import "../globals.css";
 
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
-
+// Note: generateStaticParams is intentionally omitted here. next-intl's
+// Server Component APIs (getTranslations/getMessages) require every page in
+// the tree to call `setRequestLocale` to safely opt into static rendering;
+// without that, forcing static generation via generateStaticParams causes a
+// hard prerender error. Rendering these routes dynamically (the default
+// without generateStaticParams) is correct and avoids that failure mode —
+// revisit with setRequestLocale calls if static generation is wanted later.
 export async function generateMetadata({
   params: { locale },
 }: {

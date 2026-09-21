@@ -17,6 +17,10 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
   const locale = useLocale() as Locale;
   const t = useTranslations("chat");
   const tf = useTranslations("forms");
+  // "skip" and "loading" live in the top-level "common" namespace, not
+  // under "forms" — tf("common.skip") was looking for forms.common.skip,
+  // which doesn’t exist, so next-intl rendered the raw key path as text.
+  const tc = useTranslations("common");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [draft, setDraft] = useState<LeadDraft>({});
@@ -319,7 +323,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
               className="rounded-full border border-ink-100 px-3 py-1.5 text-xs font-medium hover:bg-ink-100"
               onClick={() => advance({ ...draft, hasReferral: "Skip" })}
             >
-              {tf("common.skip")}
+              {tc("skip")}
             </button>
           </div>
         )}
@@ -342,7 +346,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
           </div>
         )}
 
-        {sending && <p className="text-xs text-ink-500">{tf("common.loading") || "…"}</p>}
+        {sending && <p className="text-xs text-ink-500">{tc("loading") || "…"}</p>}
       </div>
 
       {!submitted && (

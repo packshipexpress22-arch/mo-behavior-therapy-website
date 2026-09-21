@@ -1,0 +1,87 @@
+// Production data model for leads. Not wired up by default (see
+// lib/leadStore.ts, which uses a local JSON file until LEAD_STORE=prisma is
+// set) so the project runs with zero external services out of the box.
+//
+// To go to production:
+//   1. `npm install` already includes prisma + @prisma/client.
+//   2. Set DATABASE_URL in .env (Postgres recommended).
+//   3. `npx prisma migrate dev --name init`
+//   4. Uncomment the Prisma branch in lib/leadStore.ts and set LEAD_STORE=prisma.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LeadKind {
+  family
+  referral
+  career
+}
+
+enum LeadStatus {
+  NEW
+  CONTACT_ATTEMPTED
+  CONTACTED
+  INSURANCE_VERIFICATION
+  DOCUMENTS_NEEDED
+  ASSESSMENT_PENDING
+  WAITLIST
+  SERVICES_STARTED
+  NOT_ELIGIBLE_OUTSIDE_AREA
+  CLOSED
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  kind        LeadKind
+  status      LeadStatus @default(NEW)
+  assignedTo  String?
+  notes       String     @default("")
+  language    String     @default("en")
+
+  // Structured intake fields (mirrors LeadDraft / leadSchema in lib/validation.ts).
+  contactName      String?
+  clientFirstName  String?
+  relationship     String?
+  clientAge        String?
+  phone            String?
+  email            String?
+  city             String?
+  zip              String?
+  county           String?
+  setting          String?
+  insurance        String?
+  previousAba      String?
+  hasReferral      String?
+  hasEvaluation    String?
+  hasIep           String?
+  contactMethod    String?
+  contactTime      String?
+  howHeard         String?
+  message          String?
+
+  // Consent record — required for compliance, never overwritten.
+  consentGiven          Boolean
+  consentTextVersion    String
+  consentTimestamp      DateTime
+  consentIp             String?
+
+  // Attribution
+  sourcePage  String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  referrer    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([kind])
+  @@index([createdAt])
+}

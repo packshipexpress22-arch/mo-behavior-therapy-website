@@ -169,6 +169,13 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
     const extracted = extractFields(text, locale);
     const merged: LeadDraft = {
       ...draft,
+      // "whoFor" (yourself / your child / someone you care for) and
+      // "relationship" (Parent / Guardian / Caregiver / Self / Other) are
+      // effectively the same real-world answer, so any relationship phrase
+      // recognized by extractFields (e.g. "my son", "for myself") fills
+      // both slots at once. Without this, free-text answers to the whoFor
+      // prompt were never recorded anywhere and Milo would ask it forever.
+      whoFor: draft.whoFor || extracted.relationship,
       contactName: draft.contactName || extracted.name,
       relationship: draft.relationship || extracted.relationship,
       clientAge: draft.clientAge || extracted.age,
@@ -214,6 +221,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
   if (!open) return null;
 
   const settingOptions = tf.raw("options.settings") as string[];
+  const relationshipOptions = tf.raw("options.relationship") as string[];
   const yesNoUnsure = tf.raw("options.yesNoUnsure") as string[];
   const contactMethods = tf.raw("options.contactMethod") as string[];
   const contactTimes = tf.raw("options.contactTime") as string[];
@@ -275,6 +283,15 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
           </div>
         )}
 
+        {!submitted && missingSlot === "whoFor" && (
+          <ChoiceRow
+            options={relationshipOptions}
+            onPick={(v) => advance({ ...draft, whoFor: v, relationship: v })}
+          />
+        )}
+        {!submitted && missingSlot === "relationship" && (
+          <ChoiceRow options={relationshipOptions} onPick={(v) => advance({ ...draft, relationship: v })} />
+        )}
         {!submitted && missingSlot === "setting" && (
           <ChoiceRow options={settingOptions} onPick={(v) => advance({ ...draft, setting: v })} />
         )}

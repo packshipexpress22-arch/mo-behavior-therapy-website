@@ -134,7 +134,14 @@ export async function storeLead(input: {
   source: LeadRecord["source"];
   language: string;
 }): Promise<LeadRecord> {
-  if (process.env.LEAD_STORE === "prisma") {
+  // Prefer Prisma/Postgres whenever a database is actually configured — a
+  // separate LEAD_STORE=prisma flag used to gate this, but its value can no
+  // longer be verified (it was saved as a Vercel "Sensitive" variable, which
+  // is write-only and can never be read back, by anyone, once saved) and
+  // evidently isn't the literal string "prisma", so it silently fell back to
+  // the file store on every deploy. Keying off DATABASE_URL's presence is
+  // simpler and can't drift out of sync with what's actually configured.
+  if (process.env.DATABASE_URL) {
     await ensureLeadSchema();
     const d = input.data as Record<string, string | undefined>;
     const intakeData: Record<string, string | undefined> = {};

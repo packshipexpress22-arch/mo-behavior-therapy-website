@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { promises as fs } from "fs";
 import path from "path";
-import { prisma } from "./prisma";
+import { prisma, ensureLeadSchema } from "./prisma";
 import type { Lead as PrismaLead } from "@prisma/client";
 
 // Pluggable lead storage. LEAD_STORE=file (default, for local dev / demo)
@@ -135,6 +135,7 @@ export async function storeLead(input: {
   language: string;
 }): Promise<LeadRecord> {
   if (process.env.LEAD_STORE === "prisma") {
+    await ensureLeadSchema();
     const d = input.data as Record<string, string | undefined>;
     const intakeData: Record<string, string | undefined> = {};
     for (const key of INTAKE_FIELDS) {

@@ -79,14 +79,21 @@ const SLOT_TO_DRAFT_KEY: Record<SlotKey, (keyof LeadDraft)[]> = {
   consent: ["consent"],
 };
 
-/** Returns the first slot in SLOT_ORDER that isn't already filled. */
+/** Returns the first slot in SLOT_ORDER that isn’t already filled. */
 export function nextMissingSlot(draft: LeadDraft): SlotKey | null {
   for (const slot of SLOT_ORDER) {
     const keys = SLOT_TO_DRAFT_KEY[slot];
-    const filled = keys.every((k) => {
+    const isFilled = (k: keyof LeadDraft) => {
       const v = draft[k];
       return v !== undefined && v !== null && v !== "";
-    });
+    };
+    // "cityZip" asks for city AND zip in one prompt, but a visitor who
+    // answers with just one of them (very common — people often type only
+    // their ZIP) has still answered the question. Requiring every key here
+    // would leave the slot unfillable and Milo would re-ask it forever, so
+    // this one slot is satisfied by any key being filled rather than all of
+    // them; every other slot still requires all of its keys.
+    const filled = slot === "cityZip" ? keys.some(isFilled) : keys.every(isFilled);
     if (!filled) return slot;
   }
   return null;

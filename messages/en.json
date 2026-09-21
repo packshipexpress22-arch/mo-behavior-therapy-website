@@ -1,0 +1,468 @@
+{
+  "meta": {
+    "siteName": "MO Behavior Therapy",
+    "titleSuffix": "MO Behavior Therapy | ABA Therapy in Florida's Treasure Coast",
+    "home": {
+      "title": "ABA Therapy in Florida's Treasure Coast | MO Behavior Therapy",
+      "description": "Individualized, BCBA-led ABA therapy at home, school and in the community across St. Lucie, Martin, Indian River, Palm Beach and surrounding Florida counties."
+    }
+  },
+  "nav": {
+    "services": "Services",
+    "howAbaWorks": "How ABA Works",
+    "insurance": "Insurance",
+    "serviceAreas": "Service Areas",
+    "forFamilies": "For Families",
+    "forProviders": "For Providers",
+    "careers": "Careers",
+    "about": "About",
+    "contact": "Contact",
+    "menu": "Menu",
+    "close": "Close"
+  },
+  "common": {
+    "requestServices": "Request ABA Services",
+    "requestServicesShort": "Request Services",
+    "callUs": "Call (305) 795-0600",
+    "callUsShort": "Call",
+    "verifyInsurance": "Verify Insurance",
+    "verifyMyBenefits": "Verify My Benefits",
+    "talkToTeam": "Talk to Our Team",
+    "startHere": "Start Here",
+    "referAClient": "Refer a Client",
+    "joinOurTeam": "Join Our Team",
+    "chatWithUs": "Chat with Us",
+    "learnMore": "Learn More",
+    "readMore": "Read More",
+    "viewAll": "View All",
+    "submit": "Submit",
+    "send": "Send",
+    "back": "Back",
+    "skip": "Skip",
+    "next": "Next",
+    "loading": "Loading…",
+    "officeLocation": "Office Location",
+    "serviceAreaLabel": "Areas We May Serve",
+    "readyForNextStep": "Ready to Take the Next Step?",
+    "dontSeeInsurance": "Don't see your insurance? Contact us to verify your benefits.",
+    "hours": "Monday–Friday, 8:30 AM–5:00 PM",
+    "email": "mobehavior@mobehaviortherapy.com"
+  },
+  "languageSelector": {
+    "label": "Language",
+    "moreLanguages": "More Languages",
+    "moreLanguagesNote": "Our team can also assist in additional languages by phone — just ask."
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Florida's Treasure Coast & Surrounding Communities",
+      "headline": "Building Brighter Futures, One Child at a Time.",
+      "subheadline": "Individualized ABA Therapy Designed Around Your Child and Family.",
+      "body": "Compassionate, evidence-based behavioral support at home, school and in the community — with a team that partners with families every step of the way.",
+      "primaryCta": "Request ABA Services",
+      "secondaryCta": "Verify Insurance",
+      "callCta": "Call (305) 795-0600"
+    },
+    "trustBar": {
+      "items": [
+        "Individualized Care",
+        "BCBA-Supervised Services",
+        "Family Collaboration",
+        "Home • School • Community",
+        "Insurance Support"
+      ]
+    },
+    "services": {
+      "heading": "Individualized ABA Services",
+      "subheading": "Treatment is built around each child's assessment, goals and family priorities — not a one-size-fits-all program.",
+      "cta": "View All Services"
+    },
+    "whereSupport": {
+      "heading": "Support Where Your Child Needs It Most",
+      "home": {
+        "title": "Home-Based ABA",
+        "description": "Skills are practiced in the child's natural environment, alongside the routines and people they know best."
+      },
+      "school": {
+        "title": "School-Based ABA",
+        "description": "Coordinated support in school settings when clinically appropriate and authorized by the school or district."
+      },
+      "community": {
+        "title": "Community-Based ABA",
+        "description": "Practicing functional, real-world skills in relevant community settings when clinically indicated."
+      }
+    },
+    "why": {
+      "heading": "Why Families Choose MO Behavior Therapy",
+      "items": [
+        { "title": "Individualized Care", "description": "Treatment designed around each client's unique needs." },
+        { "title": "Family Partnership", "description": "Parents and caregivers are active partners throughout treatment." },
+        { "title": "Meaningful Life Skills", "description": "Goals can target communication, daily living, independence and other clinically appropriate skills." },
+        { "title": "Data-Driven Care", "description": "Progress is monitored and treatment is adjusted based on clinical data." },
+        { "title": "Support Where Life Happens", "description": "Services may be provided across natural environments when clinically appropriate." },
+        { "title": "Experienced Clinical Leadership", "description": "BCBA-supervised ABA services and individualized treatment planning." }
+      ]
+    },
+    "timeline": {
+      "heading": "How ABA Services Begin",
+      "steps": [
+        { "step": "01", "title": "Contact Us", "description": "Tell us a little about your family and how we can help." },
+        { "step": "02", "title": "Insurance & Initial Review", "description": "Our team reviews your insurance information and eligibility." },
+        { "step": "03", "title": "Clinical Assessment", "description": "A BCBA completes an assessment and develops individualized recommendations." },
+        { "step": "04", "title": "Personalized Treatment Plan", "description": "Goals and strategies are built around your child's assessment and your family's priorities." },
+        { "step": "05", "title": "Authorization", "description": "We coordinate with your insurance plan on any required authorization." },
+        { "step": "06", "title": "Services Begin", "description": "When authorized and appropriate, treatment begins in the agreed setting." },
+        { "step": "07", "title": "Ongoing Progress Monitoring", "description": "Progress is continuously reviewed and the plan is adjusted based on data." }
+      ]
+    },
+    "insurance": {
+      "heading": "Insurance & Coverage",
+      "body": "We work with several major health plans to help families access ABA therapy. Coverage and authorization requirements vary by individual plan — our team can help verify your benefits.",
+      "cta": "Verify My Insurance",
+      "viewInsurancePage": "See All Insurance Information"
+    },
+    "family": {
+      "heading": "Family & Caregiver Collaboration",
+      "body": "BCBAs work closely with parents and caregivers so strategies generalize beyond therapy sessions — into daily routines, school and the community."
+    },
+    "referring": {
+      "heading": "For Referring Professionals",
+      "body": "Pediatricians, psychologists, neurologists, schools, case managers and other professionals can refer a client directly to our team.",
+      "cta": "Refer a Client"
+    },
+    "serviceArea": {
+      "heading": "Where We Provide Services",
+      "body": "We provide ABA services to families throughout the counties and communities below. Service availability can vary by location, staffing, clinical need and insurance authorization.",
+      "officeNote": "Our office is located in Fort Pierce, FL. Not every service occurs at our office — many families are served at home, school or in the community.",
+      "cta": "See All Service Areas"
+    },
+    "finalCta": {
+      "heading": "Ready to Take the Next Step?",
+      "body": "Our team is ready to answer your questions and help you get started.",
+      "primaryCta": "Request Services",
+      "secondaryCta": "Chat with Us",
+      "tertiaryCta": "Call Us"
+    }
+  },
+  "pages": {
+    "abaTherapy": {
+      "title": "How ABA Works",
+      "intro": "Applied Behavior Analysis (ABA) is an evidence-based approach to understanding and supporting behavior. Here's how the process works at MO Behavior Therapy, from first contact through ongoing care.",
+      "sections": [
+        { "title": "Initial ABA Assessment", "body": "A BCBA evaluates your child's needs, behavioral patterns, strengths and your family's priorities to identify potential treatment goals." },
+        { "title": "Functional Behavior Assessment", "body": "When appropriate, we assess the purpose behind specific behaviors so support strategies address the underlying function, not just the behavior itself." },
+        { "title": "Individualized ABA Therapy", "body": "Treatment is built from the assessment, with measurable, individualized goals — not a standardized program applied to every child." },
+        { "title": "Treatment Plan Development", "body": "Goals, strategies and the plan for measuring progress are documented and reviewed with your family." },
+        { "title": "Behavior Intervention Plans", "body": "When indicated, a plan outlines positive, evidence-based strategies for behaviors that interfere with learning, independence or safety." },
+        { "title": "Data Collection & Progress Monitoring", "body": "Treatment is continuously reviewed and modified based on data and documented progress — never left on autopilot." }
+      ]
+    },
+    "services": {
+      "title": "ABA Services",
+      "intro": "Every family's plan looks different. Not every child receives every service below — your BCBA will recommend what's appropriate based on assessment.",
+      "categories": {
+        "heading": "Skill Acquisition Areas May Include",
+        "items": ["Communication", "Social Skills", "Daily Living", "Independence", "Following Routines", "Transitions", "Functional Play", "Safety Skills"]
+      },
+      "behaviorReduction": {
+        "title": "Behavior Reduction / Behavior Support",
+        "body": "We use positive, evidence-based strategies to address behaviors that interfere with learning, independence or safety — always with respectful, non-stigmatizing language."
+      },
+      "parentTraining": {
+        "title": "Parent & Caregiver Training",
+        "body": "One of the most important parts of treatment. BCBAs collaborate with caregivers so strategies generalize outside therapy sessions."
+      }
+    },
+    "parentTraining": {
+      "title": "Parent & Caregiver Training",
+      "intro": "Parent and caregiver involvement is one of the most important parts of ABA treatment. Our BCBAs work directly with families so strategies carry over into daily life — not just therapy sessions.",
+      "body": "Training is individualized to your family's routines and goals, and may cover communication strategies, positive reinforcement, routines and transitions, and how to respond consistently to challenging moments."
+    },
+    "whereWeProvide": {
+      "title": "Where We Provide Services",
+      "intro": "MO Behavior Therapy provides ABA services across multiple settings, based on clinical need and what's appropriate for each child.",
+      "home": { "title": "Home", "body": "Practicing skills in the child's natural environment offers advantages for generalizing routines with family members present." },
+      "school": { "title": "School", "body": "MO Behavior Therapy has experience coordinating ABA services in school environments when permitted and clinically appropriate. School access is subject to school/district requirements and authorization." },
+      "community": { "title": "Community", "body": "Practicing appropriate skills in relevant community settings when clinically indicated." }
+    },
+    "insurance": {
+      "title": "Insurance & Coverage",
+      "intro": "We work with several major health plans to help families access ABA therapy. Coverage, benefits and authorization requirements vary by individual plan — our team can help verify eligibility and behavioral health benefits before services begin.",
+      "primaryHeading": "Plans We Work With",
+      "cta": "Verify My Benefits",
+      "note": "Insurance participation and benefits vary by plan. We do not require a Social Security number or insurance member ID to begin a conversation — that information is only collected later, through a secure intake process."
+    },
+    "about": {
+      "title": "About MO Behavior Therapy",
+      "intro": "MO Behavior Therapy is a Florida behavioral-health provider focused on individualized ABA therapy and family collaboration.",
+      "leadershipHeading": "Clinical Leadership"
+    },
+    "serviceAreas": {
+      "title": "Service Areas",
+      "intro": "We provide ABA services to families throughout the counties and communities below. Service availability can vary by location, staffing, clinical need and insurance authorization.",
+      "officeHeading": "Office Location",
+      "citiesHeading": "Communities We Serve",
+      "countiesHeading": "Counties We Serve"
+    },
+    "referralSources": {
+      "title": "Referral Sources",
+      "intro": "Physicians, psychologists, neurologists, schools, case managers, insurance professionals and social workers can refer a client directly to our team.",
+      "cta": "Refer a Client",
+      "note": "Our referral form is kept separate from family intake, and we do not collect unnecessary protected health information through standard, unsecured email."
+    },
+    "careers": {
+      "title": "Careers",
+      "intro": "MO Behavior Therapy is looking for dedicated clinical and support professionals to join our team.",
+      "roles": ["Registered Behavior Technicians (RBTs)", "BCBAs", "BCaBAs (where applicable)", "Other clinical & support roles as posted"],
+      "note": "Credentialing and documentation requirements can vary by position.",
+      "cta": "Apply / Join Our Team"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions"
+    },
+    "contact": {
+      "title": "Contact Us / Request Services",
+      "intro": "Tell us a little about your family, and our team will follow up soon. You can also call us directly during business hours."
+    },
+    "privacyPolicy": {
+      "title": "Privacy Policy",
+      "intro": "This Privacy Policy explains, in general terms, how MO Behavior Therapy LLC collects, uses and protects information submitted through this website. It is provided for general informational purposes and does not constitute legal advice.",
+      "sections": [
+        { "title": "Information We Collect", "body": "We collect information you voluntarily provide through our contact forms, our virtual assistant, and referral or career applications — such as your name, contact details, general location, and general insurance information." },
+        { "title": "How We Use Information", "body": "Information is used to respond to inquiries, evaluate potential services, coordinate care, and communicate with you about your request. We do not sell your information." },
+        { "title": "Protected Health Information", "body": "Where information may constitute protected health information, we apply administrative, technical and physical safeguards appropriate to its sensitivity, and we minimize what is collected through public-facing forms and chat." },
+        { "title": "Consent to Contact", "body": "By submitting a request, you may be asked to separately authorize MO Behavior Therapy to contact you by phone, text or email. This consent is never a condition of receiving services and can be withdrawn at any time." },
+        { "title": "Third-Party Services", "body": "We may use third-party vendors for functions like email delivery, hosting and analytics. We do not place protected health information into analytics or advertising platforms." },
+        { "title": "Contact Us", "body": "Questions about this policy can be directed to mobehavior@mobehaviortherapy.com or (305) 795-0600." }
+      ]
+    },
+    "accessibility": {
+      "title": "Accessibility Statement",
+      "body": "MO Behavior Therapy is committed to ensuring this website is accessible to people of all abilities. We aim to meet WCAG 2.2 Level AA guidelines, including keyboard accessibility, appropriate color contrast, semantic structure, and screen-reader-friendly forms and chat controls. If you encounter an accessibility barrier on this site, please contact us at mobehavior@mobehaviortherapy.com or (305) 795-0600 so we can assist you and address the issue."
+    },
+    "terms": {
+      "title": "Terms & Website Disclaimer",
+      "body": "This website is provided for general informational purposes about MO Behavior Therapy LLC and its services. It does not constitute medical advice, and information on this site should not be used to diagnose or treat any condition. Use of the virtual assistant or contact forms does not create a provider-client relationship. Insurance information is general in nature; actual coverage depends on your specific plan and must be verified. For emergencies, call 911 or seek immediate medical attention."
+    }
+  },
+  "forms": {
+    "labels": {
+      "fullName": "Full Name",
+      "contactName": "Your Name",
+      "clientFirstName": "Potential Client's First Name (optional)",
+      "phone": "Phone Number",
+      "email": "Email Address",
+      "city": "City",
+      "zip": "ZIP Code",
+      "county": "County (if known)",
+      "preferredLanguage": "Preferred Language",
+      "relationship": "Relationship to Potential Client",
+      "clientAge": "Potential Client's Age / Age Group",
+      "insurance": "Insurance Company",
+      "preferredSetting": "Preferred Service Setting",
+      "previousAba": "Have you received ABA services before?",
+      "hasReferral": "Do you currently have a referral?",
+      "hasEvaluation": "Do you have a diagnostic evaluation?",
+      "hasIep": "Do you have an IEP or 504 plan?",
+      "preferredContactMethod": "Preferred Contact Method",
+      "preferredContactTime": "Preferred Contact Time",
+      "howHeard": "How did you hear about us?",
+      "message": "Anything else you'd like us to know? (optional)",
+      "organization": "Organization / Practice",
+      "role": "Your Role",
+      "positionAppliedFor": "Position Applying For",
+      "resume": "Resume / CV"
+    },
+    "options": {
+      "relationship": ["Parent", "Guardian", "Caregiver", "Self", "Other"],
+      "settings": ["Home", "School", "Community", "Not Sure"],
+      "yesNoUnsure": ["Yes", "No", "Not Sure"],
+      "availability": ["Available", "Not Available", "Not Applicable", "Unsure"],
+      "contactMethod": ["Phone", "Text", "Email"],
+      "contactTime": ["Morning", "Afternoon", "Anytime during business hours"],
+      "howHeard": ["Google Search", "Social Media", "Physician / Provider Referral", "School", "Friend or Family", "Insurance Company", "Other"]
+    },
+    "consent": {
+      "text": "By checking this box and submitting my information, I authorize MO Behavior Therapy LLC to contact me regarding my request for services using the phone number and/or email address I provided, including by phone call, text message or email. Consent is not a condition of receiving services.",
+      "links": "See our <privacyPolicy>Privacy Policy</privacyPolicy> and <terms>Terms</terms>.",
+      "privacyPolicy": "Privacy Policy",
+      "terms": "Terms"
+    },
+    "rememberMe": "I'd rather discuss this with someone directly.",
+    "validation": {
+      "required": "This field is required.",
+      "invalidEmail": "Please enter a valid email address.",
+      "invalidPhone": "Please enter a valid phone number.",
+      "invalidZip": "Please enter a valid 5-digit ZIP code.",
+      "consentRequired": "Please review and check the consent box to submit your request.",
+      "genericError": "Something went wrong submitting your request. Please try again, or call us at (305) 795-0600.",
+      "success": "Thank you — your request has been received. Our team will be in touch soon."
+    },
+    "leadForm": {
+      "title": "Request ABA Services",
+      "subtitle": "Tell us a little about your family. This takes about two minutes."
+    },
+    "referralForm": {
+      "title": "Refer a Client",
+      "subtitle": "This form is separate from family intake and is intended for referring professionals."
+    },
+    "careersForm": {
+      "title": "Apply / Join Our Team",
+      "subtitle": "Tell us about your background and the role you're interested in."
+    }
+  },
+  "chat": {
+    "assistantName": "Milo",
+    "assistantSubtitle": "MO Behavior Therapy Assistant",
+    "disclosure": "Virtual assistant — not a clinician",
+    "greeting": "Hi! 👋 I'm MO Behavior Therapy's virtual assistant. I can help you learn about ABA services, check your service area or insurance, and help our team contact you. How can I help?",
+    "quickActions": {
+      "needServices": "I Need ABA Services",
+      "verifyInsurance": "Verify Insurance",
+      "checkZip": "Do You Serve My ZIP Code?",
+      "haveReferral": "I Have a Referral",
+      "amProvider": "I'm a Healthcare Provider",
+      "lookingForJob": "I'm Looking for a Job",
+      "haveQuestion": "I Have a Question"
+    },
+    "prompts": {
+      "whoFor": "Are you looking for ABA services for yourself, your child, or someone you care for?",
+      "contactName": "What's your name?",
+      "clientFirstName": "What's the potential client's first name? (optional)",
+      "relationship": "And what's your relationship to them?",
+      "clientAge": "About how old are they?",
+      "cityZip": "What city and ZIP code are you in?",
+      "setting": "Would you prefer services at home, at school, in the community, or are you not sure yet?",
+      "insurance": "What insurance do you have?",
+      "previousAba": "Have they received ABA services before?",
+      "documents": "Do you currently have any of the following? A referral, a diagnostic evaluation, or an IEP/504 plan — these are all optional.",
+      "phone": "What's the best phone number to reach you?",
+      "email": "And your email address?",
+      "contactMethod": "How would you prefer we contact you — phone, text or email?",
+      "contactTime": "What's the best time — morning, afternoon, or anytime during business hours?",
+      "consent": "Last step — do we have your permission to contact you about this request?",
+      "inServiceArea": "Good news — that ZIP code is within the area we typically serve.",
+      "outsideServiceArea": "Your ZIP code may be outside our current primary service area, but we'd still be happy to review your request.",
+      "talkToSomeone": "Of course — you're welcome to call us anytime at (305) 795-0600 during business hours, and a member of our team will help you directly.",
+      "emergency": "I'm not able to help with emergencies or provide crisis support. If this is a medical emergency or you or someone else is in immediate danger, please call 911 or go to your nearest emergency room right away.",
+      "clarify": "Sorry, I didn't quite catch that — could you tell me a bit more?"
+    },
+    "confirmation": {
+      "title": "Thank you!",
+      "body": "Thank you for sharing your information with MO Behavior Therapy. Your request has been received. A member of our team will review your information and contact you soon. If you'd prefer to speak with us directly, you can call (305) 795-0600 during business hours."
+    }
+  },
+  "email": {
+    "internal": {
+      "subject": "NEW ABA INQUIRY – {name} – {zip}",
+      "heading": "New MO Behavior Therapy Inquiry"
+    },
+    "confirmation": {
+      "subject": "We've Received Your Request | MO Behavior Therapy",
+      "greeting": "Hi {firstName},",
+      "body1": "Thank you for contacting MO Behavior Therapy.",
+      "body2": "We've received your information. A member of our team will review your request and contact you soon regarding the next steps.",
+      "body3": "If you'd prefer to speak with us directly, please call:",
+      "closing": "Thank you for considering MO Behavior Therapy.",
+      "signOff": "MO Behavior Therapy Team"
+    }
+  },
+  "footer": {
+    "quickLinks": "Quick Links",
+    "forProfessionals": "For Professionals",
+    "legal": "Legal",
+    "abaTherapy": "How ABA Works",
+    "services": "Services",
+    "parentTraining": "Parent & Caregiver Training",
+    "whereWeServe": "Where We Provide Services",
+    "about": "About",
+    "serviceAreas": "Service Areas",
+    "careers": "Careers",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "referralSources": "Referral Sources",
+    "insurance": "Insurance",
+    "privacyPolicy": "Privacy Policy",
+    "accessibility": "Accessibility",
+    "terms": "Terms",
+    "copyright": "© {year} MO Behavior Therapy LLC. All rights reserved."
+  },
+  "mobileBar": {
+    "call": "Call",
+    "request": "Request",
+    "chat": "Chat"
+  },
+  "faq": {
+    "items": {
+      "whatIsAba": {
+        "question": "What is ABA therapy?",
+        "answer": "Applied Behavior Analysis (ABA) is an evidence-based approach used to understand behavior and teach meaningful skills like communication, social interaction and daily living, based on an individualized assessment."
+      },
+      "howToKnowIfAppropriate": {
+        "question": "How do I know if ABA may be appropriate?",
+        "answer": "The best way to know is to talk with our team. A BCBA can review your situation and, after an assessment, help determine whether ABA is appropriate and what goals might be recommended."
+      },
+      "diagnosisRequired": {
+        "question": "Do I need an autism diagnosis?",
+        "answer": "Not necessarily to start a conversation with our team — contact us and we can discuss your specific situation and any documentation that may be helpful."
+      },
+      "insuranceCoverage": {
+        "question": "Does insurance cover ABA?",
+        "answer": "Many plans include behavioral health benefits that can apply to ABA, but coverage and authorization requirements vary by plan. Our team can help verify your benefits."
+      },
+      "whichPlans": {
+        "question": "Which insurance plans do you work with?",
+        "answer": "We currently work with Aetna, Florida Blue, Simply Healthcare, UnitedHealthcare and Cigna. Don't see your plan? Contact us — we can review your specific coverage."
+      },
+      "howVerificationWorks": {
+        "question": "How does insurance verification work?",
+        "answer": "After you contact us, our team reviews your insurance information and checks eligibility and behavioral health benefits before any services begin."
+      },
+      "whereProvided": {
+        "question": "Where are services provided?",
+        "answer": "Depending on clinical need and authorization, services may be provided at home, at school, or in the community."
+      },
+      "schoolBased": {
+        "question": "Do you provide ABA at school?",
+        "answer": "We have experience coordinating ABA in school settings when clinically appropriate and authorized by the school or district."
+      },
+      "homeBased": {
+        "question": "Do you provide home-based ABA?",
+        "answer": "Yes — many families are served at home, which can make it easier to practice skills within daily routines."
+      },
+      "parentTraining": {
+        "question": "What does parent training involve?",
+        "answer": "Parent and caregiver training is a core part of treatment. BCBAs work directly with families so strategies carry over into everyday life."
+      },
+      "whatHappensAtAssessment": {
+        "question": "What happens during an ABA assessment?",
+        "answer": "A BCBA evaluates your child's needs, behavioral patterns, strengths and your family's priorities to help identify potential treatment goals."
+      },
+      "howQuicklyCanStart": {
+        "question": "How quickly can services start?",
+        "answer": "Timing depends on insurance authorization, assessment scheduling and staffing availability — our team can give you a clearer picture once we review your information."
+      },
+      "documentsNeeded": {
+        "question": "What documents may be needed?",
+        "answer": "This can vary, but may include a referral, a diagnostic evaluation, or an IEP/504 plan. None of these are required to start a conversation with us."
+      },
+      "pediatricianReferral": {
+        "question": "Can my pediatrician send a referral?",
+        "answer": "Yes — physicians, psychologists and other professionals can refer a client directly to our team through our referral form."
+      },
+      "areasServed": {
+        "question": "What areas do you serve?",
+        "answer": "We serve families throughout St. Lucie, Martin, Indian River, Palm Beach, Hendry, Glades, Highlands and Okeechobee counties, with availability varying by location and staffing."
+      },
+      "spanishServices": {
+        "question": "Do you provide services in Spanish?",
+        "answer": "Yes — our team and virtual assistant support Spanish, along with English, Haitian Creole, Portuguese, French and German."
+      },
+      "howToRequestServices": {
+        "question": "How can I request services?",
+        "answer": "You can fill out our contact form, chat with our virtual assistant, or call us directly at (305) 795-0600."
+      }
+    }
+  }
+}
+

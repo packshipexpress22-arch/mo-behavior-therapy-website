@@ -1,0 +1,468 @@
+{
+  "meta": {
+    "siteName": "MO Behavior Therapy",
+    "titleSuffix": "MO Behavior Therapy | Terapi ABA nan Treasure Coast Florid",
+    "home": {
+      "title": "Terapi ABA nan Treasure Coast Florid | MO Behavior Therapy",
+      "description": "Terapi ABA endividyalize, dirije pa yon BCBA, nan kay, lekòl ak nan kominote a atravè St. Lucie, Martin, Indian River, Palm Beach ak zòn ki antoure yo."
+    }
+  },
+  "nav": {
+    "services": "Sèvis",
+    "howAbaWorks": "Kijan ABA Fonksyone",
+    "insurance": "Asirans",
+    "serviceAreas": "Zòn Sèvis",
+    "forFamilies": "Pou Fanmi",
+    "forProviders": "Pou Founisè",
+    "careers": "Travay",
+    "about": "Sou Nou",
+    "contact": "Kontakte",
+    "menu": "Meni",
+    "close": "Fèmen"
+  },
+  "common": {
+    "requestServices": "Mande Sèvis ABA",
+    "requestServicesShort": "Mande Sèvis",
+    "callUs": "Rele (305) 795-0600",
+    "callUsShort": "Rele",
+    "verifyInsurance": "Verifye Asirans",
+    "verifyMyBenefits": "Verifye Benefis Mwen",
+    "talkToTeam": "Pale ak Ekip Nou an",
+    "startHere": "Kòmanse Isit",
+    "referAClient": "Refere Yon Kliyan",
+    "joinOurTeam": "Vin Fè Pati Ekip Nou an",
+    "chatWithUs": "Chat Avèk Nou",
+    "learnMore": "Aprann Plis",
+    "readMore": "Li Plis",
+    "viewAll": "Wè Tout",
+    "submit": "Soumèt",
+    "send": "Voye",
+    "back": "Tounen",
+    "skip": "Sote",
+    "next": "Kontinye",
+    "loading": "L'ap chaje…",
+    "officeLocation": "Kote Biwo a Chita",
+    "serviceAreaLabel": "Zòn Nou Ka Sèvi",
+    "readyForNextStep": "Ou Pare Pou Pwochen Etap la?",
+    "dontSeeInsurance": "Ou pa wè asirans ou a? Kontakte nou pou nou verifye benefis ou.",
+    "hours": "Lendi–Vandredi, 8:30 AM–5:00 PM",
+    "email": "mobehavior@mobehaviortherapy.com"
+  },
+  "languageSelector": {
+    "label": "Lang",
+    "moreLanguages": "Plis Lang",
+    "moreLanguagesNote": "Ekip nou an ka ede ou tou nan lòt lang sou telefòn — jis mande."
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Treasure Coast Florid ak Kominote Alantou",
+      "headline": "Bati Yon Fiti Pi Klere, Yon Timoun Alafwa.",
+      "subheadline": "Terapi ABA Endividyalize, Fèt Pou Pitit ou ak Fanmi ou.",
+      "body": "Sipò konpòtman ki gen konpasyon epi ki baze sou prèv nan kay, lekòl ak nan kominote a — ak yon ekip ki kolabore ak fanmi yo nan chak etap.",
+      "primaryCta": "Mande Sèvis ABA",
+      "secondaryCta": "Verifye Asirans",
+      "callCta": "Rele (305) 795-0600"
+    },
+    "trustBar": {
+      "items": [
+        "Swen Endividyalize",
+        "Sèvis Sipèvize pa BCBA",
+        "Kolaborasyon ak Fanmi",
+        "Kay • Lekòl • Kominote",
+        "Èd ak Asirans"
+      ]
+    },
+    "services": {
+      "heading": "Sèvis ABA Endividyalize",
+      "subheading": "Tretman an konstwi selon evalyasyon, objektif ak priyorite chak fanmi — se pa yon pwogram ki menm jan pou tout moun.",
+      "cta": "Wè Tout Sèvis"
+    },
+    "whereSupport": {
+      "heading": "Sipò Kote Pitit ou Bezwen li Plis",
+      "home": {
+        "title": "ABA nan Kay",
+        "description": "Kapasite yo pratike nan anviwònman natirèl timoun nan, ansanm ak woutin ak moun li konnen pi byen."
+      },
+      "school": {
+        "title": "ABA nan Lekòl",
+        "description": "Sipò kowòdone nan anviwònman lekòl lè sa apwopriye klinikman epi otorize pa lekòl la oswa distri a."
+      },
+      "community": {
+        "title": "ABA nan Kominote",
+        "description": "Pratike kapasite fonksyonèl nan anviwònman kominotè apwopriye lè sa endike klinikman."
+      }
+    },
+    "why": {
+      "heading": "Poukisa Fanmi Chwazi MO Behavior Therapy",
+      "items": [
+        { "title": "Swen Endividyalize", "description": "Tretman ki fèt selon bezwen inik chak kliyan." },
+        { "title": "Patenarya ak Fanmi", "description": "Paran ak moun k ap pran swen yo se patnè aktif pandan tout tretman an." },
+        { "title": "Kapasite ki Enpòtan pou Lavi", "description": "Objektif yo ka gen ladan kominikasyon, lavi chak jou, endepandans ak lòt kapasite apwopriye klinikman." },
+        { "title": "Swen Baze sou Done", "description": "Pwogrè a swiv epi tretman an ajiste selon done klinik." },
+        { "title": "Sipò Kote Lavi a Fèt", "description": "Sèvis yo ka ofri nan anviwònman natirèl lè sa apwopriye klinikman." },
+        { "title": "Lidèchip Klinik Eksperimante", "description": "Sèvis ABA sipèvize pa BCBA ak planifikasyon tretman endividyalize." }
+      ]
+    },
+    "timeline": {
+      "heading": "Kijan Sèvis ABA Kòmanse",
+      "steps": [
+        { "step": "01", "title": "Kontakte Nou", "description": "Di nou yon ti kras sou fanmi ou epi kijan nou ka ede." },
+        { "step": "02", "title": "Asirans ak Revizyon Inisyal", "description": "Ekip nou an revize enfòmasyon asirans ou ak elijiblite ou." },
+        { "step": "03", "title": "Evalyasyon Klinik", "description": "Yon BCBA fè yon evalyasyon epi devlope rekòmandasyon endividyalize." },
+        { "step": "04", "title": "Plan Tretman Pèsonalize", "description": "Objektif ak estrateji yo bati selon evalyasyon pitit ou ak priyorite fanmi ou." },
+        { "step": "05", "title": "Otorizasyon", "description": "Nou kowòdone ak plan asirans ou nenpòt otorizasyon ki nesesè." },
+        { "step": "06", "title": "Sèvis yo Kòmanse", "description": "Lè otorize epi apwopriye, tretman an kòmanse nan anviwònman ki dakò a." },
+        { "step": "07", "title": "Siveyans Kontinyèl Pwogrè", "description": "Pwogrè a revize kontinyèlman epi plan an ajiste selon done yo." }
+      ]
+    },
+    "insurance": {
+      "heading": "Asirans ak Kouvèti",
+      "body": "Nou travay ak plizyè gwo plan sante pou ede fanmi yo jwenn aksè nan terapi ABA. Kouvèti ak egzijans otorizasyon varye selon chak plan — ekip nou an ka ede ou verifye benefis ou.",
+      "cta": "Verifye Asirans Mwen",
+      "viewInsurancePage": "Wè Tout Enfòmasyon sou Asirans"
+    },
+    "family": {
+      "heading": "Kolaborasyon ak Fanmi ak Moun k ap Pran Swen",
+      "body": "BCBA yo travay pre pre ak paran ak moun k ap pran swen pou estrateji yo ka aplike pi lwen pase sesyon terapi yo — nan woutin chak jou, lekòl ak kominote a."
+    },
+    "referring": {
+      "heading": "Pou Pwofesyonèl ki Refere",
+      "body": "Pedyat, sikològ, neològ, lekòl, jesyonè ka, ak lòt pwofesyonèl ka refere yon kliyan dirèkteman bay ekip nou an.",
+      "cta": "Refere Yon Kliyan"
+    },
+    "serviceArea": {
+      "heading": "Kote Nou Ofri Sèvis",
+      "body": "Nou ofri sèvis ABA bay fanmi atravè konte ak kominote ki anba yo. Disponiblite sèvis la ka varye selon kote, anplwaye, bezwen klinik ak otorizasyon asirans.",
+      "officeNote": "Biwo nou an chita nan Fort Pierce, FL. Se pa tout sèvis ki fèt nan biwo nou an — anpil fanmi resevwa sèvis nan kay, lekòl oswa nan kominote a.",
+      "cta": "Wè Tout Zòn Sèvis"
+    },
+    "finalCta": {
+      "heading": "Ou Pare Pou Pwochen Etap la?",
+      "body": "Ekip nou an pare pou reponn kesyon ou yo epi ede ou kòmanse.",
+      "primaryCta": "Mande Sèvis",
+      "secondaryCta": "Chat Avèk Nou",
+      "tertiaryCta": "Rele Nou"
+    }
+  },
+  "pages": {
+    "abaTherapy": {
+      "title": "Kijan ABA Fonksyone",
+      "intro": "Analiz Konpòtman Aplike (ABA) se yon apwòch ki baze sou prèv pou konprann ak sipòte konpòtman. Men kijan pwosesis la fonksyone nan MO Behavior Therapy, soti nan premye kontak jiska swen kontinyèl.",
+      "sections": [
+        { "title": "Premye Evalyasyon ABA", "body": "Yon BCBA evalye bezwen pitit ou, modèl konpòtman, fòs ak priyorite fanmi ou pou idantifye posib objektif tretman." },
+        { "title": "Evalyasyon Fonksyonèl Konpòtman", "body": "Lè sa apwopriye, nou evalye rezon dèyè konpòtman espesifik pou estrateji sipò yo adrese fonksyon ki dèyè a, pa sèlman konpòtman an." },
+        { "title": "Terapi ABA Endividyalize", "body": "Tretman an bati apati evalyasyon an, ak objektif ki mezirab epi endividyalize — se pa yon pwogram estandadize aplike sou chak timoun." },
+        { "title": "Devlopman Plan Tretman", "body": "Objektif, estrateji ak plan pou mezire pwogrè dokimante epi revize ak fanmi ou." },
+        { "title": "Plan Entèvansyon Konpòtman", "body": "Lè sa endike, yon plan dekri estrateji pozitif, baze sou prèv, pou konpòtman ki entèfere ak aprantisaj, endepandans oswa sekirite." },
+        { "title": "Kolèt Done ak Siveyans Pwogrè", "body": "Tretman an revize epi modifye kontinyèlman selon done ak pwogrè dokimante — li pa janm kite sou pilòt otomatik." }
+      ]
+    },
+    "services": {
+      "title": "Sèvis ABA",
+      "intro": "Plan chak fanmi diferan. Se pa chak timoun ki resevwa chak sèvis anba a — BCBA ou a ap rekòmande sa ki apwopriye selon evalyasyon an.",
+      "categories": {
+        "heading": "Zòn Akizisyon Kapasite Ka Genyen",
+        "items": ["Kominikasyon", "Kapasite Sosyal", "Lavi Chak Jou", "Endepandans", "Swiv Woutin", "Tranzisyon", "Jwe Fonksyonèl", "Kapasite Sekirite"]
+      },
+      "behaviorReduction": {
+        "title": "Redwi Konpòtman / Sipò Konpòtman",
+        "body": "Nou itilize estrateji pozitif, baze sou prèv, pou adrese konpòtman ki entèfere ak aprantisaj, endepandans oswa sekirite — toujou ak yon langaj respektye, san stigmatizasyon."
+      },
+      "parentTraining": {
+        "title": "Fòmasyon pou Paran ak Moun k ap Pran Swen",
+        "body": "Youn nan pati ki pi enpòtan nan tretman an. BCBA yo kolabore ak moun k ap pran swen pou estrateji yo aplike pi lwen pase sesyon terapi yo."
+      }
+    },
+    "parentTraining": {
+      "title": "Fòmasyon pou Paran ak Moun k ap Pran Swen",
+      "intro": "Patisipasyon paran ak moun k ap pran swen se youn nan pati ki pi enpòtan nan tretman ABA. BCBA nou yo travay dirèkteman ak fanmi yo pou estrateji yo aplike nan lavi chak jou — pa sèlman nan sesyon terapi yo.",
+      "body": "Fòmasyon an endividyalize selon woutin ak objektif fanmi ou, epi li ka kouvri estrateji kominikasyon, ranfòsman pozitif, woutin ak tranzisyon, ak kijan pou reponn yon fason konsistan nan moman ki difisil."
+    },
+    "whereWeProvide": {
+      "title": "Kote Nou Ofri Sèvis",
+      "intro": "MO Behavior Therapy ofri sèvis ABA nan plizyè anviwònman, selon bezwen klinik ak sa ki apwopriye pou chak timoun.",
+      "home": { "title": "Kay", "body": "Pratike kapasite nan anviwònman natirèl timoun nan ofri avantaj pou aplike woutin ak manm fanmi yo prezan." },
+      "school": { "title": "Lekòl", "body": "MO Behavior Therapy gen eksperyans nan kowòdone sèvis ABA nan anviwònman lekòl lè sa pèmèt epi apwopriye klinikman. Aksè nan lekòl la soumèt a egzijans ak otorizasyon lekòl la oswa distri a." },
+      "community": { "title": "Kominote", "body": "Pratike kapasite apwopriye nan anviwònman kominotè relevan lè sa endike klinikman." }
+    },
+    "insurance": {
+      "title": "Asirans ak Kouvèti",
+      "intro": "Nou travay ak plizyè gwo plan sante pou ede fanmi yo jwenn aksè nan terapi ABA. Kouvèti, benefis ak egzijans otorizasyon varye selon chak plan — ekip nou an ka ede verifye elijiblite ak benefis sante konpòtman anvan sèvis yo kòmanse.",
+      "primaryHeading": "Plan Nou Travay Avèk",
+      "cta": "Verifye Benefis Mwen",
+      "note": "Patisipasyon asirans ak benefis varye selon plan an. Nou pa mande nimewo sekirite sosyal ni nimewo manm asirans pou kòmanse yon konvèsasyon — enfòmasyon sa a sèlman kolekte pita, nan yon pwosesis admisyon ki sekirize."
+    },
+    "about": {
+      "title": "Sou MO Behavior Therapy",
+      "intro": "MO Behavior Therapy se yon founisè sante konpòtman nan Florid ki konsantre sou terapi ABA endividyalize ak kolaborasyon ak fanmi.",
+      "leadershipHeading": "Lidèchip Klinik"
+    },
+    "serviceAreas": {
+      "title": "Zòn Sèvis",
+      "intro": "Nou ofri sèvis ABA bay fanmi atravè konte ak kominote ki anba yo. Disponiblite sèvis la ka varye selon kote, anplwaye, bezwen klinik ak otorizasyon asirans.",
+      "officeHeading": "Kote Biwo a Chita",
+      "citiesHeading": "Kominote Nou Sèvi",
+      "countiesHeading": "Konte Nou Sèvi"
+    },
+    "referralSources": {
+      "title": "Sous Referans",
+      "intro": "Doktè, sikològ, neològ, lekòl, jesyonè ka, pwofesyonèl asirans ak travayè sosyal ka refere yon kliyan dirèkteman bay ekip nou an.",
+      "cta": "Refere Yon Kliyan",
+      "note": "Fòm referans nou an separe de admisyon fanmi, epi nou pa kolekte enfòmasyon sante pwoteje san nesesite atravè imel estanda ki pa sekirize."
+    },
+    "careers": {
+      "title": "Travay",
+      "intro": "MO Behavior Therapy ap chèche pwofesyonèl klinik ak sipò devwe pou vin fè pati ekip nou an.",
+      "roles": ["Teknisyen Konpòtman Anrejistre (RBT)", "BCBA", "BCaBA (lè sa aplikab)", "Lòt wòl klinik ak sipò selon sa ki pibliye"],
+      "note": "Egzijans kredansyèl ak dokimantasyon ka varye selon pozisyon an.",
+      "cta": "Aplike / Vin Fè Pati Ekip Nou an"
+    },
+    "faq": {
+      "title": "Kesyon Moun Poze Souvan"
+    },
+    "contact": {
+      "title": "Kontakte Nou / Mande Sèvis",
+      "intro": "Di nou yon ti kras sou fanmi ou epi ekip nou an ap swiv byento. Ou kapab rele nou dirèkteman tou pandan orè travay nou."
+    },
+    "privacyPolicy": {
+      "title": "Politik sou Vi Prive",
+      "intro": "Politik sou Vi Prive sa a eksplike, an tèm jeneral, kijan MO Behavior Therapy LLC kolekte, itilize epi pwoteje enfòmasyon ki soumèt atravè sit entènèt sa a. Li ofri pou rezon enfòmasyon jeneral epi li pa konstitye konsèy legal.",
+      "sections": [
+        { "title": "Enfòmasyon Nou Kolekte", "body": "Nou kolekte enfòmasyon ou bay volontèman atravè fòm kontak nou yo, asistan vityèl nou an, ak aplikasyon referans oswa travay — tankou non ou, detay kontak, kote jeneral ou, ak enfòmasyon asirans jeneral." },
+        { "title": "Kijan Nou Itilize Enfòmasyon", "body": "Enfòmasyon yo itilize pou reponn kesyon, evalye posib sèvis, kowòdone swen, epi kominike avèk ou sou demand ou. Nou pa vann enfòmasyon ou." },
+        { "title": "Enfòmasyon Sante Pwoteje", "body": "Kote enfòmasyon ka konstitye enfòmasyon sante pwoteje, nou aplike pwoteksyon administratif, teknik ak fizik apwopriye a sansiblite li, epi nou minimize sa ki kolekte atravè fòm piblik ak chat." },
+        { "title": "Konsantman pou Kontak", "body": "Lè ou soumèt yon demand, ou ka mande otorize separeman MO Behavior Therapy pou kontakte ou pa telefòn, mesaj tèks oswa imel. Konsantman sa a pa janm yon kondisyon pou resevwa sèvis epi ou ka retire li nenpòt kilè." },
+        { "title": "Sèvis Twazyèm Pati", "body": "Nou ka itilize founisè twazyèm pati pou fonksyon tankou livrezon imel, ebèjman ak analiz. Nou pa mete enfòmasyon sante pwoteje nan platfòm analiz oswa piblisite." },
+        { "title": "Kontakte Nou", "body": "Kesyon sou politik sa a ka voye bay mobehavior@mobehaviortherapy.com oswa (305) 795-0600." }
+      ]
+    },
+    "accessibility": {
+      "title": "Deklarasyon sou Aksè",
+      "body": "MO Behavior Therapy angaje pou asire sit entènèt sa a aksesib pou moun ak tout kapasite. Nou vize respekte gid WCAG 2.2 Nivo AA, ki gen ladan aksè pa klavye, kontras koulè apwopriye, estrikti semantik, ak fòm ak kontwòl chat ki byen adapte ak lektè ekran. Si ou jwenn yon baryè aksè sou sit sa a, tanpri kontakte nou nan mobehavior@mobehaviortherapy.com oswa (305) 795-0600 pou nou ka ede ou epi rezoud pwoblèm nan."
+    },
+    "terms": {
+      "title": "Kondisyon ak Egzansyon Sit Entènèt",
+      "body": "Sit entènèt sa a ofri pou rezon enfòmasyon jeneral sou MO Behavior Therapy LLC ak sèvis li yo. Li pa konstitye konsèy medikal, epi enfòmasyon sou sit sa a pa ta dwe itilize pou dyagnostike oswa trete nenpòt kondisyon. Itilizasyon asistan vityèl la oswa fòm kontak yo pa kreye yon relasyon founisè-kliyan. Enfòmasyon asirans se jeneral; kouvèti reyèl depann de plan espesifik ou epi li dwe verifye. Pou ijans, rele 911 oswa chèche atansyon medikal imedyatman."
+    }
+  },
+  "forms": {
+    "labels": {
+      "fullName": "Non Konplè",
+      "contactName": "Non Ou",
+      "clientFirstName": "Premye Non Posib Kliyan an (opsyonèl)",
+      "phone": "Nimewo Telefòn",
+      "email": "Adrès Imel",
+      "city": "Vil",
+      "zip": "Kòd Postal",
+      "county": "Konte (si ou konnen l)",
+      "preferredLanguage": "Lang Preferab",
+      "relationship": "Relasyon ak Posib Kliyan an",
+      "clientAge": "Laj Posib Kliyan an / Gwoup Laj",
+      "insurance": "Konpayi Asirans",
+      "preferredSetting": "Anviwònman Sèvis Preferab",
+      "previousAba": "Èske ou te resevwa sèvis ABA anvan?",
+      "hasReferral": "Èske ou gen yon referans kounye a?",
+      "hasEvaluation": "Èske ou gen yon evalyasyon dyagnostik?",
+      "hasIep": "Èske ou gen yon plan IEP oswa 504?",
+      "preferredContactMethod": "Metòd Kontak Preferab",
+      "preferredContactTime": "Lè Kontak Preferab",
+      "howHeard": "Kijan ou te tande pale de nou?",
+      "message": "Gen lòt bagay ou vle nou konnen? (opsyonèl)",
+      "organization": "Òganizasyon / Pratik",
+      "role": "Wòl Ou",
+      "positionAppliedFor": "Pozisyon w ap Aplike Pou",
+      "resume": "Rezime / CV"
+    },
+    "options": {
+      "relationship": ["Paran", "Gadyen", "Moun k ap pran swen", "Mwen menm", "Lòt"],
+      "settings": ["Kay", "Lekòl", "Kominote", "Mwen pa sèten"],
+      "yesNoUnsure": ["Wi", "Non", "Mwen pa sèten"],
+      "availability": ["Disponib", "Pa Disponib", "Pa Aplikab", "Mwen pa sèten"],
+      "contactMethod": ["Telefòn", "Mesaj Tèks", "Imel"],
+      "contactTime": ["Maten", "Aprèmidi", "Nenpòt lè pandan orè travay"],
+      "howHeard": ["Rechèch Google", "Rezo Sosyal", "Referans Doktè/Founisè", "Lekòl", "Zanmi oswa Fanmi", "Konpayi Asirans", "Lòt"]
+    },
+    "consent": {
+      "text": "Lè m mete tik nan kaz sa a epi soumèt enfòmasyon mwen, mwen otorize MO Behavior Therapy LLC pou kontakte m konsènan demand mwen pou sèvis lè l sèvi ak nimewo telefòn ak/oswa adrès imel mwen bay la, ki gen ladan pa apèl telefòn, mesaj tèks oswa imel. Konsantman sa a pa yon kondisyon pou resevwa sèvis.",
+      "links": "Gade <privacyPolicy>Politik sou Vi Prive</privacyPolicy> nou an ak <terms>Kondisyon</terms> nou yo.",
+      "privacyPolicy": "Politik sou Vi Prive",
+      "terms": "Kondisyon"
+    },
+    "rememberMe": "Mwen ta pito diskite sa dirèkteman ak yon moun.",
+    "validation": {
+      "required": "Chan sa a obligatwa.",
+      "invalidEmail": "Tanpri antre yon adrès imel valab.",
+      "invalidPhone": "Tanpri antre yon nimewo telefòn valab.",
+      "invalidZip": "Tanpri antre yon kòd postal 5 chif valab.",
+      "consentRequired": "Tanpri revize epi mete tik nan kaz konsantman an pou soumèt demand ou.",
+      "genericError": "Gen yon pwoblèm ki fèt lè n ap soumèt demand ou. Tanpri eseye ankò, oswa rele nou nan (305) 795-0600.",
+      "success": "Mèsi — nou resevwa demand ou. Ekip nou an ap kontakte ou byento."
+    },
+    "leadForm": {
+      "title": "Mande Sèvis ABA",
+      "subtitle": "Di nou yon ti kras sou fanmi ou. Sa pran anviwon de minit."
+    },
+    "referralForm": {
+      "title": "Refere Yon Kliyan",
+      "subtitle": "Fòm sa a separe de admisyon fanmi epi li fèt pou pwofesyonèl ki refere pasyan."
+    },
+    "careersForm": {
+      "title": "Aplike / Vin Fè Pati Ekip Nou an",
+      "subtitle": "Di nou sou eksperyans ou ak pozisyon ki enterese ou."
+    }
+  },
+  "chat": {
+    "assistantName": "Milo",
+    "assistantSubtitle": "Asistan MO Behavior Therapy",
+    "disclosure": "Asistan vityèl — se pa yon klinisyen",
+    "greeting": "Bonjou! 👋 Mwen se asistan vityèl MO Behavior Therapy. Mwen ka ede ou aprann sou sèvis ABA nou yo, verifye zòn sèvis ou oswa asirans ou, epi ede ekip nou an kontakte ou. Kijan m ka ede ou?",
+    "quickActions": {
+      "needServices": "Mwen Bezwen Sèvis ABA",
+      "verifyInsurance": "Verifye Asirans",
+      "checkZip": "Èske Nou Sèvi Kòd Postal Mwen?",
+      "haveReferral": "Mwen Gen Yon Referans",
+      "amProvider": "Mwen se Yon Founisè Sante",
+      "lookingForJob": "M ap Chèche Travay",
+      "haveQuestion": "Mwen Gen Yon Kesyon"
+    },
+    "prompts": {
+      "whoFor": "Èske w ap chèche sèvis ABA pou ou menm, pou pitit ou, oswa pou yon moun w ap pran swen?",
+      "contactName": "Ki non ou?",
+      "clientFirstName": "Ki premye non posib kliyan an? (opsyonèl)",
+      "relationship": "Epi ki relasyon ou genyen avèk moun sa a?",
+      "clientAge": "Apeprè ki laj li genyen?",
+      "cityZip": "Nan ki vil ak kòd postal ou ye?",
+      "setting": "Èske ou ta pito sèvis nan kay, nan lekòl, nan kominote a, oswa ou poko sèten?",
+      "insurance": "Ki asirans ou genyen?",
+      "previousAba": "Èske li te resevwa sèvis ABA anvan?",
+      "documents": "Èske ou gen youn nan bagay sa yo kounye a? Yon referans, yon evalyasyon dyagnostik, oswa yon plan IEP/504 — tout se opsyonèl.",
+      "phone": "Ki pi bon nimewo telefòn pou nou rele ou?",
+      "email": "Epi adrès imel ou?",
+      "contactMethod": "Kijan ou ta pito nou kontakte ou — telefòn, mesaj tèks oswa imel?",
+      "contactTime": "Ki pi bon lè — maten, aprèmidi, oswa nenpòt lè pandan orè travay?",
+      "consent": "Dènye etap — èske ou ban nou pèmisyon pou kontakte ou sou demand sa a?",
+      "inServiceArea": "Bon nouvèl — kòd postal sa a nan zòn nou konn sèvi.",
+      "outsideServiceArea": "Kòd postal ou a ka andeyò zòn sèvis prensipal nou an kounye a, men n ap kontan revize demand ou kanmenm.",
+      "talkToSomeone": "Va byen — ou ka rele nou nenpòt lè nan (305) 795-0600 pandan orè travay nou, epi yon manm ekip nou an ap ede ou dirèkteman.",
+      "emergency": "Mwen pa kapab ede ak ijans oswa bay sipò nan kriz. Si sa a se yon ijans medikal oswa ou menm oswa yon lòt moun an danje imedya, tanpri rele 911 oswa ale nan sal ijans ki pi pre ou touswit.",
+      "clarify": "Eskize m, mwen pa t byen konprann — èske ou ka di m yon ti kras plis?"
+    },
+    "confirmation": {
+      "title": "Mèsi!",
+      "body": "Mèsi paske ou pataje enfòmasyon ou ak MO Behavior Therapy. Nou resevwa demand ou. Yon manm nan ekip nou an ap revize enfòmasyon ou epi kontakte ou byento. Si ou ta pito pale dirèkteman avèk nou, ou ka rele (305) 795-0600 pandan orè travay nou."
+    }
+  },
+  "email": {
+    "internal": {
+      "subject": "NOUVO DEMAND ABA – {name} – {zip}",
+      "heading": "Nouvo Demand MO Behavior Therapy"
+    },
+    "confirmation": {
+      "subject": "Nou Resevwa Demand Ou | MO Behavior Therapy",
+      "greeting": "Bonjou {firstName},",
+      "body1": "Mèsi paske ou kontakte MO Behavior Therapy.",
+      "body2": "Nou resevwa enfòmasyon ou. Yon manm nan ekip nou an ap revize demand ou epi kontakte ou byento konsènan pwochen etap yo.",
+      "body3": "Si ou ta pito pale dirèkteman avèk nou, tanpri rele:",
+      "closing": "Mèsi paske ou konsidere MO Behavior Therapy.",
+      "signOff": "Ekip MO Behavior Therapy"
+    }
+  },
+  "footer": {
+    "quickLinks": "Lyen Rapid",
+    "forProfessionals": "Pou Pwofesyonèl",
+    "legal": "Legal",
+    "abaTherapy": "Kijan ABA Fonksyone",
+    "services": "Sèvis",
+    "parentTraining": "Fòmasyon pou Paran ak Moun k ap Pran Swen",
+    "whereWeServe": "Kote Nou Ofri Sèvis",
+    "about": "Sou Nou",
+    "serviceAreas": "Zòn Sèvis",
+    "careers": "Travay",
+    "faq": "Kesyon Moun Poze Souvan",
+    "contact": "Kontakte",
+    "referralSources": "Sous Referans",
+    "insurance": "Asirans",
+    "privacyPolicy": "Politik sou Vi Prive",
+    "accessibility": "Aksè",
+    "terms": "Kondisyon",
+    "copyright": "© {year} MO Behavior Therapy LLC. Tout dwa rezève."
+  },
+  "mobileBar": {
+    "call": "Rele",
+    "request": "Mande",
+    "chat": "Chat"
+  },
+  "faq": {
+    "items": {
+      "whatIsAba": {
+        "question": "Kisa terapi ABA ye?",
+        "answer": "Analiz Konpòtman Aplike (ABA) se yon apwòch ki baze sou prèv itilize pou konprann konpòtman epi anseye kapasite ki enpòtan tankou kominikasyon, entèraksyon sosyal ak lavi chak jou, selon yon evalyasyon endividyalize."
+      },
+      "howToKnowIfAppropriate": {
+        "question": "Kijan mwen ka konnen si ABA apwopriye?",
+        "answer": "Pi bon fason pou konnen se pale ak ekip nou an. Yon BCBA ka revize sitiyasyon ou epi, apre yon evalyasyon, ede detèmine si ABA apwopriye ak ki objektif ki ka rekòmande."
+      },
+      "diagnosisRequired": {
+        "question": "Èske mwen bezwen yon dyagnostik otis?",
+        "answer": "Pa nesesèman pou kòmanse yon konvèsasyon ak ekip nou an — kontakte nou epi nou ka pale sou sitiyasyon espesifik ou ak nenpòt dokimantasyon ki ka itil."
+      },
+      "insuranceCoverage": {
+        "question": "Èske asirans kouvri ABA?",
+        "answer": "Anpil plan gen benefis sante konpòtman ki ka aplike pou ABA, men kouvèti ak egzijans otorizasyon varye selon plan an. Ekip nou an ka ede ou verifye benefis ou."
+      },
+      "whichPlans": {
+        "question": "Ki plan asirans nou travay avèk?",
+        "answer": "Kounye a nou travay ak Aetna, Florida Blue, Simply Healthcare, UnitedHealthcare ak Cigna. Ou pa wè plan ou a? Kontakte nou — nou ka revize kouvèti espesifik ou."
+      },
+      "howVerificationWorks": {
+        "question": "Kijan verifikasyon asirans lan fonksyone?",
+        "answer": "Apre ou kontakte nou, ekip nou an revize enfòmasyon asirans ou epi verifye elijiblite ak benefis sante konpòtman anvan nenpòt sèvis kòmanse."
+      },
+      "whereProvided": {
+        "question": "Kote sèvis yo ofri?",
+        "answer": "Selon bezwen klinik ak otorizasyon, sèvis yo ka ofri nan kay, nan lekòl, oswa nan kominote a."
+      },
+      "schoolBased": {
+        "question": "Èske nou ofri ABA nan lekòl?",
+        "answer": "Nou gen eksperyans nan kowòdone ABA nan anviwònman lekòl lè sa klinikman apwopriye epi otorize pa lekòl la oswa distri a."
+      },
+      "homeBased": {
+        "question": "Èske nou ofri ABA nan kay?",
+        "answer": "Wi — anpil fanmi resevwa sèvis nan kay, sa ki ka fè pi fasil pou pratike kapasite nan woutin chak jou."
+      },
+      "parentTraining": {
+        "question": "Kisa fòmasyon pou paran an genyen ladan l?",
+        "answer": "Fòmasyon pou paran ak moun k ap pran swen se yon pati santral nan tretman an. BCBA yo travay dirèkteman ak fanmi yo pou estrateji yo aplike nan lavi chak jou."
+      },
+      "whatHappensAtAssessment": {
+        "question": "Kisa ki pase pandan yon evalyasyon ABA?",
+        "answer": "Yon BCBA evalye bezwen pitit ou, modèl konpòtman, fòs ak priyorite fanmi ou pou ede idantifye posib objektif tretman."
+      },
+      "howQuicklyCanStart": {
+        "question": "Kijan sèvis yo ka kòmanse vit?",
+        "answer": "Tan an depann de otorizasyon asirans, pwogramasyon evalyasyon ak disponiblite anplwaye — ekip nou an ka ba ou yon lide pi klè lè nou revize enfòmasyon ou."
+      },
+      "documentsNeeded": {
+        "question": "Ki dokiman ki ka nesesè?",
+        "answer": "Sa ka varye, men li ka gen ladan yon referans, yon evalyasyon dyagnostik, oswa yon plan IEP/504. Okenn nan sa yo pa nesesè pou kòmanse yon konvèsasyon ak nou."
+      },
+      "pediatricianReferral": {
+        "question": "Èske pedyat mwen ka voye yon referans?",
+        "answer": "Wi — doktè, sikològ ak lòt pwofesyonèl ka refere yon kliyan dirèkteman bay ekip nou an atravè fòm referans nou an."
+      },
+      "areasServed": {
+        "question": "Ki zòn nou sèvi?",
+        "answer": "Nou sèvi fanmi atravè konte St. Lucie, Martin, Indian River, Palm Beach, Hendry, Glades, Highlands ak Okeechobee, ak disponiblite ki varye selon kote ak anplwaye."
+      },
+      "spanishServices": {
+        "question": "Èske nou ofri sèvis an kreyòl ayisyen?",
+        "answer": "Wi — ekip nou an ak asistan vityèl nou an sipòte kreyòl ayisyen, ansanm ak angle, panyòl, pòtigè, fransè ak alman."
+      },
+      "howToRequestServices": {
+        "question": "Kijan mwen ka mande sèvis?",
+        "answer": "Ou ka ranpli fòm kontak nou an, chat ak asistan vityèl nou an, oswa rele nou dirèkteman nan (305) 795-0600."
+      }
+    }
+  }
+}
+

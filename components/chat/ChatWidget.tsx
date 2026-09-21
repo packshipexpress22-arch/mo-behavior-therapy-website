@@ -119,6 +119,8 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
           insurance: finalDraft.insurance,
           previousAba: finalDraft.previousAba,
           hasReferral: finalDraft.hasReferral,
+          hasEvaluation: finalDraft.hasEvaluation,
+          hasIep: finalDraft.hasIep,
           contactMethod: finalDraft.contactMethod,
           contactTime: finalDraft.contactTime,
           phone: finalDraft.phone,
@@ -180,27 +182,50 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
     // reply is directly answering that slot, fall back to using it as-is
     // (with a light sanity check for the numeric age slot).
     const askedSlot = nextMissingSlot(draft);
-    const bareAge = askedSlot === "clientAge" ? text.trim().match(/^\d{1,2}$/)?.[0] : undefined;
-    const bareName =
-      askedSlot === "contactName" && text.length <= 60 && !/[?？]/.test(text) ? text : undefined;
+    // A "bare" answer is a short, non-question reply typed directly in
+    // response to the question Milo just asked. extractFields() only
+    // catches info volunteered in passing ("my son", "6 years old", "in
+    // Stuart") — a plain direct answer ("Child", "6", "I don't know",
+    // "Jensen Beach") matches none of those regexes and used to leave the
+    // slot unfilled forever, so Milo re-asked the same question in a loop.
+    // For every slot where a visitor might reasonably type something
+    // extractFields() can't parse, fall back to accepting the reply as-is
+    // so the conversation always moves forward — being flexible about what
+    // counts as "answered" matters more here than strict validation.
+    const isBareAnswer = (max: number) =>
+      text.length > 0 && text.length <= max && !/[?？]/.test(text);
+    const zipDigits = text.trim().match(/^\d{5}$/)?.[0];
+    const bareName = askedSlot === "contactName" && isBareAnswer(60) ? text : undefined;
+    const bareAge = askedSlot === "clientAge" && isBareAnswer(20) ? text : undefined;
+    const bareZip = askedSlot === "cityZip" && zipDigits ? zipDigits : undefined;
+    const bareCity = askedSlot === "cityZip" && isBareAnswer(80) && !zipDigits ? text : undefined;
+    const bareWhoFor =
+      askedSlot === "whoFor" && !extracted.relationship && isBareAnswer(60) ? text : undefined;
+    const bareDocuments = askedSlot === "documents" && isBareAnswer(40) ? text : undefined;
     const merged: LeadDraft = {
       ...draft,
       // "whoFor" (yourself / your child / someone you care for) and
       // "relationship" (Parent / Guardian / Caregiver / Self / Other) are
       // effectively the same real-world answer, so any relationship phrase
-      // recognized by extractFields (e.g. "my son", "for myself") fills
-      // both slots at once. Without this, free-text answers to the whoFor
-      // prompt were never recorded anywhere and Milo would ask it forever.
-      whoFor: draft.whoFor || extracted.relationship,
+      // recognized by extractFields (e.g. "my son", "for myself") — or,
+      // failing that, the bare reply itself — fills both slots at once.
+      whoFor: draft.whoFor || extracted.relationship || bareWhoFor,
       contactName: draft.contactName || extracted.name || bareName,
-      relationship: draft.relationship || extracted.relationship,
+      relationship: draft.relationship || extracted.relationship || bareWhoFor,
       clientAge: draft.clientAge || extracted.age || bareAge,
-      city: draft.city || extracted.city,
-      zip: draft.zip || extracted.zip,
+      city: draft.city || extracted.city || bareCity,
+      zip: draft.zip || extracted.zip || bareZip,
       setting: draft.setting || (extracted.setting as string | undefined),
       insurance: draft.insurance || extracted.insurance,
       phone: draft.phone || extracted.phone,
       email: draft.email || extracted.email,
+      // The documents question bundles three optional yes/no items
+      // (referral / evaluation / IEP) into a single message — a single
+      // typed or picked answer fills all three the same way "Skip" already
+      // did, rather than leaving the slot answerable only by button.
+      hasReferral: draft.hasReferral || bareDocuments,
+      hasEvaluation: draft.hasEvaluation || bareDocuments,
+      hasIep: draft.hasIep || bareDocuments,
     };
 
     // If this looks like a free-form question rather than a slot answer
@@ -319,9 +344,22 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
         )}
         {!submitted && missingSlot === "documents" && (
           <div className="flex flex-wrap gap-2">
+            {yesNoUnsure.map((opt) => (
+              <button
+                key={opt}
+                onClick={() =>
+                  advance({ ...draft, hasReferral: opt, hasEvaluation: opt, hasIep: opt })
+                }
+                className="rounded-full border border-ink-100 bg-white px-3 py-1.5 text-xs font-medium text-ink-900 hover:border-brand-blue hover:text-brand-blue"
+              >
+                {opt}
+              </button>
+            ))}
             <button
               className="rounded-full border border-ink-100 px-3 py-1.5 text-xs font-medium hover:bg-ink-100"
-              onClick={() => advance({ ...draft, hasReferral: "Skip" })}
+              onClick={() =>
+                advance({ ...draft, hasReferral: "Skip", hasEvaluation: "Skip", hasIep: "Skip" })
+              }
             >
               {tc("skip")}
             </button>

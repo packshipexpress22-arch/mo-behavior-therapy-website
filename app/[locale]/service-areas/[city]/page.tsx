@@ -7,9 +7,10 @@ import JsonLd from "@/components/seo/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
 import { cities, counties, officeLocation } from "@/data/serviceAreas";
 
-export function generateStaticParams() {
-  return cities.map((c) => ({ city: c.slug }));
-}
+// Note: generateStaticParams is intentionally omitted here (see
+// app/[locale]/layout.tsx for why) — forcing static generation for this
+// route while it calls next-intl's getTranslations() without setRequestLocale
+// causes a hard prerender error. Rendering dynamically is correct.
 
 export async function generateMetadata({ params }: { params: { city: string } }) {
   const city = cities.find((c) => c.slug === params.city);

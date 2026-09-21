@@ -167,6 +167,18 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
     }
 
     const extracted = extractFields(text, locale);
+    // The slot Milo is actively waiting on when this message arrives. For a
+    // couple of free-text-only slots, extractFields()’s regexes only catch
+    // a message that volunteers the info in passing (e.g. "my name is
+    // Maria", "he’s 6 years old") — a plain reply to the question Milo just
+    // asked ("Maria", "6") matched nothing and left the slot unfilled
+    // forever, so Milo re-asked the same question in a loop. When the
+    // reply is directly answering that slot, fall back to using it as-is
+    // (with a light sanity check for the numeric age slot).
+    const askedSlot = nextMissingSlot(draft);
+    const bareAge = askedSlot === "clientAge" ? text.trim().match(/^\d{1,2}$/)?.[0] : undefined;
+    const bareName =
+      askedSlot === "contactName" && text.length <= 60 && !/[?？]/.test(text) ? text : undefined;
     const merged: LeadDraft = {
       ...draft,
       // "whoFor" (yourself / your child / someone you care for) and
@@ -176,9 +188,9 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
       // both slots at once. Without this, free-text answers to the whoFor
       // prompt were never recorded anywhere and Milo would ask it forever.
       whoFor: draft.whoFor || extracted.relationship,
-      contactName: draft.contactName || extracted.name,
+      contactName: draft.contactName || extracted.name || bareName,
       relationship: draft.relationship || extracted.relationship,
-      clientAge: draft.clientAge || extracted.age,
+      clientAge: draft.clientAge || extracted.age || bareAge,
       city: draft.city || extracted.city,
       zip: draft.zip || extracted.zip,
       setting: draft.setting || (extracted.setting as string | undefined),
@@ -188,11 +200,11 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
     };
 
     // If this looks like a free-form question rather than a slot answer
-    // (i.e. we didn't extract anything new and conversation hasn't started
+    // (i.e. we didn’t extract anything new and conversation hasn’t started
     // collecting yet), try the grounded /api/chat responder before falling
     // into slot-filling.
     const gotNewInfo = JSON.stringify(merged) !== JSON.stringify(draft);
-    const noSlotsYet = nextMissingSlot(draft) === "whoFor" && !gotNewInfo;
+    const noSlotsYet = askedSlot === "whoFor" && !gotNewInfo;
 
     if (noSlotsYet && /\?|qué|como|kijan|comment|wie|what|how|does|do you/i.test(text)) {
       try {

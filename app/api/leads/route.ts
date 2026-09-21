@@ -84,7 +84,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, leadId: lead.id });
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("[leads] failed to store lead:", err);
+    console.error("[leads] failed to store lead:", err, {
+      hasDbUrl: !!process.env.DATABASE_URL,
+      dbUrlLen: (process.env.DATABASE_URL || "").length,
+      leadStoreVal: JSON.stringify(process.env.LEAD_STORE),
+    });
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }

@@ -1,0 +1,468 @@
+{
+  "meta": {
+    "siteName": "MO Behavior Therapy",
+    "titleSuffix": "MO Behavior Therapy | ABA-Therapie an Floridas Treasure Coast",
+    "home": {
+      "title": "ABA-Therapie an Floridas Treasure Coast | MO Behavior Therapy",
+      "description": "Individualisierte, von einem BCBA geleitete ABA-Therapie zu Hause, in der Schule und in der Gemeinde in den Countys St. Lucie, Martin, Indian River, Palm Beach und Umgebung."
+    }
+  },
+  "nav": {
+    "services": "Leistungen",
+    "howAbaWorks": "Wie ABA Funktioniert",
+    "insurance": "Versicherung",
+    "serviceAreas": "Einzugsgebiete",
+    "forFamilies": "Für Familien",
+    "forProviders": "Für Fachkräfte",
+    "careers": "Karriere",
+    "about": "Über Uns",
+    "contact": "Kontakt",
+    "menu": "Menü",
+    "close": "Schließen"
+  },
+  "common": {
+    "requestServices": "ABA-Leistungen Anfragen",
+    "requestServicesShort": "Leistungen Anfragen",
+    "callUs": "Rufen Sie (305) 795-0600 an",
+    "callUsShort": "Anrufen",
+    "verifyInsurance": "Versicherung Prüfen",
+    "verifyMyBenefits": "Meine Leistungen Prüfen",
+    "talkToTeam": "Mit Unserem Team Sprechen",
+    "startHere": "Hier Beginnen",
+    "referAClient": "Klienten Überweisen",
+    "joinOurTeam": "Unserem Team Beitreten",
+    "chatWithUs": "Mit Uns Chatten",
+    "learnMore": "Mehr Erfahren",
+    "readMore": "Weiterlesen",
+    "viewAll": "Alle Anzeigen",
+    "submit": "Absenden",
+    "send": "Senden",
+    "back": "Zurück",
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "loading": "Wird geladen…",
+    "officeLocation": "Standort des Büros",
+    "serviceAreaLabel": "Gebiete, die Wir Betreuen Können",
+    "readyForNextStep": "Bereit für den Nächsten Schritt?",
+    "dontSeeInsurance": "Ihre Versicherung ist nicht aufgeführt? Kontaktieren Sie uns, um Ihre Leistungen zu prüfen.",
+    "hours": "Montag–Freitag, 8:30–17:00 Uhr",
+    "email": "mobehavior@mobehaviortherapy.com"
+  },
+  "languageSelector": {
+    "label": "Sprache",
+    "moreLanguages": "Weitere Sprachen",
+    "moreLanguagesNote": "Unser Team kann Ihnen telefonisch auch in weiteren Sprachen helfen — fragen Sie einfach."
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Floridas Treasure Coast und Umliegende Gemeinden",
+      "headline": "Wir gestalten hellere Zukunftsaussichten, ein Kind nach dem anderen.",
+      "subheadline": "Individualisierte ABA-Therapie, abgestimmt auf Ihr Kind und Ihre Familie.",
+      "body": "Einfühlsame, evidenzbasierte Verhaltensunterstützung zu Hause, in der Schule und in der Gemeinde — mit einem Team, das Familien bei jedem Schritt begleitet.",
+      "primaryCta": "ABA-Leistungen Anfragen",
+      "secondaryCta": "Versicherung Prüfen",
+      "callCta": "Rufen Sie (305) 795-0600 an"
+    },
+    "trustBar": {
+      "items": [
+        "Individuelle Betreuung",
+        "Von BCBA Überwachte Leistungen",
+        "Zusammenarbeit mit der Familie",
+        "Zuhause • Schule • Gemeinde",
+        "Unterstützung bei der Versicherung"
+      ]
+    },
+    "services": {
+      "heading": "Individualisierte ABA-Leistungen",
+      "subheading": "Die Behandlung basiert auf der Beurteilung, den Zielen und den Prioritäten jeder Familie — kein Programm nach Schema F.",
+      "cta": "Alle Leistungen Ansehen"
+    },
+    "whereSupport": {
+      "heading": "Unterstützung, wo Ihr Kind sie am Meisten Braucht",
+      "home": {
+        "title": "ABA zu Hause",
+        "description": "Fertigkeiten werden im natürlichen Umfeld des Kindes geübt, zusammen mit den Routinen und Personen, die es am besten kennt."
+      },
+      "school": {
+        "title": "ABA in der Schule",
+        "description": "Koordinierte Unterstützung im schulischen Umfeld, wenn klinisch angemessen und von der Schule bzw. dem Schulbezirk genehmigt."
+      },
+      "community": {
+        "title": "ABA in der Gemeinde",
+        "description": "Üben funktionaler Fertigkeiten in relevanten gemeinschaftlichen Umgebungen, wenn klinisch angezeigt."
+      }
+    },
+    "why": {
+      "heading": "Warum Familien sich für MO Behavior Therapy Entscheiden",
+      "items": [
+        { "title": "Individuelle Betreuung", "description": "Behandlung, die auf die einzigartigen Bedürfnisse jedes Klienten zugeschnitten ist." },
+        { "title": "Partnerschaft mit der Familie", "description": "Eltern und Betreuungspersonen sind während der gesamten Behandlung aktiv beteiligt." },
+        { "title": "Bedeutsame Lebensfertigkeiten", "description": "Ziele können Kommunikation, Alltagsbewältigung, Selbstständigkeit und andere klinisch angemessene Fertigkeiten umfassen." },
+        { "title": "Datengestützte Betreuung", "description": "Der Fortschritt wird überwacht und die Behandlung anhand klinischer Daten angepasst." },
+        { "title": "Unterstützung, wo das Leben Stattfindet", "description": "Leistungen können, wenn klinisch angemessen, in natürlichen Umgebungen erbracht werden." },
+        { "title": "Erfahrene Klinische Leitung", "description": "Von BCBA überwachte ABA-Leistungen und individuelle Behandlungsplanung." }
+      ]
+    },
+    "timeline": {
+      "heading": "So Beginnen die ABA-Leistungen",
+      "steps": [
+        { "step": "01", "title": "Kontaktieren Sie Uns", "description": "Erzählen Sie uns etwas über Ihre Familie und wie wir helfen können." },
+        { "step": "02", "title": "Versicherung & Erste Prüfung", "description": "Unser Team prüft Ihre Versicherungsangaben und Ihre Anspruchsberechtigung." },
+        { "step": "03", "title": "Klinische Beurteilung", "description": "Ein BCBA führt eine Beurteilung durch und entwickelt individuelle Empfehlungen." },
+        { "step": "04", "title": "Persönlicher Behandlungsplan", "description": "Ziele und Strategien basieren auf der Beurteilung Ihres Kindes und den Prioritäten Ihrer Familie." },
+        { "step": "05", "title": "Genehmigung", "description": "Wir stimmen alle erforderlichen Genehmigungen mit Ihrer Versicherung ab." },
+        { "step": "06", "title": "Leistungsbeginn", "description": "Nach Genehmigung und wenn angemessen, beginnt die Behandlung im vereinbarten Rahmen." },
+        { "step": "07", "title": "Fortlaufende Fortschrittskontrolle", "description": "Der Fortschritt wird laufend überprüft und der Plan anhand der Daten angepasst." }
+      ]
+    },
+    "insurance": {
+      "heading": "Versicherung & Kostenübernahme",
+      "body": "Wir arbeiten mit mehreren großen Krankenversicherungen zusammen, um Familien den Zugang zur ABA-Therapie zu erleichtern. Kostenübernahme und Genehmigungsanforderungen variieren je nach Tarif — unser Team hilft Ihnen gerne, Ihre Leistungen zu prüfen.",
+      "cta": "Meine Versicherung Prüfen",
+      "viewInsurancePage": "Alle Informationen zur Versicherung Ansehen"
+    },
+    "family": {
+      "heading": "Zusammenarbeit mit Familie und Betreuungspersonen",
+      "body": "BCBAs arbeiten eng mit Eltern und Betreuungspersonen zusammen, damit sich Strategien über die Therapiesitzungen hinaus verallgemeinern — auf den Alltag, die Schule und die Gemeinde."
+    },
+    "referring": {
+      "heading": "Für Überweisende Fachkräfte",
+      "body": "Kinderärzte, Psychologen, Neurologen, Schulen, Fallmanager und andere Fachkräfte können einen Klienten direkt an unser Team überweisen.",
+      "cta": "Klienten Überweisen"
+    },
+    "serviceArea": {
+      "heading": "Wo Wir Leistungen Anbieten",
+      "body": "Wir bieten ABA-Leistungen für Familien in den unten aufgeführten Countys und Gemeinden an. Die Verfügbarkeit kann je nach Standort, Personal, klinischem Bedarf und Versicherungsgenehmigung variieren.",
+      "officeNote": "Unser Büro befindet sich in Fort Pierce, FL. Nicht jede Leistung findet in unserem Büro statt — viele Familien werden zu Hause, in der Schule oder in der Gemeinde betreut.",
+      "cta": "Alle Einzugsgebiete Ansehen"
+    },
+    "finalCta": {
+      "heading": "Bereit für den Nächsten Schritt?",
+      "body": "Unser Team beantwortet gerne Ihre Fragen und hilft Ihnen beim Einstieg.",
+      "primaryCta": "Leistungen Anfragen",
+      "secondaryCta": "Mit Uns Chatten",
+      "tertiaryCta": "Rufen Sie Uns An"
+    }
+  },
+  "pages": {
+    "abaTherapy": {
+      "title": "Wie ABA Funktioniert",
+      "intro": "Angewandte Verhaltensanalyse (ABA) ist ein evidenzbasierter Ansatz zum Verständnis und zur Unterstützung von Verhalten. So läuft der Prozess bei MO Behavior Therapy ab — vom ersten Kontakt bis zur fortlaufenden Betreuung.",
+      "sections": [
+        { "title": "Erste ABA-Beurteilung", "body": "Ein BCBA beurteilt die Bedürfnisse, Verhaltensmuster und Stärken Ihres Kindes sowie die Prioritäten Ihrer Familie, um mögliche Behandlungsziele zu ermitteln." },
+        { "title": "Funktionale Verhaltensanalyse", "body": "Wenn angemessen, beurteilen wir den Zweck hinter bestimmten Verhaltensweisen, damit sich Unterstützungsstrategien auf die zugrunde liegende Funktion konzentrieren, nicht nur auf das Verhalten selbst." },
+        { "title": "Individualisierte ABA-Therapie", "body": "Die Behandlung basiert auf der Beurteilung, mit messbaren, individuellen Zielen — kein standardisiertes Programm für jedes Kind." },
+        { "title": "Entwicklung des Behandlungsplans", "body": "Ziele, Strategien und der Plan zur Fortschrittsmessung werden dokumentiert und mit Ihrer Familie besprochen." },
+        { "title": "Verhaltensinterventionspläne", "body": "Bei Bedarf beschreibt ein Plan positive, evidenzbasierte Strategien für Verhaltensweisen, die Lernen, Selbstständigkeit oder Sicherheit beeinträchtigen." },
+        { "title": "Datenerfassung & Fortschrittskontrolle", "body": "Die Behandlung wird fortlaufend anhand von Daten und dokumentiertem Fortschritt überprüft und angepasst — nie sich selbst überlassen." }
+      ]
+    },
+    "services": {
+      "title": "ABA-Leistungen",
+      "intro": "Der Plan jeder Familie sieht anders aus. Nicht jedes Kind erhält jede der unten genannten Leistungen — Ihr BCBA empfiehlt, was auf Grundlage der Beurteilung angemessen ist.",
+      "categories": {
+        "heading": "Bereiche des Fertigkeitserwerbs Können Umfassen",
+        "items": ["Kommunikation", "Soziale Fertigkeiten", "Alltagsbewältigung", "Selbstständigkeit", "Routinen Befolgen", "Übergänge", "Funktionales Spiel", "Sicherheitsfertigkeiten"]
+      },
+      "behaviorReduction": {
+        "title": "Verhaltensreduktion / Verhaltensunterstützung",
+        "body": "Wir setzen positive, evidenzbasierte Strategien ein, um Verhaltensweisen zu adressieren, die Lernen, Selbstständigkeit oder Sicherheit beeinträchtigen — stets mit respektvoller, nicht stigmatisierender Sprache."
+      },
+      "parentTraining": {
+        "title": "Eltern- und Betreuungspersonen-Training",
+        "body": "Einer der wichtigsten Teile der Behandlung. BCBAs arbeiten mit Betreuungspersonen zusammen, damit sich Strategien über die Therapiesitzungen hinaus verallgemeinern."
+      }
+    },
+    "parentTraining": {
+      "title": "Eltern- und Betreuungspersonen-Training",
+      "intro": "Die Einbindung von Eltern und Betreuungspersonen ist einer der wichtigsten Bestandteile der ABA-Behandlung. Unsere BCBAs arbeiten direkt mit Familien zusammen, damit sich Strategien auf den Alltag übertragen — nicht nur auf die Therapiesitzungen.",
+      "body": "Das Training wird individuell auf die Routinen und Ziele Ihrer Familie abgestimmt und kann Kommunikationsstrategien, positive Verstärkung, Routinen und Übergänge sowie den konsistenten Umgang mit herausfordernden Momenten umfassen."
+    },
+    "whereWeProvide": {
+      "title": "Wo Wir Leistungen Anbieten",
+      "intro": "MO Behavior Therapy bietet ABA-Leistungen in verschiedenen Umgebungen an, je nach klinischem Bedarf und dem, was für jedes Kind angemessen ist.",
+      "home": { "title": "Zuhause", "body": "Das Üben von Fertigkeiten im natürlichen Umfeld des Kindes bietet Vorteile für die Verallgemeinerung von Routinen in Anwesenheit von Familienmitgliedern." },
+      "school": { "title": "Schule", "body": "MO Behavior Therapy verfügt über Erfahrung in der Koordination von ABA-Leistungen im schulischen Umfeld, wenn dies erlaubt und klinisch angemessen ist. Der Zugang zur Schule unterliegt den Anforderungen und der Genehmigung der Schule bzw. des Schulbezirks." },
+      "community": { "title": "Gemeinde", "body": "Üben angemessener Fertigkeiten in relevanten gemeinschaftlichen Umgebungen, wenn klinisch angezeigt." }
+    },
+    "insurance": {
+      "title": "Versicherung & Kostenübernahme",
+      "intro": "Wir arbeiten mit mehreren großen Krankenversicherungen zusammen, um Familien den Zugang zur ABA-Therapie zu erleichtern. Kostenübernahme, Leistungen und Genehmigungsanforderungen variieren je nach Tarif — unser Team hilft Ihnen, die Anspruchsberechtigung und die Leistungen für Verhaltensgesundheit vor Behandlungsbeginn zu prüfen.",
+      "primaryHeading": "Tarife, mit Denen Wir Zusammenarbeiten",
+      "cta": "Meine Leistungen Prüfen",
+      "note": "Die Versicherungsteilnahme und die Leistungen variieren je nach Tarif. Wir benötigen weder eine Sozialversicherungsnummer noch eine Mitgliedsnummer der Versicherung, um ein Gespräch zu beginnen — diese Angaben werden erst später im Rahmen eines sicheren Aufnahmeverfahrens erfasst."
+    },
+    "about": {
+      "title": "Über MO Behavior Therapy",
+      "intro": "MO Behavior Therapy ist ein Anbieter für Verhaltensgesundheit in Florida, der sich auf individualisierte ABA-Therapie und die Zusammenarbeit mit Familien konzentriert.",
+      "leadershipHeading": "Klinische Leitung"
+    },
+    "serviceAreas": {
+      "title": "Einzugsgebiete",
+      "intro": "Wir bieten ABA-Leistungen für Familien in den unten aufgeführten Countys und Gemeinden an. Die Verfügbarkeit kann je nach Standort, Personal, klinischem Bedarf und Versicherungsgenehmigung variieren.",
+      "officeHeading": "Standort des Büros",
+      "citiesHeading": "Gemeinden, die Wir Betreuen",
+      "countiesHeading": "Countys, die Wir Betreuen"
+    },
+    "referralSources": {
+      "title": "Überweisungsquellen",
+      "intro": "Ärzte, Psychologen, Neurologen, Schulen, Fallmanager, Versicherungsfachkräfte und Sozialarbeiter können einen Klienten direkt an unser Team überweisen.",
+      "cta": "Klienten Überweisen",
+      "note": "Unser Überweisungsformular ist getrennt von der Familienaufnahme, und wir erfassen keine unnötigen geschützten Gesundheitsdaten über gewöhnliche, ungesicherte E-Mails."
+    },
+    "careers": {
+      "title": "Karriere",
+      "intro": "MO Behavior Therapy sucht engagierte klinische und unterstützende Fachkräfte für unser Team.",
+      "roles": ["Registered Behavior Technicians (RBTs)", "BCBAs", "BCaBAs (soweit zutreffend)", "Weitere klinische und unterstützende Positionen nach Ausschreibung"],
+      "note": "Die Anforderungen an Qualifikationen und Dokumentation können je nach Position variieren.",
+      "cta": "Bewerben / Unserem Team Beitreten"
+    },
+    "faq": {
+      "title": "Häufig Gestellte Fragen"
+    },
+    "contact": {
+      "title": "Kontakt / Leistungen Anfragen",
+      "intro": "Erzählen Sie uns etwas über Ihre Familie, und unser Team meldet sich bald bei Ihnen. Sie können uns auch während der Geschäftszeiten direkt anrufen."
+    },
+    "privacyPolicy": {
+      "title": "Datenschutzerklärung",
+      "intro": "Diese Datenschutzerklärung erläutert in allgemeinen Worten, wie MO Behavior Therapy LLC Informationen erfasst, verwendet und schützt, die über diese Website übermittelt werden. Sie dient allgemeinen Informationszwecken und stellt keine Rechtsberatung dar.",
+      "sections": [
+        { "title": "Informationen, die Wir Erfassen", "body": "Wir erfassen Informationen, die Sie freiwillig über unsere Kontaktformulare, unseren virtuellen Assistenten sowie Überweisungs- oder Bewerbungsanträge bereitstellen — etwa Ihren Namen, Kontaktdaten, ungefähren Wohnort und allgemeine Versicherungsangaben." },
+        { "title": "Wie Wir Informationen Verwenden", "body": "Informationen werden verwendet, um Anfragen zu beantworten, mögliche Leistungen zu prüfen, die Betreuung zu koordinieren und mit Ihnen über Ihre Anfrage zu kommunizieren. Wir verkaufen Ihre Informationen nicht." },
+        { "title": "Geschützte Gesundheitsdaten", "body": "Wo Informationen geschützte Gesundheitsdaten darstellen können, wenden wir administrative, technische und physische Schutzmaßnahmen an, die ihrer Sensibilität angemessen sind, und minimieren, was über öffentlich zugängliche Formulare und Chats erfasst wird." },
+        { "title": "Einwilligung zur Kontaktaufnahme", "body": "Beim Absenden einer Anfrage kann Sie gebeten werden, MO Behavior Therapy gesondert zu autorisieren, Sie per Telefon, SMS oder E-Mail zu kontaktieren. Diese Einwilligung ist niemals Voraussetzung für den Erhalt von Leistungen und kann jederzeit widerrufen werden." },
+        { "title": "Dienste Dritter", "body": "Wir können Drittanbieter für Funktionen wie E-Mail-Versand, Hosting und Analyse einsetzen. Wir übermitteln keine geschützten Gesundheitsdaten an Analyse- oder Werbeplattformen." },
+        { "title": "Kontaktieren Sie Uns", "body": "Fragen zu dieser Richtlinie können an mobehavior@mobehaviortherapy.com oder (305) 795-0600 gerichtet werden." }
+      ]
+    },
+    "accessibility": {
+      "title": "Erklärung zur Barrierefreiheit",
+      "body": "MO Behavior Therapy setzt sich dafür ein, dass diese Website für Menschen mit allen Fähigkeiten zugänglich ist. Wir streben an, die WCAG 2.2 Stufe AA einzuhalten, einschließlich Tastaturbedienbarkeit, angemessenem Farbkontrast, semantischer Struktur sowie bildschirmleserfreundlicher Formulare und Chat-Steuerelemente. Wenn Sie auf dieser Website auf eine Zugänglichkeitsbarriere stoßen, kontaktieren Sie uns bitte unter mobehavior@mobehaviortherapy.com oder (305) 795-0600, damit wir Ihnen helfen und das Problem beheben können."
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen und Haftungsausschluss",
+      "body": "Diese Website dient allgemeinen Informationszwecken über MO Behavior Therapy LLC und ihre Leistungen. Sie stellt keine medizinische Beratung dar, und Informationen auf dieser Website sollten nicht zur Diagnose oder Behandlung einer Erkrankung verwendet werden. Die Nutzung des virtuellen Assistenten oder der Kontaktformulare begründet kein Behandler-Klienten-Verhältnis. Versicherungsinformationen sind allgemeiner Natur; die tatsächliche Kostenübernahme hängt von Ihrem konkreten Tarif ab und muss geprüft werden. Rufen Sie im Notfall 911 an oder suchen Sie umgehend medizinische Hilfe auf."
+    }
+  },
+  "forms": {
+    "labels": {
+      "fullName": "Vollständiger Name",
+      "contactName": "Ihr Name",
+      "clientFirstName": "Vorname des Potenziellen Klienten (optional)",
+      "phone": "Telefonnummer",
+      "email": "E-Mail-Adresse",
+      "city": "Stadt",
+      "zip": "Postleitzahl",
+      "county": "County (falls bekannt)",
+      "preferredLanguage": "Bevorzugte Sprache",
+      "relationship": "Beziehung zum Potenziellen Klienten",
+      "clientAge": "Alter des Potenziellen Klienten / Altersgruppe",
+      "insurance": "Versicherungsgesellschaft",
+      "preferredSetting": "Bevorzugter Leistungsort",
+      "previousAba": "Haben Sie bereits ABA-Leistungen erhalten?",
+      "hasReferral": "Haben Sie derzeit eine Überweisung?",
+      "hasEvaluation": "Haben Sie eine diagnostische Beurteilung?",
+      "hasIep": "Haben Sie einen IEP- oder 504-Plan?",
+      "preferredContactMethod": "Bevorzugte Kontaktmethode",
+      "preferredContactTime": "Bevorzugte Kontaktzeit",
+      "howHeard": "Wie haben Sie von uns erfahren?",
+      "message": "Möchten Sie uns noch etwas mitteilen? (optional)",
+      "organization": "Organisation / Praxis",
+      "role": "Ihre Funktion",
+      "positionAppliedFor": "Beworbene Position",
+      "resume": "Lebenslauf"
+    },
+    "options": {
+      "relationship": ["Elternteil", "Vormund", "Betreuungsperson", "Ich selbst", "Andere"],
+      "settings": ["Zuhause", "Schule", "Gemeinde", "Noch Unsicher"],
+      "yesNoUnsure": ["Ja", "Nein", "Unsicher"],
+      "availability": ["Verfügbar", "Nicht Verfügbar", "Nicht Zutreffend", "Unsicher"],
+      "contactMethod": ["Telefon", "SMS", "E-Mail"],
+      "contactTime": ["Vormittag", "Nachmittag", "Jederzeit während der Geschäftszeiten"],
+      "howHeard": ["Google-Suche", "Soziale Medien", "Überweisung durch Arzt/Fachkraft", "Schule", "Freund oder Familie", "Versicherungsgesellschaft", "Andere"]
+    },
+    "consent": {
+      "text": "Durch Ankreuzen dieses Kästchens und Absenden meiner Angaben autorisiere ich MO Behavior Therapy LLC, mich bezüglich meiner Leistungsanfrage über die von mir angegebene Telefonnummer und/oder E-Mail-Adresse zu kontaktieren, einschließlich per Telefonanruf, SMS oder E-Mail. Die Einwilligung ist keine Voraussetzung für den Erhalt von Leistungen.",
+      "links": "Siehe unsere <privacyPolicy>Datenschutzerklärung</privacyPolicy> und unsere <terms>Nutzungsbedingungen</terms>.",
+      "privacyPolicy": "Datenschutzerklärung",
+      "terms": "Nutzungsbedingungen"
+    },
+    "rememberMe": "Ich möchte dies lieber direkt mit jemandem besprechen.",
+    "validation": {
+      "required": "Dieses Feld ist erforderlich.",
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "invalidPhone": "Bitte geben Sie eine gültige Telefonnummer ein.",
+      "invalidZip": "Bitte geben Sie eine gültige 5-stellige Postleitzahl ein.",
+      "consentRequired": "Bitte prüfen und aktivieren Sie das Einwilligungskästchen, um Ihre Anfrage abzusenden.",
+      "genericError": "Beim Absenden Ihrer Anfrage ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder rufen Sie uns unter (305) 795-0600 an.",
+      "success": "Vielen Dank — Ihre Anfrage ist eingegangen. Unser Team wird sich in Kürze bei Ihnen melden."
+    },
+    "leadForm": {
+      "title": "ABA-Leistungen Anfragen",
+      "subtitle": "Erzählen Sie uns etwas über Ihre Familie. Das dauert etwa zwei Minuten."
+    },
+    "referralForm": {
+      "title": "Klienten Überweisen",
+      "subtitle": "Dieses Formular ist getrennt von der Familienaufnahme und richtet sich an überweisende Fachkräfte."
+    },
+    "careersForm": {
+      "title": "Bewerben / Unserem Team Beitreten",
+      "subtitle": "Erzählen Sie uns von Ihrem Hintergrund und der Position, die Sie interessiert."
+    }
+  },
+  "chat": {
+    "assistantName": "Milo",
+    "assistantSubtitle": "MO Behavior Therapy Assistent",
+    "disclosure": "Virtueller Assistent — kein Kliniker",
+    "greeting": "Hallo! 👋 Ich bin der virtuelle Assistent von MO Behavior Therapy. Ich kann Ihnen Informationen zu unseren ABA-Leistungen geben, Ihr Einzugsgebiet oder Ihre Versicherung prüfen und dabei helfen, dass unser Team Sie kontaktiert. Wie kann ich helfen?",
+    "quickActions": {
+      "needServices": "Ich Benötige ABA-Leistungen",
+      "verifyInsurance": "Versicherung Prüfen",
+      "checkZip": "Betreuen Sie Meine Postleitzahl?",
+      "haveReferral": "Ich Habe eine Überweisung",
+      "amProvider": "Ich Bin eine Gesundheitsfachkraft",
+      "lookingForJob": "Ich Suche einen Job",
+      "haveQuestion": "Ich Habe eine Frage"
+    },
+    "prompts": {
+      "whoFor": "Suchen Sie ABA-Leistungen für sich selbst, Ihr Kind, oder eine Person, die Sie betreuen?",
+      "contactName": "Wie heißen Sie?",
+      "clientFirstName": "Wie lautet der Vorname des potenziellen Klienten? (optional)",
+      "relationship": "Und in welcher Beziehung stehen Sie zu dieser Person?",
+      "clientAge": "Wie alt ist sie ungefähr?",
+      "cityZip": "In welcher Stadt und Postleitzahl befinden Sie sich?",
+      "setting": "Bevorzugen Sie Leistungen zu Hause, in der Schule, in der Gemeinde, oder sind Sie sich noch nicht sicher?",
+      "insurance": "Welche Versicherung haben Sie?",
+      "previousAba": "Hat sie bereits ABA-Leistungen erhalten?",
+      "documents": "Haben Sie derzeit eines der folgenden? Eine Überweisung, eine diagnostische Beurteilung oder einen IEP-/504-Plan — alle sind optional.",
+      "phone": "Unter welcher Telefonnummer erreichen wir Sie am besten?",
+      "email": "Und Ihre E-Mail-Adresse?",
+      "contactMethod": "Wie möchten Sie kontaktiert werden — per Telefon, SMS oder E-Mail?",
+      "contactTime": "Welche Zeit passt am besten — vormittags, nachmittags, oder jederzeit während der Geschäftszeiten?",
+      "consent": "Letzter Schritt — dürfen wir Sie bezüglich dieser Anfrage kontaktieren?",
+      "inServiceArea": "Gute Nachrichten — diese Postleitzahl liegt in unserem üblichen Einzugsgebiet.",
+      "outsideServiceArea": "Ihre Postleitzahl liegt möglicherweise außerhalb unseres derzeitigen primären Einzugsgebiets, aber wir prüfen Ihre Anfrage trotzdem gerne.",
+      "talkToSomeone": "Selbstverständlich — Sie können uns jederzeit während der Geschäftszeiten unter (305) 795-0600 anrufen, und ein Mitglied unseres Teams hilft Ihnen direkt weiter.",
+      "emergency": "Ich kann bei Notfällen nicht helfen oder Krisenunterstützung bieten. Wenn dies ein medizinischer Notfall ist oder Sie oder eine andere Person in unmittelbarer Gefahr sind, rufen Sie bitte sofort 911 an oder suchen Sie die nächste Notaufnahme auf.",
+      "clarify": "Entschuldigung, das habe ich nicht ganz verstanden — könnten Sie mir etwas mehr dazu sagen?"
+    },
+    "confirmation": {
+      "title": "Vielen Dank!",
+      "body": "Vielen Dank, dass Sie Ihre Informationen mit MO Behavior Therapy geteilt haben. Ihre Anfrage ist eingegangen. Ein Mitglied unseres Teams wird Ihre Angaben prüfen und sich bald bei Ihnen melden. Wenn Sie lieber direkt mit uns sprechen möchten, können Sie uns während der Geschäftszeiten unter (305) 795-0600 anrufen."
+    }
+  },
+  "email": {
+    "internal": {
+      "subject": "NEUE ABA-ANFRAGE – {name} – {zip}",
+      "heading": "Neue MO Behavior Therapy Anfrage"
+    },
+    "confirmation": {
+      "subject": "Wir Haben Ihre Anfrage Erhalten | MO Behavior Therapy",
+      "greeting": "Hallo {firstName},",
+      "body1": "Vielen Dank, dass Sie MO Behavior Therapy kontaktiert haben.",
+      "body2": "Wir haben Ihre Angaben erhalten. Ein Mitglied unseres Teams wird Ihre Anfrage prüfen und sich bald bezüglich der nächsten Schritte bei Ihnen melden.",
+      "body3": "Wenn Sie lieber direkt mit uns sprechen möchten, rufen Sie bitte an unter:",
+      "closing": "Vielen Dank, dass Sie sich für MO Behavior Therapy interessieren.",
+      "signOff": "Ihr MO Behavior Therapy Team"
+    }
+  },
+  "footer": {
+    "quickLinks": "Schnellzugriff",
+    "forProfessionals": "Für Fachkräfte",
+    "legal": "Rechtliches",
+    "abaTherapy": "Wie ABA Funktioniert",
+    "services": "Leistungen",
+    "parentTraining": "Eltern- und Betreuungspersonen-Training",
+    "whereWeServe": "Wo Wir Leistungen Anbieten",
+    "about": "Über Uns",
+    "serviceAreas": "Einzugsgebiete",
+    "careers": "Karriere",
+    "faq": "FAQ",
+    "contact": "Kontakt",
+    "referralSources": "Überweisungsquellen",
+    "insurance": "Versicherung",
+    "privacyPolicy": "Datenschutzerklärung",
+    "accessibility": "Barrierefreiheit",
+    "terms": "Nutzungsbedingungen",
+    "copyright": "© {year} MO Behavior Therapy LLC. Alle Rechte vorbehalten."
+  },
+  "mobileBar": {
+    "call": "Anrufen",
+    "request": "Anfragen",
+    "chat": "Chat"
+  },
+  "faq": {
+    "items": {
+      "whatIsAba": {
+        "question": "Was ist ABA-Therapie?",
+        "answer": "Angewandte Verhaltensanalyse (ABA) ist ein evidenzbasierter Ansatz, der Verhalten verständlich macht und wichtige Fertigkeiten wie Kommunikation, soziale Interaktion und Alltagsbewältigung vermittelt, basierend auf einer individuellen Beurteilung."
+      },
+      "howToKnowIfAppropriate": {
+        "question": "Woher weiß ich, ob ABA geeignet sein könnte?",
+        "answer": "Am besten sprechen Sie dazu mit unserem Team. Ein BCBA kann Ihre Situation prüfen und nach einer Beurteilung helfen festzustellen, ob ABA geeignet ist und welche Ziele empfohlen werden könnten."
+      },
+      "diagnosisRequired": {
+        "question": "Benötige ich eine Autismus-Diagnose?",
+        "answer": "Nicht unbedingt, um ein Gespräch mit unserem Team zu beginnen — kontaktieren Sie uns, und wir besprechen Ihre konkrete Situation sowie hilfreiche Unterlagen."
+      },
+      "insuranceCoverage": {
+        "question": "Übernimmt die Versicherung ABA?",
+        "answer": "Viele Tarife beinhalten Leistungen für Verhaltensgesundheit, die auf ABA anwendbar sein können, aber die Kostenübernahme und Genehmigungsanforderungen variieren je nach Tarif. Unser Team hilft Ihnen gerne, Ihre Leistungen zu prüfen."
+      },
+      "whichPlans": {
+        "question": "Mit welchen Versicherungstarifen arbeiten Sie zusammen?",
+        "answer": "Derzeit arbeiten wir mit Aetna, Florida Blue, Simply Healthcare, UnitedHealthcare und Cigna zusammen. Ihr Tarif ist nicht aufgeführt? Kontaktieren Sie uns — wir prüfen gerne Ihre konkrete Kostenübernahme."
+      },
+      "howVerificationWorks": {
+        "question": "Wie funktioniert die Versicherungsprüfung?",
+        "answer": "Nachdem Sie uns kontaktiert haben, prüft unser Team Ihre Versicherungsangaben sowie die Anspruchsberechtigung und die Leistungen für Verhaltensgesundheit, bevor Leistungen beginnen."
+      },
+      "whereProvided": {
+        "question": "Wo werden die Leistungen erbracht?",
+        "answer": "Je nach klinischem Bedarf und Genehmigung können Leistungen zu Hause, in der Schule oder in der Gemeinde erbracht werden."
+      },
+      "schoolBased": {
+        "question": "Bieten Sie ABA in der Schule an?",
+        "answer": "Wir verfügen über Erfahrung in der Koordination von ABA im schulischen Umfeld, wenn dies klinisch angemessen und von der Schule bzw. dem Schulbezirk genehmigt ist."
+      },
+      "homeBased": {
+        "question": "Bieten Sie ABA zu Hause an?",
+        "answer": "Ja — viele Familien werden zu Hause betreut, was das Üben von Fertigkeiten im Alltag erleichtern kann."
+      },
+      "parentTraining": {
+        "question": "Was beinhaltet das Elterntraining?",
+        "answer": "Eltern- und Betreuungspersonen-Training ist ein zentraler Bestandteil der Behandlung. BCBAs arbeiten direkt mit Familien zusammen, damit sich Strategien auf den Alltag übertragen."
+      },
+      "whatHappensAtAssessment": {
+        "question": "Was passiert bei einer ABA-Beurteilung?",
+        "answer": "Ein BCBA beurteilt die Bedürfnisse, Verhaltensmuster und Stärken Ihres Kindes sowie die Prioritäten Ihrer Familie, um mögliche Behandlungsziele zu ermitteln."
+      },
+      "howQuicklyCanStart": {
+        "question": "Wie schnell können die Leistungen beginnen?",
+        "answer": "Der Zeitrahmen hängt von der Versicherungsgenehmigung, der Terminplanung der Beurteilung und der Personalverfügbarkeit ab — unser Team kann Ihnen nach Prüfung Ihrer Angaben eine klarere Einschätzung geben."
+      },
+      "documentsNeeded": {
+        "question": "Welche Unterlagen könnten benötigt werden?",
+        "answer": "Dies kann variieren, umfasst aber möglicherweise eine Überweisung, eine diagnostische Beurteilung oder einen IEP-/504-Plan. Keines davon ist erforderlich, um ein Gespräch mit uns zu beginnen."
+      },
+      "pediatricianReferral": {
+        "question": "Kann mein Kinderarzt eine Überweisung senden?",
+        "answer": "Ja — Ärzte, Psychologen und andere Fachkräfte können einen Klienten über unser Überweisungsformular direkt an unser Team überweisen."
+      },
+      "areasServed": {
+        "question": "Welche Gebiete betreuen Sie?",
+        "answer": "Wir betreuen Familien in den Countys St. Lucie, Martin, Indian River, Palm Beach, Hendry, Glades, Highlands und Okeechobee, wobei die Verfügbarkeit je nach Standort und Personal variiert."
+      },
+      "spanishServices": {
+        "question": "Bieten Sie Leistungen auf Deutsch an?",
+        "answer": "Ja — unser Team und unser virtueller Assistent unterstützen Deutsch sowie Englisch, Spanisch, Haitianisches Kreol, Portugiesisch und Französisch."
+      },
+      "howToRequestServices": {
+        "question": "Wie kann ich Leistungen anfragen?",
+        "answer": "Sie können unser Kontaktformular ausfüllen, mit unserem virtuellen Assistenten chatten oder uns direkt unter (305) 795-0600 anrufen."
+      }
+    }
+  }
+}
+

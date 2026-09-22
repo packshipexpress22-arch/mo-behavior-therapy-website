@@ -34,26 +34,23 @@ export default function Hero() {
               <Button href="/contact" variant="primary">
                 {t("primaryCta")}
               </Button>
-              <Button href="/insurance" variant="secondary">
+              <Button href={telHref(company.phone)} variant="outline">
                 {t("secondaryCta")}
-              </Button>
-              <Button href={telHref(company.phone.e164)} variant="ghost">
-                {t("callCta")}
               </Button>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-6">
               <LanguageSelector />
             </div>
           </div>
 
           <div className="relative animate-fade-up [animation-delay:150ms]">
             <div className="aspect-[4/3] w-full overflow-hidden rounded-xl3 border border-white/60 bg-gradient-to-br from-brand-blue-light via-white to-brand-green-light shadow-soft">
-              <div className="flex h-full items-center justify-center p-10 text-center">
-                <p className="text-sm text-ink-500">
-                  [ Photography placeholder — swap for approved family/therapy imagery ]
-                </p>
-              </div>
+              <img
+                src="/hero-child.jpg"
+                alt="Child engaged in a therapy activity"
+                className="h-full w-full object-cover"
+              />
             </div>
           </div>
         </div>

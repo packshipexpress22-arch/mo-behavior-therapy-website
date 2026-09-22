@@ -39,8 +39,8 @@ This is a genuinely functional codebase, not a mockup — but a few things were 
 | Lead storage | Local JSON file by default; a full Postgres schema is ready to switch on. | `lib/leadStore.ts`, `prisma/schema.prisma` |
 | Email delivery | Fully implemented for SMTP and Resend — just needs real credentials. | `lib/email.ts` |
 | Milo (AI assistant) | **Fully functional without any external API** via deterministic slot-filling + entity extraction. Optionally upgraded with Claude for open-ended Q&A if `ANTHROPIC_API_KEY` is set. | `lib/chat/*`, `components/chat/ChatWidget.tsx` |
-| Bot protection | Honeypot field is live. Turnstile/CAPTCHA has a clearly marked spot to plug in once you choose a provider. | `app/api/leads/route.ts` |
-| Admin lead dashboard | Data model and status pipeline exist (`LeadStatus` in `prisma/schema.prisma`); the protected UI itself is not built — see section 8. | — |
+| Bot protection | Honeypot field **and** Cloudflare Turnstile are both live. Turnstile is a no-op (widget doesn't render, server skips verification) until `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` are set — see section 3 and 8b. | `lib/turnstile.ts`, `components/forms/Turnstile.tsx` |
+| Admin lead dashboard | **Built.** Protected `/admin` route lists/filters/updates leads from Postgres — see section 8. | `app/admin/*`, `app/api/admin/*`, `lib/adminAuth.ts` |
 | Insurance/staff logos | Text-based cards, not official insurer logos (avoids using their marks without a license). | `components/home/InsuranceSection.tsx` |
 | Testimonials | Not included anywhere. Never fabricate these — add real, authorized ones later. | — |
 
@@ -123,11 +123,22 @@ Delivery is provider-agnostic: set `EMAIL_PROVIDER=smtp` (default; works with Go
 
 ## 8. Lead dashboard
 
-Not built as a UI in this delivery, but the ground is laid:
+Built at `/admin` (outside the localized `[locale]` tree — English-only, `robots: noindex`, its own layout at `app/admin/layout.tsx`).
 
-- `prisma/schema.prisma` has a full `Lead` model with the exact status pipeline from the brief (`NEW` → … → `CLOSED`, including `NOT_ELIGIBLE_OUTSIDE_AREA`).
-- `lib/leadStore.ts` already returns a structured `LeadRecord` for every submission — building a protected `/admin` route that lists/filters/updates these is the natural next step once you're on the Prisma backend (`LEAD_STORE=prisma`).
-- Suggested auth approach for that route: the `ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` variables in `.env.example` are reserved for this.
+- **Auth**: `app/admin/login` posts to `POST /api/admin/login`, which checks `ADMIN_USER` + `ADMIN_PASSWORD_HASH` (verified with Node's built-in `scrypt`, no external auth library) and, on success, sets an httpOnly, `secure`, `sameSite: lax` cookie holding an HMAC-signed, 12-hour session token (`lib/adminAuth.ts`, signed with `ADMIN_SESSION_SECRET`). `POST /api/admin/logout` clears it. There's no signup flow and no password-reset flow by design — this is a single shared staff credential, not a multi-user system; rotate it by generating a new hash and updating the env var.
+  - To generate `ADMIN_PASSWORD_HASH` for a new password, run a one-off script that imports `hashPassword` from `lib/adminAuth.ts` and prints the result — it is **not** the plaintext password, and the plaintext is never stored anywhere once you've set the env var.
+  - `ADMIN_SESSION_SECRET` can be any long random string, e.g. `openssl rand -hex 32`.
+- **Dashboard** (`app/admin/page.tsx`, a server component that checks the session cookie and redirects to `/admin/login` if absent, rendering `app/admin/AdminDashboard.tsx`): filter leads by status/kind, free-text search (name/email/phone/city/zip), and per-row status/notes/assigned-to updates via `PATCH /api/admin/leads/[id]`. Reads live from Postgres (`GET /api/admin/leads`) — it only works once `DATABASE_URL` is set; the local-JSON-file fallback is for development only.
+- `prisma/schema.prisma` has the full `Lead` model with the exact status pipeline from the brief (`NEW` → … → `CLOSED`, including `NOT_ELIGIBLE_OUTSIDE_AREA`), plus `organization` / `role` / `positionAppliedFor` added alongside the admin dashboard so referral and career submissions show up identifiable by name too (previously only fields that happened to share a column name with the family-intake schema were carried into Postgres — see `lib/leadStore.ts`'s `INTAKE_FIELDS`). `lib/prisma.ts`'s `ensureLeadSchema()` handles both a brand-new table and adding these columns to the table that already existed in production, via idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements.
+
+### 8b. Bot protection (Cloudflare Turnstile)
+
+The honeypot field (`companyWebsite`) is always on. Turnstile adds a second layer and is entirely optional — with `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` unset, the widget simply doesn't render and the server skips verification, so nothing breaks without it.
+
+To turn it on:
+1. Create a Turnstile widget at the [Cloudflare dashboard](https://dash.cloudflare.com/?to=/:account/turnstile) for your domain (Managed or Non-interactive mode both work fine here).
+2. Set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (public, safe to ship to the browser) and `TURNSTILE_SECRET_KEY` (server-only, never exposed) in `.env` / your host's env vars.
+3. That's it — `components/forms/Turnstile.tsx` renders the widget on the `/contact`, `/referral-sources`, and `/careers` forms and inside the Milo chat widget's consent step; `lib/turnstile.ts` verifies the token server-side in all three API routes (`/api/leads`, `/api/referrals`, `/api/careers`) via Cloudflare's `siteverify` endpoint.
 
 ---
 
@@ -153,7 +164,8 @@ npm run start   # serves on PORT (default 3000)
 - Email provider credentials are real and `COMPANY_NOTIFICATION_EMAIL` is correct.
 - `LEAD_STORE=prisma` + `DATABASE_URL` are set (the local JSON file store is for development only — most hosts have an ephemeral filesystem in production).
 - Real logo/photography assets have replaced the placeholders (section 2).
-- `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` are set if you want CAPTCHA-grade bot protection beyond the built-in honeypot.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` are set if you want CAPTCHA-grade bot protection beyond the built-in honeypot (section 8b).
+- `ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` are set with a real, strong password if you want to use the `/admin` lead dashboard (section 8).
 
 ---
 
@@ -170,4 +182,3 @@ npm run start   # serves on PORT (default 3000)
 - ✅ Lead storage happens before email attempts, and email failures are caught so they never lose or block a lead.
 - ✅ SEO: sitemap.ts, robots.ts, Organization/LocalBusiness/FAQ/Breadcrumb/Service JSON-LD, per-page metadata.
 - ⚠️ Not yet run against this delivery (needs the real deployment target): Lighthouse performance pass, full automated a11y audit (axe/Wave), and a native-speaker proofread of the ht/pt/fr/de copy beyond what was produced here — recommended before launch.
-

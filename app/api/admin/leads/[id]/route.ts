@@ -61,3 +61,24 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const token = cookies().get(ADMIN_COOKIE_NAME)?.value;
+  const session = verifySessionToken(token);
+  if (!session) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  if (!process.env.DATABASE_URL) {
+    return NextResponse.json({ error: "no_database" }, { status: 503 });
+  }
+
+  try {
+    await prisma.lead.delete({ where: { id: params.id } });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("[admin/leads] delete failed:", err);
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+}

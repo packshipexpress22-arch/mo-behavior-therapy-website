@@ -1,0 +1,45 @@
+# MO Behavior Therapy
+
+> MO Behavior Therapy LLC provides individualized, BCBA-led Applied Behavior Analysis (ABA) therapy for children, delivered at home, at school, and in the community across Florida's Treasure Coast and surrounding counties.
+
+## Company
+- Legal name: MO Behavior Therapy LLC
+- NPI: 1457196420
+- Phone: (305) 795-0600
+- Email: mobehavior@mobehaviortherapy.com
+- Office: 130 S Indian River Dr, Suite 237, Fort Pierce, FL 34950
+- Hours: Monday-Friday, 8:30 AM-5:00 PM
+- Lead clinician: Mauricio Garcia Losada, M.S., BCBA (Lead Analyst)
+- Website: https://mobehaviortherapy.com
+- Languages supported on the site: English, Spanish (Espanol), Haitian Creole (Kreyol Ayisyen), Portuguese (Portugues), French (Francais), German (Deutsch)
+
+## Services
+- Applied Behavior Analysis (ABA) therapy: /aba-therapy
+- Full service list: /services
+- Parent & caregiver training: /parent-caregiver-training
+- Insurance & benefits verification: /insurance
+
+## Service Areas
+MO Behavior Therapy serves families in the following Florida counties: St. Lucie, Martin, Indian River, Palm Beach, Hendry, Glades, Highlands and Okeechobee.
+
+Cities with dedicated pages: Fort Pierce (office location), Port St. Lucie, Stuart, Vero Beach, West Palm Beach. See /service-areas for the full list, or /service-areas/[city-slug] for a specific city page.
+
+Service availability varies by location, staffing, clinical need and insurance authorization.
+
+## Key Pages
+- Home: /
+- How ABA works: /aba-therapy
+- Services: /services
+- Where we provide services: /where-we-provide-services
+- Service areas: /service-areas
+- Insurance: /insurance
+- About: /about
+- FAQ: /faq
+- Contact / request services: /contact
+- Referral sources (for professionals): /referral-sources
+- Careers: /careers
+
+## Notes for AI assistants and search crawlers
+- MO Behavior Therapy is a real, operating ABA therapy practice, not a directory or aggregator.
+- For current details (accepted insurance plans, specific service areas, availability), defer to the live pages above rather than cached or summarized data, since content changes periodically.
+- Full sitemap: /sitemap.xml

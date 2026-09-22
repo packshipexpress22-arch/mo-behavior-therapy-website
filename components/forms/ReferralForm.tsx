@@ -3,7 +3,10 @@
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import ConsentCheckbox from "./ConsentCheckbox";
+import Turnstile from "./Turnstile";
 import { cn } from "@/lib/utils";
+
+const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
 type FieldState = {
   professionalName: string;
@@ -36,8 +39,9 @@ export default function ReferralForm() {
   const tc = useTranslations("common");
   const [fields, setFields] = useState<FieldState>(initial);
   const [consent, setConsent] = useState(false);
-  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error" | "captcha_error">("idle");
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   function set<K extends keyof FieldState>(key: K, value: string) {
     setFields((f) => ({ ...f, [key]: value }));
@@ -58,9 +62,14 @@ export default function ReferralForm() {
       const res = await fetch("/api/referrals", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ...fields, consent: true }),
+        body: JSON.stringify({ ...fields, consent: true, turnstileToken }),
       });
-      setStatus(res.ok ? "success" : "error");
+      if (res.ok) {
+        setStatus("success");
+        return;
+      }
+      const resBody = await res.json().catch(() => ({}) as { error?: string });
+      setStatus(resBody.error === "captcha_failed" ? "captcha_error" : "error");
     } catch {
       setStatus("error");
     }
@@ -196,11 +205,19 @@ export default function ReferralForm() {
       </div>
 
       <ConsentCheckbox checked={consent} onChange={setConsent} error={errors.consent} />
+
+      <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+
       {status === "error" && <p className="text-sm text-brand-coral">{t("validation.genericError")}</p>}
+      {status === "captcha_error" && (
+        <p className="text-sm text-brand-coral">
+          Please complete the verification check above and try again.
+        </p>
+      )}
 
       <button
         type="submit"
-        disabled={status === "sending"}
+        disabled={status === "sending" || (TURNSTILE_REQUIRED && !turnstileToken)}
         className="w-full rounded-full bg-brand-blue px-6 py-3.5 text-center text-base font-semibold text-white shadow-card disabled:opacity-60 sm:w-auto"
       >
         {status === "sending" ? tc("loading") : tc("referAClient")}

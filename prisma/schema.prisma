@@ -65,6 +65,15 @@ model Lead {
   howHeard         String?
   message          String?
 
+  // Kind-specific fields — referrals (professionalName is stored in
+  // contactName, clientCity/clientZip in city/zip, notes in message; see
+  // app/api/referrals/route.ts) and careers (applicantName is stored in
+  // contactName; see app/api/careers/route.ts) normalize into the shared
+  // columns above where the meaning lines up, and use these for the rest.
+  organization     String?
+  role             String?
+  positionAppliedFor String?
+
   // Consent record — required for compliance, never overwritten.
   consentGiven          Boolean
   consentTextVersion    String

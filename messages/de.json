@@ -385,6 +385,7 @@
     "privacyPolicy": "Datenschutzerklärung",
     "accessibility": "Barrierefreiheit",
     "terms": "Nutzungsbedingungen",
+    "getDirections": "Route Anzeigen",
     "copyright": "© {year} MO Behavior Therapy LLC. Alle Rechte vorbehalten."
   },
   "mobileBar": {

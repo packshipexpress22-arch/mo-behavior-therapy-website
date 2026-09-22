@@ -1,7 +1,19 @@
 import { company } from "@/data/company";
 import { counties, cities } from "@/data/serviceAreas";
+import { mapsHref } from "@/lib/utils";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
+
+function areaServedList() {
+  return [
+    ...counties.map((c) => ({ "@type": "AdministrativeArea", name: c.name })),
+    ...cities.map((c) => ({
+      "@type": "City",
+      name: c.name,
+      "@id": `${siteUrl}/service-areas/${c.slug}`,
+    })),
+  ];
+}
 
 export function organizationSchema() {
   return {
@@ -21,7 +33,8 @@ export function organizationSchema() {
       postalCode: company.address.zip,
       addressCountry: "US",
     },
-    areaServed: [...counties.map((c) => c.name), ...cities.map((c) => c.name)],
+    hasMap: mapsHref(),
+    areaServed: areaServedList(),
     medicalSpecialty: "Applied Behavior Analysis (ABA) Therapy",
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
@@ -49,6 +62,7 @@ export function localBusinessSchema() {
       postalCode: company.address.zip,
       addressCountry: "US",
     },
+    hasMap: mapsHref(),
     priceRange: "$$",
   };
 }
@@ -81,13 +95,15 @@ export function faqSchema(items: { question: string; answer: string }[]) {
   };
 }
 
-export function serviceSchema(name: string, description: string) {
+export function serviceSchema(name: string, description: string, areaServedNames?: string[]) {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
     serviceType: name,
     description,
     provider: { "@id": `${siteUrl}/#organization` },
-    areaServed: [...counties.map((c) => c.name)],
+    areaServed: areaServedNames
+      ? areaServedNames.map((n) => ({ "@type": "City", name: n }))
+      : counties.map((c) => ({ "@type": "AdministrativeArea", name: c.name })),
   };
 }

@@ -2,24 +2,41 @@ import { NextRequest, NextResponse } from "next/server";
 import { careersSchema } from "@/lib/validation";
 import { storeLead } from "@/lib/leadStore";
 import { sendEmail } from "@/lib/email";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 import { company } from "@/data/company";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "invalid_body" }, { status: 400 });
   if (body.companyWebsite) return NextResponse.json({ ok: true });
+
+  const turnstileOk = await verifyTurnstileToken(body.turnstileToken, ip);
+  if (!turnstileOk) {
+    return NextResponse.json({ error: "captcha_failed" }, { status: 422 });
+  }
 
   const parsed = careersSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "validation_error", issues: parsed.error.flatten() }, { status: 422 });
   }
 
+  // Normalize into the shared Lead columns (see prisma/schema.prisma) so an
+  // application shows up identifiable by name in the admin dashboard.
+  const storedData = {
+    contactName: parsed.data.applicantName,
+    phone: parsed.data.phone,
+    email: parsed.data.email,
+    positionAppliedFor: parsed.data.positionAppliedFor,
+    message: parsed.data.message,
+  };
+
   try {
     const lead = await storeLead({
       kind: "career",
-      data: parsed.data,
+      data: storedData,
       language: "en",
       consent: { given: true, textVersion: "2026-09-v1", timestamp: new Date().toISOString(), ip: null },
       source: { page: "/careers", utm: {}, referrer: "" },

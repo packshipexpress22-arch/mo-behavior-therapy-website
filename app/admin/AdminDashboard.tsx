@@ -178,6 +178,27 @@ export default function AdminDashboard({ username }: { username: string }) {
     }
   }
 
+  async function deleteLead(id: string) {
+    const lead = leads.find((l) => l.id === id);
+    const label = lead ? displayName(lead) : "this lead";
+    if (!window.confirm(`Permanently delete "${label}"? This can't be undone.`)) {
+      return;
+    }
+    setSavingId(id);
+    try {
+      const res = await fetch(`/api/admin/leads/${id}`, { method: "DELETE" });
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (!res.ok) return;
+      setLeads((prev) => prev.filter((l) => l.id !== id));
+      setExpandedId((cur) => (cur === id ? null : cur));
+    } finally {
+      setSavingId(null);
+    }
+  }
+
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
@@ -315,6 +336,7 @@ export default function AdminDashboard({ username }: { username: string }) {
                       assignedTo: draftAssignee[lead.id] ?? lead.assignedTo ?? "",
                     })
                   }
+                  onDelete={() => deleteLead(lead.id)}
                 />
               ))}
             </tbody>
@@ -336,6 +358,7 @@ function FragmentRow({
   onNotesChange,
   onAssigneeChange,
   onSaveDetails,
+  onDelete,
 }: {
   lead: Lead;
   expanded: boolean;
@@ -347,6 +370,7 @@ function FragmentRow({
   onNotesChange: (notes: string) => void;
   onAssigneeChange: (assignedTo: string) => void;
   onSaveDetails: () => void;
+  onDelete: () => void;
 }) {
   const detailFields: [string, string | null][] = [
     ["Relationship", lead.relationship],
@@ -476,13 +500,22 @@ function FragmentRow({
               </div>
             </div>
 
-            <button
-              onClick={onSaveDetails}
-              disabled={saving}
-              className="mt-3 rounded-full bg-brand-blue px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
-            >
-              {saving ? "Saving…" : "Save notes & assignee"}
-            </button>
+            <div className="mt-3 flex items-center gap-3">
+              <button
+                onClick={onSaveDetails}
+                disabled={saving}
+                className="rounded-full bg-brand-blue px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+              >
+                {saving ? "Saving…" : "Save notes & assignee"}
+              </button>
+              <button
+                onClick={onDelete}
+                disabled={saving}
+                className="rounded-full border border-brand-coral px-4 py-2 text-xs font-semibold text-brand-coral hover:bg-brand-coral/10 disabled:opacity-60"
+              >
+                Delete lead
+              </button>
+            </div>
           </td>
         </tr>
       )}

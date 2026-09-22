@@ -119,6 +119,7 @@ export default function AdminDashboard({ username }: { username: string }) {
   const [qInput, setQInput] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
   const [draftAssignee, setDraftAssignee] = useState<Record<string, string>>({});
 
@@ -179,11 +180,6 @@ export default function AdminDashboard({ username }: { username: string }) {
   }
 
   async function deleteLead(id: string) {
-    const lead = leads.find((l) => l.id === id);
-    const label = lead ? displayName(lead) : "this lead";
-    if (!window.confirm(`Permanently delete "${label}"? This can't be undone.`)) {
-      return;
-    }
     setSavingId(id);
     try {
       const res = await fetch(`/api/admin/leads/${id}`, { method: "DELETE" });
@@ -196,6 +192,7 @@ export default function AdminDashboard({ username }: { username: string }) {
       setExpandedId((cur) => (cur === id ? null : cur));
     } finally {
       setSavingId(null);
+      setConfirmDeleteId(null);
     }
   }
 
@@ -322,6 +319,7 @@ export default function AdminDashboard({ username }: { username: string }) {
                   lead={lead}
                   expanded={expandedId === lead.id}
                   saving={savingId === lead.id}
+                  confirmingDelete={confirmDeleteId === lead.id}
                   notesDraft={draftNotes[lead.id] ?? lead.notes}
                   assigneeDraft={draftAssignee[lead.id] ?? lead.assignedTo ?? ""}
                   onToggle={() => setExpandedId((cur) => (cur === lead.id ? null : lead.id))}
@@ -336,7 +334,9 @@ export default function AdminDashboard({ username }: { username: string }) {
                       assignedTo: draftAssignee[lead.id] ?? lead.assignedTo ?? "",
                     })
                   }
-                  onDelete={() => deleteLead(lead.id)}
+                  onDeleteClick={() => setConfirmDeleteId(lead.id)}
+                  onDeleteCancel={() => setConfirmDeleteId(null)}
+                  onDeleteConfirm={() => deleteLead(lead.id)}
                 />
               ))}
             </tbody>
@@ -351,6 +351,7 @@ function FragmentRow({
   lead,
   expanded,
   saving,
+  confirmingDelete,
   notesDraft,
   assigneeDraft,
   onToggle,
@@ -358,11 +359,14 @@ function FragmentRow({
   onNotesChange,
   onAssigneeChange,
   onSaveDetails,
-  onDelete,
+  onDeleteClick,
+  onDeleteCancel,
+  onDeleteConfirm,
 }: {
   lead: Lead;
   expanded: boolean;
   saving: boolean;
+  confirmingDelete: boolean;
   notesDraft: string;
   assigneeDraft: string;
   onToggle: () => void;
@@ -370,7 +374,9 @@ function FragmentRow({
   onNotesChange: (notes: string) => void;
   onAssigneeChange: (assignedTo: string) => void;
   onSaveDetails: () => void;
-  onDelete: () => void;
+  onDeleteClick: () => void;
+  onDeleteCancel: () => void;
+  onDeleteConfirm: () => void;
 }) {
   const detailFields: [string, string | null][] = [
     ["Relationship", lead.relationship],
@@ -500,7 +506,7 @@ function FragmentRow({
               </div>
             </div>
 
-            <div className="mt-3 flex items-center gap-3">
+            <div className="mt-3 flex flex-wrap items-center gap-3">
               <button
                 onClick={onSaveDetails}
                 disabled={saving}
@@ -508,13 +514,34 @@ function FragmentRow({
               >
                 {saving ? "Saving…" : "Save notes & assignee"}
               </button>
-              <button
-                onClick={onDelete}
-                disabled={saving}
-                className="rounded-full border border-brand-coral px-4 py-2 text-xs font-semibold text-brand-coral hover:bg-brand-coral/10 disabled:opacity-60"
-              >
-                Delete lead
-              </button>
+
+              {confirmingDelete ? (
+                <>
+                  <span className="text-xs text-ink-500">Delete this lead permanently?</span>
+                  <button
+                    onClick={onDeleteConfirm}
+                    disabled={saving}
+                    className="rounded-full bg-brand-coral px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+                  >
+                    {saving ? "Deleting…" : "Confirm delete"}
+                  </button>
+                  <button
+                    onClick={onDeleteCancel}
+                    disabled={saving}
+                    className="text-xs font-medium text-ink-500 hover:underline"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={onDeleteClick}
+                  disabled={saving}
+                  className="rounded-full border border-brand-coral px-4 py-2 text-xs font-semibold text-brand-coral hover:bg-brand-coral/10 disabled:opacity-60"
+                >
+                  Delete lead
+                </button>
+              )}
             </div>
           </td>
         </tr>

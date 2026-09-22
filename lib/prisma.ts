@@ -72,6 +72,9 @@ export async function ensureLeadSchema() {
       "contactTime" TEXT,
       "howHeard" TEXT,
       "message" TEXT,
+      "organization" TEXT,
+      "role" TEXT,
+      "positionAppliedFor" TEXT,
       "consentGiven" BOOLEAN NOT NULL,
       "consentTextVersion" TEXT NOT NULL,
       "consentTimestamp" TIMESTAMP(3) NOT NULL,
@@ -85,6 +88,17 @@ export async function ensureLeadSchema() {
       "updatedAt" TIMESTAMP(3) NOT NULL
     );
   `);
+
+  // ADD COLUMN IF NOT EXISTS covers the case where "Lead" already existed
+  // from before these three columns were added (this project's production
+  // table was bootstrapped by an earlier version of this function) — the
+  // CREATE TABLE IF NOT EXISTS above is a no-op once the table exists, so
+  // new columns need their own explicit, idempotent migration step here.
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "organization" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "role" TEXT;`);
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "positionAppliedFor" TEXT;`
+  );
 
   await prisma.$executeRawUnsafe(
     `CREATE INDEX IF NOT EXISTS "Lead_status_idx" ON "Lead"("status");`

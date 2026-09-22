@@ -34,12 +34,15 @@ export default function Hero() {
               <Button href="/contact" variant="primary">
                 {t("primaryCta")}
               </Button>
-              <Button href={telHref(company.phone)} variant="outline">
+              <Button href="/insurance" variant="secondary">
                 {t("secondaryCta")}
+              </Button>
+              <Button href={telHref(company.phone.e164)} variant="ghost">
+                {t("callCta")}
               </Button>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-8">
               <LanguageSelector />
             </div>
           </div>

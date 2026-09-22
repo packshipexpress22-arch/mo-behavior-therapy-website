@@ -9,7 +9,8 @@ export default createMiddleware({
 });
 
 export const config = {
-  // Skip static assets, API routes, and Next internals.
-  matcher: ["/((?!api|_next|.*\\..*).*)"],
+  // Skip static assets, API routes, the admin dashboard (its own
+  // English-only, non-localized tree — see app/admin/layout.tsx), and Next
+  // internals.
+  matcher: ["/((?!api|admin|_next|.*\\..*).*)"],
 };
-

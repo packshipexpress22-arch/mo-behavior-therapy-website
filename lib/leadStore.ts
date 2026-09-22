@@ -89,6 +89,9 @@ const INTAKE_FIELDS = [
   "contactTime",
   "howHeard",
   "message",
+  "organization",
+  "role",
+  "positionAppliedFor",
 ] as const;
 
 function fromPrismaLead(row: PrismaLead): LeadRecord {

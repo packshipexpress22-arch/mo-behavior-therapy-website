@@ -10,6 +10,9 @@ import { insuranceSelectOptions } from "@/data/insurance";
 import { company } from "@/data/company";
 import { cn, telHref } from "@/lib/utils";
 import Logo from "@/components/layout/Logo";
+import Turnstile from "@/components/forms/Turnstile";
+
+const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
 type Msg = { id: string; role: "assistant" | "user"; text: string };
 
@@ -19,7 +22,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
   const tf = useTranslations("forms");
   // "skip" and "loading" live in the top-level "common" namespace, not
   // under "forms" — tf("common.skip") was looking for forms.common.skip,
-  // which doesn’t exist, so next-intl rendered the raw key path as text.
+  // which doesn't exist, so next-intl rendered the raw key path as text.
   const tc = useTranslations("common");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -27,6 +30,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
   const [submitted, setSubmitted] = useState(false);
   const [pendingConsent, setPendingConsent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
 
@@ -130,13 +134,20 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
           sourcePage: typeof window !== "undefined" ? window.location.pathname : "",
           referrer: typeof document !== "undefined" ? document.referrer : "",
           companyWebsite: "",
+          turnstileToken,
         }),
       });
       if (res.ok) {
         setSubmitted(true);
         pushAssistant(t("confirmation.body"));
       } else {
-        pushAssistant(tf("validation.genericError"));
+        const resBody = await res.json().catch(() => ({}) as { error?: string });
+        if (resBody.error === "captcha_failed") {
+          pushAssistant("Please complete the verification check above and try again.");
+          setPendingConsent(true);
+        } else {
+          pushAssistant(tf("validation.genericError"));
+        }
       }
     } catch {
       pushAssistant(tf("validation.genericError"));
@@ -146,13 +157,20 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
   }
 
   function handleConsent(accepted: boolean) {
-    setPendingConsent(false);
     pushUser(accepted ? "✓" : "✗");
     if (!accepted) {
-      pushAssistant(tf("validation.consentRequired"));
       setPendingConsent(true);
+      pushAssistant(tf("validation.consentRequired"));
       return;
     }
+    if (TURNSTILE_REQUIRED && !turnstileToken) {
+      // Keep the consent step open — the visitor still needs to complete
+      // the verification widget rendered alongside it below.
+      setPendingConsent(true);
+      pushAssistant("Please also complete the verification check above.");
+      return;
+    }
+    setPendingConsent(false);
     void finalizeSubmission(draft);
   }
 
@@ -174,9 +192,9 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
 
     const extracted = extractFields(text, locale);
     // The slot Milo is actively waiting on when this message arrives. For a
-    // couple of free-text-only slots, extractFields()’s regexes only catch
+    // couple of free-text-only slots, extractFields()'s regexes only catch
     // a message that volunteers the info in passing (e.g. "my name is
-    // Maria", "he’s 6 years old") — a plain reply to the question Milo just
+    // Maria", "he's 6 years old") — a plain reply to the question Milo just
     // asked ("Maria", "6") matched nothing and left the slot unfilled
     // forever, so Milo re-asked the same question in a loop. When the
     // reply is directly answering that slot, fall back to using it as-is
@@ -229,7 +247,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
     };
 
     // If this looks like a free-form question rather than a slot answer
-    // (i.e. we didn’t extract anything new and conversation hasn’t started
+    // (i.e. we didn't extract anything new and conversation hasn't started
     // collecting yet), try the grounded /api/chat responder before falling
     // into slot-filling.
     const gotNewInfo = JSON.stringify(merged) !== JSON.stringify(draft);
@@ -381,6 +399,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
               />
               <span>{tf("consent.text")}</span>
             </label>
+            <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
           </div>
         )}
 

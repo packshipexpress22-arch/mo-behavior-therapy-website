@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/lib/navigation";
 import { footerNav } from "@/data/nav";
 import { company } from "@/data/company";
-import { telHref, mailHref } from "@/lib/utils";
+import { telHref, mailHref, mapsHref, mapsEmbedSrc } from "@/lib/utils";
 import Logo from "./Logo";
 
 export default function Footer() {
@@ -94,6 +94,27 @@ export default function Footer() {
               ))}
             </ul>
           </nav>
+        </div>
+
+        <div className="mt-10 overflow-hidden rounded-xl2 border border-ink-100 shadow-card">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink-100 bg-white px-5 py-3.5">
+            <h2 className="text-sm font-semibold text-ink-900">{tc("officeLocation")}</h2>
+            <a
+              href={mapsHref()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-brand-blue hover:underline"
+            >
+              {t("getDirections")}
+            </a>
+          </div>
+          <iframe
+            src={mapsEmbedSrc()}
+            title={tc("officeLocation")}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="h-72 w-full border-0 sm:h-80"
+          />
         </div>
 
         <div className="mt-10 border-t border-ink-100 pt-6 text-xs text-ink-500">

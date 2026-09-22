@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { referralSchema } from "@/lib/validation";
 import { storeLead } from "@/lib/leadStore";
 import { sendEmail } from "@/lib/email";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 import { company } from "@/data/company";
 
 export const runtime = "nodejs";
@@ -11,9 +12,15 @@ export const runtime = "nodejs";
 // family intake, and this form collects less personal data about the
 // prospective client.
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "invalid_body" }, { status: 400 });
   if (body.companyWebsite) return NextResponse.json({ ok: true });
+
+  const turnstileOk = await verifyTurnstileToken(body.turnstileToken, ip);
+  if (!turnstileOk) {
+    return NextResponse.json({ error: "captcha_failed" }, { status: 422 });
+  }
 
   const parsed = referralSchema.safeParse(body);
   if (!parsed.success) {
@@ -22,10 +29,25 @@ export async function POST(req: NextRequest) {
 
   const { consent, ...data } = parsed.data;
 
+  // Normalize into the shared Lead columns (see prisma/schema.prisma) so a
+  // referral shows up identifiable — by contact name, city/zip — in the
+  // admin dashboard, not just in this endpoint's own notification email.
+  const storedData = {
+    contactName: data.professionalName,
+    organization: data.organization,
+    role: data.role,
+    phone: data.phone,
+    email: data.email,
+    clientFirstName: data.clientFirstName,
+    city: data.clientCity,
+    zip: data.clientZip,
+    message: data.notes,
+  };
+
   try {
     const lead = await storeLead({
       kind: "referral",
-      data,
+      data: storedData,
       language: "en",
       consent: { given: consent, textVersion: "2026-09-v1", timestamp: new Date().toISOString(), ip: null },
       source: { page: "/referral-sources", utm: {}, referrer: "" },

@@ -24,7 +24,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "meta" });
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
-  const ogImage = `${siteUrl}/og-image.png`;
+  const ogImage = `${siteUrl}/logo.png`;
 
   return {
     metadataBase: new URL(siteUrl),
@@ -38,10 +38,10 @@ export async function generateMetadata({
       siteName: t("siteName"),
       type: "website",
       locale,
-      images: [{ url: ogImage, width: 1200, height: 630, alt: t("siteName") }],
+      images: [{ url: ogImage, width: 256, height: 256, alt: t("siteName") }],
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       images: [ogImage],
     },
     robots: { index: true, follow: true },

@@ -22,7 +22,7 @@ export default function Hero() {
       />
       <Container className="relative py-16 sm:py-24">
         <div className="grid items-center gap-12 lg:grid-cols-2">
-          <div className="animate-fade-up">
+          <div className="relative z-10 animate-fade-up">
             <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-blue">{t("eyebrow")}</p>
             <h1 className="font-display text-4xl font-bold leading-[1.1] text-ink-900 sm:text-5xl">
               {t("headline")}
@@ -47,11 +47,11 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="relative animate-fade-up [animation-delay:150ms]">
+          <div className="relative z-0 animate-fade-up [animation-delay:150ms]">
             <div className="aspect-[4/3] w-full overflow-hidden rounded-xl3 border border-white/60 bg-gradient-to-br from-brand-blue-light via-white to-brand-green-light shadow-soft">
               <img
-                src="/hero-child.jpg"
-                alt="Child engaged in a therapy activity"
+                src="/hero-illustration.svg"
+                alt="Illustration of a caregiver and child smiling together under a rainbow"
                 className="h-full w-full object-cover"
               />
             </div>

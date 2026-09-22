@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { leadSchema } from "@/lib/validation";
 import { storeLead } from "@/lib/leadStore";
 import { sendInternalNotification, sendClientConfirmation } from "@/lib/email";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
@@ -33,9 +34,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  // TODO: verify a Turnstile/CAPTCHA token here once TURNSTILE_SECRET_KEY is
-  // configured — see .env.example. Left as an explicit extension point
-  // rather than a hard dependency so the form works out of the box.
+  const turnstileOk = await verifyTurnstileToken(body.turnstileToken, ip);
+  if (!turnstileOk) {
+    return NextResponse.json({ error: "captcha_failed" }, { status: 422 });
+  }
 
   const parsed = leadSchema.safeParse(body);
   if (!parsed.success) {

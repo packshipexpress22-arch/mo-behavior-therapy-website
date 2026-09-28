@@ -39,6 +39,16 @@ export default $config({
     //   npx sst secret set PatientSessionSecret <random-hex> --stage <stage>
     const patientSessionSecret = new sst.Secret("PatientSessionSecret");
 
+    // Email delivery — Resend (same provider/domain already verified for
+    // the Vercel/leads pipeline at mobehaviortherapy.com; reused here so no
+    // new DNS records are needed). Powers both the lead-notification emails
+    // and the patient portal's magic-link emails (lib/email.ts's
+    // sendEmail(), used by both). If unset, sendEmail() throws and callers
+    // swallow the error (see app/api/portal/request-link/route.ts) rather
+    // than surfacing a 500 to the user.
+    //   npx sst secret set ResendApiKey <key> --stage <stage>
+    const resendApiKey = new sst.Secret("ResendApiKey");
+
     // PHI storage (Paso 2/3) — the S3 bucket and DynamoDB table were
     // created manually in the AWS console (before this app had any PHI
     // feature to provision them), not by SST/Pulumi. sst.Linkable wraps an
@@ -86,12 +96,13 @@ export default $config({
         adminPasswordHash,
         adminSessionSecret,
         patientSessionSecret,
+        resendApiKey,
         phiBucket,
         phiTable,
       ],
       environment: {
         LEAD_STORE: "file",
-        EMAIL_PROVIDER: "smtp",
+        EMAIL_PROVIDER: "resend",
         NEXT_PUBLIC_SITE_URL: "https://mobehaviortherapy.com",
         NEXT_PUBLIC_COMPANY_PHONE: "+13057950600",
         NEXT_PUBLIC_COMPANY_PHONE_DISPLAY: "(305) 795-0600",
@@ -101,6 +112,7 @@ export default $config({
         ADMIN_PASSWORD_HASH: adminPasswordHash.value,
         ADMIN_SESSION_SECRET: adminSessionSecret.value,
         PATIENT_SESSION_SECRET: patientSessionSecret.value,
+        RESEND_API_KEY: resendApiKey.value,
         PHI_BUCKET: phiBucketName,
         PHI_TABLE: phiTableName,
       },

@@ -64,11 +64,14 @@ export async function POST(req: NextRequest) {
       html,
       text,
     });
-  } catch {
+  } catch (err) {
     // Swallow — still return genericOk so we never leak whether email
     // delivery succeeded (and so a transient SMTP failure doesn't surface a
-    // 500 to a patient trying to sign in). Delivery failures are visible in
-    // CloudWatch logs for staff to investigate.
+    // 500 to a patient trying to sign in). Log to CloudWatch (staff-only,
+    // never exposed to the caller) so delivery failures are actually
+    // investigable — a bare `catch {}` here previously discarded the error
+    // entirely despite this comment claiming otherwise.
+    console.error("[portal/request-link] sendEmail failed:", err);
   }
 
   return genericOk;

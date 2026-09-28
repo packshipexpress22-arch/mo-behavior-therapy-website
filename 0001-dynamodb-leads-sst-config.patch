@@ -1,0 +1,573 @@
+From 8a414d6319c7892e01fb8861ea87fbacc4bf2e9b Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 24 Sep 2026 18:03:39 -0400
+Subject: [PATCH] Add AWS Lambda deploy support: DynamoDB-backed leads, SST
+ config
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Add sst.config.ts (SST v3/Ion): sst.aws.Nextjs wrapping OpenNext for
+  AWS Lambda + CloudFront hosting, plus a new sst.aws.Dynamo leads
+  table (MoLeadsTable) linked to the site for least-privilege IAM.
+- Add lib/dynamoLeads.ts: DynamoDB-backed lead storage (FlatLead shape
+  matching the existing Prisma Lead columns 1:1) so the admin
+  dashboard UI needs no changes.
+- Wire lib/leadStore.ts and app/api/admin/leads/* to use DynamoDB
+  first (when LEADS_TABLE is set), falling back to Prisma/Postgres
+  (Vercel) and then the local-file dev fallback, in that order.
+- Fix tsconfig.json: exclude .sst, sst.config.ts and sst-env.d.ts so
+  next build's type-checker doesn't follow SST's generated Pulumi
+  types via the triple-slash reference (fixes an unrelated SST
+  internal type error in alb.ts that otherwise fails the build).
+- Add @aws-sdk/client-dynamodb, @aws-sdk/lib-dynamodb, and sst as
+  dependencies; ignore SST's generated .sst/ and sst-env.d.ts.
+
+The local-file lead fallback (LEAD_STORE=file) cannot work on Lambda
+because the deployed package directory is read-only (EROFS) — this
+was caught by a test deploy to a "test" stage (CloudFront URL, not
+the production domain) and verified fixed by submitting the live
+contact form and confirming the record landed correctly in DynamoDB.
+
+Vercel/Prisma remains the production backend for
+mobehaviortherapy.com; this is purely additive, for an in-progress
+migration to AWS (see project docs for HIPAA/BAA context). No DNS or
+production traffic changes.
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01FBSWRm5QRyfzgVbg8eTivt
+---
+ .gitignore                        |   4 +
+ app/api/admin/leads/[id]/route.ts |  35 +++++-
+ app/api/admin/leads/route.ts      |  25 +++--
+ lib/dynamoLeads.ts                | 173 ++++++++++++++++++++++++++++++
+ lib/leadStore.ts                  | 100 ++++++++++++++++-
+ package.json                      |   7 +-
+ sst.config.ts                     |  42 ++++++++
+ tsconfig.json                     |   2 +-
+ 8 files changed, 369 insertions(+), 19 deletions(-)
+ create mode 100644 lib/dynamoLeads.ts
+ create mode 100644 sst.config.ts
+
+diff --git a/.gitignore b/.gitignore
+index f13c0e6..d658e9f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -7,3 +7,7 @@ data/leads.local.json
+ *.log
+ .DS_Store
+ 
++# SST (Ion) build/state artifacts — generated locally during `sst deploy`, not source
++.sst
++sst-env.d.ts
++
+diff --git a/app/api/admin/leads/[id]/route.ts b/app/api/admin/leads/[id]/route.ts
+index f56934f..2a3c4e7 100644
+--- a/app/api/admin/leads/[id]/route.ts
++++ b/app/api/admin/leads/[id]/route.ts
+@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
+ import { cookies } from "next/headers";
+ import { verifySessionToken, ADMIN_COOKIE_NAME } from "@/lib/adminAuth";
+ import { prisma } from "@/lib/prisma";
++import {
++  dynamoLeadsConfigured,
++  updateLead as dynamoUpdateLead,
++  deleteLead as dynamoDeleteLead,
++} from "@/lib/dynamoLeads";
+ 
+ export const runtime = "nodejs";
+ 
+@@ -25,10 +30,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
+     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+   }
+ 
+-  if (!process.env.DATABASE_URL) {
+-    return NextResponse.json({ error: "no_database" }, { status: 503 });
+-  }
+-
+   const body = await req.json().catch(() => null);
+   if (!body) return NextResponse.json({ error: "invalid_body" }, { status: 400 });
+ 
+@@ -52,6 +53,21 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
+     return NextResponse.json({ error: "no_changes" }, { status: 400 });
+   }
+ 
++  if (dynamoLeadsConfigured()) {
++    try {
++      const lead = await dynamoUpdateLead(params.id, data);
++      return NextResponse.json({ ok: true, lead });
++    } catch (err) {
++      // eslint-disable-next-line no-console
++      console.error("[admin/leads] dynamo update failed:", err);
++      return NextResponse.json({ error: "not_found" }, { status: 404 });
++    }
++  }
++
++  if (!process.env.DATABASE_URL) {
++    return NextResponse.json({ error: "no_database" }, { status: 503 });
++  }
++
+   try {
+     const lead = await prisma.lead.update({ where: { id: params.id }, data });
+     return NextResponse.json({ ok: true, lead });
+@@ -69,6 +85,17 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
+     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+   }
+ 
++  if (dynamoLeadsConfigured()) {
++    try {
++      await dynamoDeleteLead(params.id);
++      return NextResponse.json({ ok: true });
++    } catch (err) {
++      // eslint-disable-next-line no-console
++      console.error("[admin/leads] dynamo delete failed:", err);
++      return NextResponse.json({ error: "not_found" }, { status: 404 });
++    }
++  }
++
+   if (!process.env.DATABASE_URL) {
+     return NextResponse.json({ error: "no_database" }, { status: 503 });
+   }
+diff --git a/app/api/admin/leads/route.ts b/app/api/admin/leads/route.ts
+index 5894774..68dc9c0 100644
+--- a/app/api/admin/leads/route.ts
++++ b/app/api/admin/leads/route.ts
+@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
+ import { cookies } from "next/headers";
+ import { verifySessionToken, ADMIN_COOKIE_NAME } from "@/lib/adminAuth";
+ import { prisma, ensureLeadSchema } from "@/lib/prisma";
++import { dynamoLeadsConfigured, listLeads } from "@/lib/dynamoLeads";
+ 
+ export const runtime = "nodejs";
+ 
+@@ -26,14 +27,6 @@ export async function GET(req: NextRequest) {
+     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+   }
+ 
+-  if (!process.env.DATABASE_URL) {
+-    // Admin dashboard only makes sense once leads are actually in Postgres —
+-    // the local-JSON-file fallback (lib/leadStore.ts) is dev-only.
+-    return NextResponse.json({ error: "no_database", leads: [] }, { status: 503 });
+-  }
+-
+-  await ensureLeadSchema();
+-
+   const { searchParams } = new URL(req.url);
+   const status = searchParams.get("status");
+   const kind = searchParams.get("kind");
+@@ -46,6 +39,22 @@ export async function GET(req: NextRequest) {
+     return NextResponse.json({ error: "invalid_kind" }, { status: 422 });
+   }
+ 
++  // AWS Lambda deploys: leads live in DynamoDB (see lib/dynamoLeads.ts),
++  // returned in the same flat shape Prisma rows have below, so the admin
++  // dashboard UI (app/admin/AdminDashboard.tsx) needs no changes.
++  if (dynamoLeadsConfigured()) {
++    const leads = await listLeads({ status, kind, q, limit: 200 });
++    return NextResponse.json({ leads });
++  }
++
++  if (!process.env.DATABASE_URL) {
++    // Admin dashboard only makes sense once leads are actually in a real
++    // store — the local-JSON-file fallback (lib/leadStore.ts) is dev-only.
++    return NextResponse.json({ error: "no_database", leads: [] }, { status: 503 });
++  }
++
++  await ensureLeadSchema();
++
+   // Loosely typed on purpose: Prisma's generated WhereInput type is exact
+   // about enum filter shapes in a way that's easy to get subtly wrong by
+   // hand, and this object is fully validated above before it ever reaches
+diff --git a/lib/dynamoLeads.ts b/lib/dynamoLeads.ts
+new file mode 100644
+index 0000000..c54d2cd
+--- /dev/null
++++ b/lib/dynamoLeads.ts
+@@ -0,0 +1,173 @@
++import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
++import {
++  DynamoDBDocumentClient,
++  PutCommand,
++  GetCommand,
++  UpdateCommand,
++  DeleteCommand,
++  QueryCommand,
++} from "@aws-sdk/lib-dynamodb";
++
++// DynamoDB-backed lead storage, used only when LEADS_TABLE is set (AWS
++// Lambda deploys via sst.config.ts, which links a sst.aws.Dynamo table and
++// grants the Lambda role least-privilege access to it). The Vercel/Prisma
++// path (lib/prisma.ts) is untouched and remains the production backend for
++// mobehaviortherapy.com until a cutover is explicitly decided.
++//
++// Item shape mirrors prisma/schema.prisma's Lead model exactly (flat
++// top-level attributes, all optional fields as string | null) so
++// app/api/admin/leads/* can return DynamoDB items directly to the existing
++// admin dashboard UI with zero changes there — see
++// app/admin/AdminDashboard.tsx's local `Lead` type for the authoritative
++// shape this must match.
++//
++// gsi1pk/gsi1sk exist only to support "list newest first": every item gets
++// gsi1pk="LEAD" (a single logical partition — fine at this table's expected
++// volume, a therapy practice's lead intake, not a high-throughput system)
++// and gsi1sk=createdAt (ISO string, so lexicographic order == chronological
++// order), queried with ScanIndexForward:false.
++
++const TABLE_NAME = process.env.LEADS_TABLE;
++
++export function dynamoLeadsConfigured(): boolean {
++  return Boolean(TABLE_NAME);
++}
++
++const client = TABLE_NAME
++  ? DynamoDBDocumentClient.from(new DynamoDBClient({}), {
++      marshallOptions: { removeUndefinedValues: true },
++    })
++  : null;
++
++export type FlatLead = {
++  id: string;
++  kind: "family" | "referral" | "career";
++  status: string;
++  assignedTo: string | null;
++  notes: string;
++  language: string;
++  contactName: string | null;
++  clientFirstName: string | null;
++  relationship: string | null;
++  clientAge: string | null;
++  phone: string | null;
++  email: string | null;
++  city: string | null;
++  zip: string | null;
++  county: string | null;
++  setting: string | null;
++  insurance: string | null;
++  previousAba: string | null;
++  hasReferral: string | null;
++  hasEvaluation: string | null;
++  hasIep: string | null;
++  contactMethod: string | null;
++  contactTime: string | null;
++  howHeard: string | null;
++  message: string | null;
++  organization: string | null;
++  role: string | null;
++  positionAppliedFor: string | null;
++  consentGiven: boolean;
++  consentTextVersion: string;
++  consentTimestamp: string;
++  consentIp: string | null;
++  sourcePage: string | null;
++  utmSource: string | null;
++  utmMedium: string | null;
++  utmCampaign: string | null;
++  referrer: string | null;
++  createdAt: string;
++  updatedAt: string;
++};
++
++function requireClient() {
++  if (!client || !TABLE_NAME) {
++    throw new Error("dynamoLeads: LEADS_TABLE is not configured");
++  }
++  return client;
++}
++
++export async function putLead(item: FlatLead): Promise<void> {
++  const c = requireClient();
++  await c.send(
++    new PutCommand({
++      TableName: TABLE_NAME,
++      Item: { ...item, gsi1pk: "LEAD", gsi1sk: item.createdAt },
++    })
++  );
++}
++
++export async function getLead(id: string): Promise<FlatLead | null> {
++  const c = requireClient();
++  const res = await c.send(new GetCommand({ TableName: TABLE_NAME, Key: { id } }));
++  return (res.Item as FlatLead) ?? null;
++}
++
++export async function listLeads(opts: {
++  status?: string | null;
++  kind?: string | null;
++  q?: string | null;
++  limit?: number;
++}): Promise<FlatLead[]> {
++  const c = requireClient();
++  const res = await c.send(
++    new QueryCommand({
++      TableName: TABLE_NAME,
++      IndexName: "gsi1",
++      KeyConditionExpression: "gsi1pk = :pk",
++      ExpressionAttributeValues: { ":pk": "LEAD" },
++      ScanIndexForward: false,
++      Limit: 500,
++    })
++  );
++  let items = (res.Items as FlatLead[]) ?? [];
++  if (opts.status) items = items.filter((i) => i.status === opts.status);
++  if (opts.kind) items = items.filter((i) => i.kind === opts.kind);
++  if (opts.q) {
++    const q = opts.q.toLowerCase();
++    items = items.filter((i) =>
++      [i.contactName, i.clientFirstName, i.email, i.phone, i.city, i.zip]
++        .filter(Boolean)
++        .some((v) => (v as string).toLowerCase().includes(q))
++    );
++  }
++  return items.slice(0, opts.limit ?? 200);
++}
++
++export async function updateLead(
++  id: string,
++  patch: Partial<Pick<FlatLead, "status" | "notes" | "assignedTo">>
++): Promise<FlatLead> {
++  const c = requireClient();
++  const existing = await getLead(id);
++  if (!existing) throw new Error("not_found");
++
++  const names: Record<string, string> = { "#updatedAt": "updatedAt" };
++  const values: Record<string, unknown> = { ":updatedAt": new Date().toISOString() };
++  const sets = ["#updatedAt = :updatedAt"];
++
++  for (const [key, value] of Object.entries(patch)) {
++    if (value === undefined) continue;
++    names[`#${key}`] = key;
++    values[`:${key}`] = value;
++    sets.push(`#${key} = :${key}`);
++  }
++
++  const res = await c.send(
++    new UpdateCommand({
++      TableName: TABLE_NAME,
++      Key: { id },
++      UpdateExpression: `SET ${sets.join(", ")}`,
++      ExpressionAttributeNames: names,
++      ExpressionAttributeValues: values,
++      ReturnValues: "ALL_NEW",
++    })
++  );
++  return res.Attributes as FlatLead;
++}
++
++export async function deleteLead(id: string): Promise<void> {
++  const c = requireClient();
++  await c.send(new DeleteCommand({ TableName: TABLE_NAME, Key: { id } }));
++}
+diff --git a/lib/leadStore.ts b/lib/leadStore.ts
+index 64dfc3f..0642c91 100644
+--- a/lib/leadStore.ts
++++ b/lib/leadStore.ts
+@@ -3,11 +3,15 @@ import { promises as fs } from "fs";
+ import path from "path";
+ import { prisma, ensureLeadSchema } from "./prisma";
+ import type { Lead as PrismaLead } from "@prisma/client";
++import { dynamoLeadsConfigured, putLead, type FlatLead } from "./dynamoLeads";
+ 
+-// Pluggable lead storage. LEAD_STORE=file (default, for local dev / demo)
+-// appends to a gitignored JSON file. LEAD_STORE=prisma uses the Lead model
+-// in prisma/schema.prisma via lib/prisma.ts, backed by DATABASE_URL — this
+-// is the production path.
++// Pluggable lead storage, tried in this order:
++//   1. DynamoDB (LEADS_TABLE set) — the AWS Lambda deploy path, see
++//      lib/dynamoLeads.ts and sst.config.ts.
++//   2. Prisma/Postgres (DATABASE_URL set) — the Vercel production path.
++//   3. A gitignored local JSON file — local dev / demo only. Never usable on
++//      Lambda (read-only filesystem outside /tmp) or on any other
++//      serverless host with an ephemeral filesystem.
+ //
+ // Whatever backend is used, the contract is the same: storeLead() must
+ // succeed (or throw) BEFORE any email is sent, per spec ("store the lead
+@@ -130,6 +134,42 @@ function fromPrismaLead(row: PrismaLead): LeadRecord {
+   };
+ }
+ 
++function fromFlatLead(row: FlatLead): LeadRecord {
++  const data: Record<string, unknown> = {};
++  for (const key of INTAKE_FIELDS) {
++    const value = (row as unknown as Record<string, unknown>)[key];
++    if (value !== null && value !== undefined && value !== "") data[key] = value;
++  }
++
++  const utm: Record<string, string> = {};
++  if (row.utmSource) utm.utm_source = row.utmSource;
++  if (row.utmMedium) utm.utm_medium = row.utmMedium;
++  if (row.utmCampaign) utm.utm_campaign = row.utmCampaign;
++
++  return {
++    id: row.id,
++    kind: row.kind,
++    createdAt: row.createdAt,
++    updatedAt: row.updatedAt,
++    status: row.status as LeadStatus,
++    assignedTo: row.assignedTo,
++    notes: row.notes,
++    source: {
++      page: row.sourcePage || "",
++      utm,
++      referrer: row.referrer || "",
++    },
++    consent: {
++      given: row.consentGiven,
++      textVersion: row.consentTextVersion,
++      timestamp: row.consentTimestamp,
++      ip: row.consentIp,
++    },
++    language: row.language,
++    data,
++  };
++}
++
+ export async function storeLead(input: {
+   kind: LeadKind;
+   data: Record<string, unknown>;
+@@ -137,6 +177,58 @@ export async function storeLead(input: {
+   source: LeadRecord["source"];
+   language: string;
+ }): Promise<LeadRecord> {
++  // AWS Lambda deploys (sst.config.ts links a DynamoDB table and sets
++  // LEADS_TABLE): this takes priority whenever it's configured, since a
++  // Lambda deploy never has a working file-store fallback (read-only fs)
++  // and may or may not also have DATABASE_URL set.
++  if (dynamoLeadsConfigured()) {
++    const d = input.data as Record<string, string | undefined>;
++    const now = new Date().toISOString();
++    const flat: FlatLead = {
++      id: `LEAD-${nanoid(10)}`,
++      kind: input.kind,
++      status: "NEW",
++      assignedTo: null,
++      notes: "",
++      language: input.language,
++      contactName: d.contactName ?? null,
++      clientFirstName: d.clientFirstName ?? null,
++      relationship: d.relationship ?? null,
++      clientAge: d.clientAge ?? null,
++      phone: d.phone ?? null,
++      email: d.email ?? null,
++      city: d.city ?? null,
++      zip: d.zip ?? null,
++      county: d.county ?? null,
++      setting: d.setting ?? null,
++      insurance: d.insurance ?? null,
++      previousAba: d.previousAba ?? null,
++      hasReferral: d.hasReferral ?? null,
++      hasEvaluation: d.hasEvaluation ?? null,
++      hasIep: d.hasIep ?? null,
++      contactMethod: d.contactMethod ?? null,
++      contactTime: d.contactTime ?? null,
++      howHeard: d.howHeard ?? null,
++      message: d.message ?? null,
++      organization: d.organization ?? null,
++      role: d.role ?? null,
++      positionAppliedFor: d.positionAppliedFor ?? null,
++      consentGiven: input.consent.given,
++      consentTextVersion: input.consent.textVersion,
++      consentTimestamp: input.consent.timestamp,
++      consentIp: input.consent.ip,
++      sourcePage: input.source.page || null,
++      utmSource: input.source.utm.utm_source || null,
++      utmMedium: input.source.utm.utm_medium || null,
++      utmCampaign: input.source.utm.utm_campaign || null,
++      referrer: input.source.referrer || null,
++      createdAt: now,
++      updatedAt: now,
++    };
++    await putLead(flat);
++    return fromFlatLead(flat);
++  }
++
+   // Prefer Prisma/Postgres whenever a database is actually configured — a
+   // separate LEAD_STORE=prisma flag used to gate this, but its value can no
+   // longer be verified (it was saved as a Vercel "Sensitive" variable, which
+diff --git a/package.json b/package.json
+index 876a4c2..0465430 100644
+--- a/package.json
++++ b/package.json
+@@ -19,7 +19,9 @@
+     "zod": "^3.23.8",
+     "nodemailer": "^6.9.14",
+     "nanoid": "^5.0.7",
+-    "clsx": "^2.1.1"
++    "clsx": "^2.1.1",
++    "@aws-sdk/client-dynamodb": "^3.687.0",
++    "@aws-sdk/lib-dynamodb": "^3.687.0"
+   },
+   "devDependencies": {
+     "@types/node": "^20.14.9",
+@@ -33,7 +35,8 @@
+     "eslint": "^8.57.0",
+     "eslint-config-next": "^14.2.5",
+     "prisma": "^5.17.0",
+-    "@prisma/client": "^5.17.0"
++    "@prisma/client": "^5.17.0",
++    "sst": "^4.17.1"
+   }
+ }
+ 
+diff --git a/sst.config.ts b/sst.config.ts
+new file mode 100644
+index 0000000..92e0cfe
+--- /dev/null
++++ b/sst.config.ts
+@@ -0,0 +1,42 @@
++/// <reference path="./.sst/platform/config.d.ts" />
++export default $config({
++  app(input) {
++    return {
++      name: "mo-behavior-therapy",
++      removal: input?.stage === "production" ? "retain" : "remove",
++      protect: false,
++      home: "aws",
++    };
++  },
++  async run() {
++    const leadsTable = new sst.aws.Dynamo("MoLeadsTable", {
++      fields: {
++        id: "string",
++        gsi1pk: "string",
++        gsi1sk: "string",
++      },
++      primaryIndex: { hashKey: "id" },
++      globalIndexes: {
++        gsi1: { hashKey: "gsi1pk", rangeKey: "gsi1sk" },
++      },
++    });
++
++    const site = new sst.aws.Nextjs("MoBehaviorTherapySite", {
++      link: [leadsTable],
++      environment: {
++        LEAD_STORE: "file",
++        EMAIL_PROVIDER: "smtp",
++        NEXT_PUBLIC_SITE_URL: "https://mobehaviortherapy.com",
++        NEXT_PUBLIC_COMPANY_PHONE: "+13057950600",
++        NEXT_PUBLIC_COMPANY_PHONE_DISPLAY: "(305) 795-0600",
++        COMPANY_NOTIFICATION_EMAIL: "mobehavior@mobehaviortherapy.com",
++        LEADS_TABLE: leadsTable.name,
++      },
++    });
++
++    return {
++      url: site.url,
++      leadsTable: leadsTable.name,
++    };
++  },
++});
+diff --git a/tsconfig.json b/tsconfig.json
+index 1415273..0591397 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -22,6 +22,6 @@
+     }
+   },
+   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+-  "exclude": ["node_modules"]
++  "exclude": ["node_modules", ".sst", "sst.config.ts", "sst-env.d.ts"]
+ }
+ 
+-- 
+2.43.0
+

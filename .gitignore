@@ -7,3 +7,7 @@ data/leads.local.json
 *.log
 .DS_Store
 
+# SST (Ion) build/state artifacts — generated locally during `sst deploy`, not source
+.sst
+sst-env.d.ts
+

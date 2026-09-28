@@ -9,8 +9,8 @@ export default createMiddleware({
 });
 
 export const config = {
-  // Skip static assets, API routes, the admin dashboard (its own
-  // English-only, non-localized tree — see app/admin/layout.tsx), and Next
-  // internals.
-  matcher: ["/((?!api|admin|_next|.*\\..*).*)"],
+  // Skip static assets, API routes, the admin dashboard, the patient portal
+  // (both their own English-only, non-localized trees — see
+  // app/admin/layout.tsx and app/portal/layout.tsx), and Next internals.
+  matcher: ["/((?!api|admin|portal|_next|.*\\..*).*)"],
 };

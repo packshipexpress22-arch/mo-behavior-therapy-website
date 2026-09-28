@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifySessionToken, ADMIN_COOKIE_NAME } from "@/lib/adminAuth";
 import { prisma, ensureLeadSchema } from "@/lib/prisma";
+import { dynamoLeadsConfigured, listLeads } from "@/lib/dynamoLeads";
 
 export const runtime = "nodejs";
 
@@ -26,14 +27,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  if (!process.env.DATABASE_URL) {
-    // Admin dashboard only makes sense once leads are actually in Postgres —
-    // the local-JSON-file fallback (lib/leadStore.ts) is dev-only.
-    return NextResponse.json({ error: "no_database", leads: [] }, { status: 503 });
-  }
-
-  await ensureLeadSchema();
-
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
   const kind = searchParams.get("kind");
@@ -45,6 +38,22 @@ export async function GET(req: NextRequest) {
   if (kind && !VALID_KINDS.has(kind)) {
     return NextResponse.json({ error: "invalid_kind" }, { status: 422 });
   }
+
+  // AWS Lambda deploys: leads live in DynamoDB (see lib/dynamoLeads.ts),
+  // returned in the same flat shape Prisma rows have below, so the admin
+  // dashboard UI (app/admin/AdminDashboard.tsx) needs no changes.
+  if (dynamoLeadsConfigured()) {
+    const leads = await listLeads({ status, kind, q, limit: 200 });
+    return NextResponse.json({ leads });
+  }
+
+  if (!process.env.DATABASE_URL) {
+    // Admin dashboard only makes sense once leads are actually in a real
+    // store — the local-JSON-file fallback (lib/leadStore.ts) is dev-only.
+    return NextResponse.json({ error: "no_database", leads: [] }, { status: 503 });
+  }
+
+  await ensureLeadSchema();
 
   // Loosely typed on purpose: Prisma's generated WhereInput type is exact
   // about enum filter shapes in a way that's easy to get subtly wrong by

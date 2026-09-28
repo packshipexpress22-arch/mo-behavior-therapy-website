@@ -33,8 +33,62 @@ export default $config({
     const adminPasswordHash = new sst.Secret("AdminPasswordHash");
     const adminSessionSecret = new sst.Secret("AdminSessionSecret");
 
+    // Patient portal (Paso 6) — magic-link session signing secret, same
+    // mechanism as the admin secrets above, deliberately separate value so
+    // an admin session token can never double as a patient session token.
+    //   npx sst secret set PatientSessionSecret <random-hex> --stage <stage>
+    const patientSessionSecret = new sst.Secret("PatientSessionSecret");
+
+    // PHI storage (Paso 2/3) — the S3 bucket and DynamoDB table were
+    // created manually in the AWS console (before this app had any PHI
+    // feature to provision them), not by SST/Pulumi. sst.Linkable wraps an
+    // *existing* resource's name/ARN so the Nextjs function below gets
+    // least-privilege IAM permissions to it via `link`, the same pattern
+    // used for MoLeadsTable, without SST trying to create/manage/adopt the
+    // resource itself (which would risk it, given it may hold real PHI).
+    // Hardcoded rather than looked up dynamically — this is the AWS
+    // account/region this whole app already lives in (see
+    // claude/mo-hipaa-baa-setup-steps.md: account 226123186858, us-east-1).
+    const phiBucketName = "mo-behavior-therapy-phi-documents";
+    const phiTableName = "mo-behavior-therapy-phi-documents"; // same name, different resource type (S3 vs DynamoDB) — see claude/mo-hipaa-baa-setup-steps.md Paso 2/3
+    const awsAccountId = "226123186858";
+    const awsRegion = "us-east-1";
+
+    const phiBucket = new sst.Linkable("PhiDocumentsBucket", {
+      properties: { bucketName: phiBucketName },
+      include: [
+        sst.aws.permission({
+          actions: ["s3:PutObject", "s3:GetObject", "s3:HeadObject"],
+          resources: [`arn:aws:s3:::${phiBucketName}/*`],
+        }),
+      ],
+    });
+
+    const phiTable = new sst.Linkable("PhiDocumentsTable", {
+      properties: { tableName: phiTableName },
+      include: [
+        sst.aws.permission({
+          actions: [
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:Query",
+          ],
+          resources: [`arn:aws:dynamodb:${awsRegion}:${awsAccountId}:table/${phiTableName}`],
+        }),
+      ],
+    });
+
     const site = new sst.aws.Nextjs("MoBehaviorTherapySite", {
-      link: [leadsTable, adminUser, adminPasswordHash, adminSessionSecret],
+      link: [
+        leadsTable,
+        adminUser,
+        adminPasswordHash,
+        adminSessionSecret,
+        patientSessionSecret,
+        phiBucket,
+        phiTable,
+      ],
       environment: {
         LEAD_STORE: "file",
         EMAIL_PROVIDER: "smtp",
@@ -46,6 +100,9 @@ export default $config({
         ADMIN_USER: adminUser.value,
         ADMIN_PASSWORD_HASH: adminPasswordHash.value,
         ADMIN_SESSION_SECRET: adminSessionSecret.value,
+        PATIENT_SESSION_SECRET: patientSessionSecret.value,
+        PHI_BUCKET: phiBucketName,
+        PHI_TABLE: phiTableName,
       },
     });
 

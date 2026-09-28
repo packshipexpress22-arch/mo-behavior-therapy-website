@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifySessionToken, ADMIN_COOKIE_NAME } from "@/lib/adminAuth";
 import { prisma } from "@/lib/prisma";
+import {
+  dynamoLeadsConfigured,
+  updateLead as dynamoUpdateLead,
+  deleteLead as dynamoDeleteLead,
+} from "@/lib/dynamoLeads";
 
 export const runtime = "nodejs";
 
@@ -23,10 +28,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const session = verifySessionToken(token);
   if (!session) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!process.env.DATABASE_URL) {
-    return NextResponse.json({ error: "no_database" }, { status: 503 });
   }
 
   const body = await req.json().catch(() => null);
@@ -52,6 +53,21 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ error: "no_changes" }, { status: 400 });
   }
 
+  if (dynamoLeadsConfigured()) {
+    try {
+      const lead = await dynamoUpdateLead(params.id, data);
+      return NextResponse.json({ ok: true, lead });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[admin/leads] dynamo update failed:", err);
+      return NextResponse.json({ error: "not_found" }, { status: 404 });
+    }
+  }
+
+  if (!process.env.DATABASE_URL) {
+    return NextResponse.json({ error: "no_database" }, { status: 503 });
+  }
+
   try {
     const lead = await prisma.lead.update({ where: { id: params.id }, data });
     return NextResponse.json({ ok: true, lead });
@@ -67,6 +83,17 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   const session = verifySessionToken(token);
   if (!session) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  if (dynamoLeadsConfigured()) {
+    try {
+      await dynamoDeleteLead(params.id);
+      return NextResponse.json({ ok: true });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[admin/leads] dynamo delete failed:", err);
+      return NextResponse.json({ error: "not_found" }, { status: 404 });
+    }
   }
 
   if (!process.env.DATABASE_URL) {

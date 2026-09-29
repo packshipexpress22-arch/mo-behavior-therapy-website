@@ -41,6 +41,30 @@ export default function Footer() {
               </a>
             </p>
             <p className="mt-2 text-xs text-ink-500">{tc("hours")}</p>
+            {company.social.instagram && (
+              <a
+                href={company.social.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t("followOnInstagram")}
+                className="mt-4 inline-flex items-center gap-2 text-sm text-ink-700 hover:text-brand-blue"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  className="h-5 w-5 shrink-0"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none" />
+                </svg>
+                {t("followOnInstagram")}
+              </a>
+            )}
           </div>
 
           <nav aria-label={t("services")} className="lg:col-span-1">

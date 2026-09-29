@@ -47,6 +47,6 @@ export const company = {
   social: {
     // Fill in once official handles are confirmed.
     facebook: "",
-    instagram: "",
+    instagram: "https://www.instagram.com/mobehaviortherapy",
   },
 } as const;

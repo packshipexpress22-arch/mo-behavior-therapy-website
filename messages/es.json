@@ -386,6 +386,7 @@
     "accessibility": "Accesibilidad",
     "terms": "Términos",
     "getDirections": "Cómo Llegar",
+    "followOnInstagram": "Síguenos en Instagram",
     "copyright": "© {year} MO Behavior Therapy LLC. Todos los derechos reservados."
   },
   "mobileBar": {
@@ -466,4 +467,3 @@
     }
   }
 }
-

@@ -80,7 +80,7 @@ export default function LanguageSelector({ variant = "light" }: { variant?: "lig
 
       {open && (
         <div role="listbox" aria-label={t("label")}
-          className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-xl2 border border-ink-100 bg-white py-2 shadow-soft">
+          className="absolute right-0 z-50 mt-2 max-h-[70vh] w-64 overflow-y-auto rounded-xl2 border border-ink-100 bg-white py-2 shadow-soft">
           {locales.map((l) => (
             <button
               key={l}

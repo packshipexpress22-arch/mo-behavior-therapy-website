@@ -20,8 +20,17 @@ import { randomBytes, timingSafeEqual, createHmac } from "crypto";
 //      cookie after verification, checked on every /portal/* request.
 
 export const PATIENT_COOKIE_NAME = "mo_patient_session";
-const MAGIC_LINK_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const MAGIC_LINK_TTL_MS = 15 * 60 * 1000; // 15 minutes — interactive /portal/login request
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+// A document-upload invite is emailed once, right after a lead submits the
+// contact form, with no one sitting at /portal/login waiting for it — unlike
+// the 15-minute interactive sign-in link above, a caregiver may reasonably
+// open that email hours later. 24h balances that against a magic link still
+// being a bearer credential for sign-in: if a link expires before they get
+// to it, /portal/login lets them request a fresh one with the same email at
+// any time, so this isn't the only way in.
+export const DOCUMENT_INVITE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function getSecret(): string {
   const secret = process.env.PATIENT_SESSION_SECRET;
@@ -50,14 +59,18 @@ export function patientIdFromEmail(email: string): string {
   return normalizeEmail(email);
 }
 
-/** email must not contain "|" — the token format uses it as a delimiter. */
-export function createMagicLinkToken(email: string): string {
+/** email must not contain "|" — the token format uses it as a delimiter.
+ * ttlMs defaults to the 15-minute interactive window; pass
+ * DOCUMENT_INVITE_TTL_MS for an emailed invite instead. The chosen TTL is
+ * baked into the signed payload itself (see verifyMagicLinkToken), so callers
+ * never need to track which TTL a given token used. */
+export function createMagicLinkToken(email: string, ttlMs: number = MAGIC_LINK_TTL_MS): string {
   const normalized = normalizeEmail(email);
   if (normalized.includes("|")) {
     throw new Error("email must not contain '|'");
   }
   const nonce = randomBytes(9).toString("base64url");
-  const expiresAt = Date.now() + MAGIC_LINK_TTL_MS;
+  const expiresAt = Date.now() + ttlMs;
   const payload = `${normalized}|${expiresAt}|${nonce}`;
   return `${payload}|${sign(payload)}`;
 }

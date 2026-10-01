@@ -296,7 +296,7 @@
       "invalidZip": "Insira um CEP válido de 5 dígitos.",
       "consentRequired": "Revise e marque a caixa de consentimento para enviar sua solicitação.",
       "genericError": "Ocorreu um erro ao enviar sua solicitação. Tente novamente ou ligue para (305) 795-0600.",
-      "success": "Obrigado — sua solicitação foi recebida. Nossa equipe entrará em contato em breve."
+      "success": "Obrigado — sua solicitação foi recebida. Nossa equipe entrará em contato em breve. Também enviamos um e-mail com um link seguro para você enviar sua documentação (como um documento de identidade com foto e o cartão do convênio) quando for conveniente."
     },
     "leadForm": {
       "title": "Solicitar Serviços de ABA",
@@ -349,7 +349,7 @@
     },
     "confirmation": {
       "title": "Obrigado!",
-      "body": "Obrigado por compartilhar suas informações com a MO Behavior Therapy. Sua solicitação foi recebida. Um membro da nossa equipe revisará suas informações e entrará em contato em breve. Se preferir falar diretamente conosco, pode ligar para (305) 795-0600 durante o horário comercial."
+      "body": "Obrigado por compartilhar suas informações com a MO Behavior Therapy. Sua solicitação foi recebida. Um membro da nossa equipe revisará suas informações e entrará em contato em breve. Também enviamos um e-mail com um link seguro para você enviar sua documentação (como um documento de identidade com foto e o cartão do convênio) quando for conveniente. Se preferir falar diretamente conosco, pode ligar para (305) 795-0600 durante o horário comercial."
     }
   },
   "email": {

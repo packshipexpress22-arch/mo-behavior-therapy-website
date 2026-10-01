@@ -296,7 +296,7 @@
       "invalidZip": "Bitte geben Sie eine gültige 5-stellige Postleitzahl ein.",
       "consentRequired": "Bitte prüfen und aktivieren Sie das Einwilligungskästchen, um Ihre Anfrage abzusenden.",
       "genericError": "Beim Absenden Ihrer Anfrage ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder rufen Sie uns unter (305) 795-0600 an.",
-      "success": "Vielen Dank — Ihre Anfrage ist eingegangen. Unser Team wird sich in Kürze bei Ihnen melden."
+      "success": "Vielen Dank — Ihre Anfrage ist eingegangen. Unser Team wird sich in Kürze bei Ihnen melden. Wir haben Ihnen außerdem eine E-Mail mit einem sicheren Link gesendet, über den Sie Ihre Unterlagen (z. B. einen Lichtbildausweis und die Versicherungskarte) hochladen können, sobald Sie bereit sind."
     },
     "leadForm": {
       "title": "ABA-Leistungen Anfragen",
@@ -349,7 +349,7 @@
     },
     "confirmation": {
       "title": "Vielen Dank!",
-      "body": "Vielen Dank, dass Sie Ihre Informationen mit MO Behavior Therapy geteilt haben. Ihre Anfrage ist eingegangen. Ein Mitglied unseres Teams wird Ihre Angaben prüfen und sich bald bei Ihnen melden. Wenn Sie lieber direkt mit uns sprechen möchten, können Sie uns während der Geschäftszeiten unter (305) 795-0600 anrufen."
+      "body": "Vielen Dank, dass Sie Ihre Informationen mit MO Behavior Therapy geteilt haben. Ihre Anfrage ist eingegangen. Ein Mitglied unseres Teams wird Ihre Angaben prüfen und sich bald bei Ihnen melden. Wir haben Ihnen außerdem eine E-Mail mit einem sicheren Link gesendet, über den Sie Ihre Unterlagen (z. B. einen Lichtbildausweis und die Versicherungskarte) hochladen können, sobald Sie bereit sind. Wenn Sie lieber direkt mit uns sprechen möchten, können Sie uns während der Geschäftszeiten unter (305) 795-0600 anrufen."
     }
   },
   "email": {

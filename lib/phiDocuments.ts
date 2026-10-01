@@ -31,7 +31,24 @@ const client = TABLE_NAME
     })
   : null;
 
-export type DocumentType = "medical_evaluation" | "insurance" | "legal_consent" | "other";
+// Updated 2026-10-01 to the specific intake checklist the practice actually
+// needs per case (see the email invite sent from lib/email.ts's
+// sendDocumentUploadInvite()): a caregiver photo ID, the client's insurance
+// card, and — when the family has them — a diagnosing provider's letter,
+// an IEP, and a psychological evaluation. "other" is kept as a catch-all for
+// anything that doesn't fit (e.g. a legal/consent form a family uploads
+// unprompted). The previous generic categories (medical_evaluation,
+// legal_consent) are intentionally retired — existing rows already written
+// with those values still read back fine (DynamoDB has no schema to
+// migrate), they just render under whichever label app/portal/PortalDashboard.tsx
+// falls back to for an unrecognized type.
+export type DocumentType =
+  | "caregiver_id"
+  | "insurance_card"
+  | "diagnosis_letter"
+  | "iep"
+  | "psych_evaluation"
+  | "other";
 export type DocumentStatus = "pending_upload" | "uploaded";
 
 export type PhiDocument = {

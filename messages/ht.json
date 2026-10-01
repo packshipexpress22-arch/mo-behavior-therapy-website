@@ -296,7 +296,7 @@
       "invalidZip": "Tanpri antre yon kòd postal 5 chif valab.",
       "consentRequired": "Tanpri revize epi mete tik nan kaz konsantman an pou soumèt demand ou.",
       "genericError": "Gen yon pwoblèm ki fèt lè n ap soumèt demand ou. Tanpri eseye ankò, oswa rele nou nan (305) 795-0600.",
-      "success": "Mèsi — nou resevwa demand ou. Ekip nou an ap kontakte ou byento."
+      "success": "Mèsi — nou resevwa demand ou. Ekip nou an ap kontakte ou byento. Nou voye tou yon imel ak yon lyen sekirize pou ou telechaje dokiman ou yo (tankou yon kat idantite ak foto ak kat asirans lan) nenpòt lè ou pare."
     },
     "leadForm": {
       "title": "Mande Sèvis ABA",
@@ -349,7 +349,7 @@
     },
     "confirmation": {
       "title": "Mèsi!",
-      "body": "Mèsi paske ou pataje enfòmasyon ou ak MO Behavior Therapy. Nou resevwa demand ou. Yon manm nan ekip nou an ap revize enfòmasyon ou epi kontakte ou byento. Si ou ta pito pale dirèkteman avèk nou, ou ka rele (305) 795-0600 pandan orè travay nou."
+      "body": "Mèsi paske ou pataje enfòmasyon ou ak MO Behavior Therapy. Nou resevwa demand ou. Yon manm nan ekip nou an ap revize enfòmasyon ou epi kontakte ou byento. Nou voye tou yon imel ak yon lyen sekirize pou ou telechaje dokiman ou yo (tankou yon kat idantite ak foto ak kat asirans lan) nenpòt lè ou pare. Si ou ta pito pale dirèkteman avèk nou, ou ka rele (305) 795-0600 pandan orè travay nou."
     }
   },
   "email": {

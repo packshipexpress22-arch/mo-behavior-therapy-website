@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 
 // Mirrors lib/phiDocuments.ts's PhiDocument type (server-only module, so
 // re-declared here for the client bundle rather than imported).
-type DocumentType = "medical_evaluation" | "insurance" | "legal_consent" | "other";
+type DocumentType =
+  | "caregiver_id"
+  | "insurance_card"
+  | "diagnosis_letter"
+  | "iep"
+  | "psych_evaluation"
+  | "other";
 type DocumentStatus = "pending_upload" | "uploaded";
 type PhiDocument = {
   patientId: string;
@@ -20,11 +26,31 @@ type PhiDocument = {
 };
 
 const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
-  medical_evaluation: "Medical evaluation",
-  insurance: "Insurance",
-  legal_consent: "Legal / consent form",
+  caregiver_id: "Caregiver photo ID",
+  insurance_card: "Client's insurance card",
+  diagnosis_letter: "Diagnosis letter (pediatrician, neurologist, or psychiatrist)",
+  iep: "IEP (Individualized Education Program)",
+  psych_evaluation: "Psychological evaluation",
   other: "Other",
 };
+
+// What a caregiver is asked to gather before starting. The first two are
+// needed for every case; the rest only apply if the family already has
+// them (a lead may not have an IEP or a prior psych evaluation yet).
+const DOCUMENT_CHECKLIST: { type: DocumentType; required: boolean }[] = [
+  { type: "caregiver_id", required: true },
+  { type: "insurance_card", required: true },
+  { type: "diagnosis_letter", required: false },
+  { type: "iep", required: false },
+  { type: "psych_evaluation", required: false },
+];
+
+/** Old rows written under a retired category (see lib/phiDocuments.ts's
+ * history note) won't have a label above — fall back to "Other" instead of
+ * rendering "undefined". */
+function labelFor(type: DocumentType): string {
+  return DOCUMENT_TYPE_LABELS[type] ?? DOCUMENT_TYPE_LABELS.other;
+}
 
 const ACCEPTED_FILE_TYPES = ".pdf,.jpg,.jpeg,.png,.heic,.webp";
 
@@ -40,7 +66,7 @@ export default function PortalDashboard({ email }: { email: string }) {
 
   const [documents, setDocuments] = useState<PhiDocument[]>([]);
   const [loadingList, setLoadingList] = useState(true);
-  const [documentType, setDocumentType] = useState<DocumentType>("medical_evaluation");
+  const [documentType, setDocumentType] = useState<DocumentType>("caregiver_id");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -143,10 +169,42 @@ export default function PortalDashboard({ email }: { email: string }) {
       </div>
 
       <section className="mb-8 rounded-xl3 border border-ink-100 bg-white p-6 shadow-card">
+        <h2 className="mb-1 text-sm font-semibold text-ink-900">Documents you'll need</h2>
+        <p className="mb-3 text-sm text-ink-500">
+          Please upload the following. The first two are required for every case; the rest only if
+          you already have them.
+        </p>
+        <ul className="mb-2 space-y-1 text-sm text-ink-700">
+          {DOCUMENT_CHECKLIST.map(({ type, required }) => {
+            const uploaded = documents.some((d) => d.documentType === type && d.status === "uploaded");
+            return (
+              <li key={type} className="flex items-start gap-2">
+                <span
+                  className={
+                    uploaded
+                      ? "mt-0.5 inline-flex h-4 w-4 flex-none items-center justify-center rounded-full bg-brand-green text-[10px] font-bold text-white"
+                      : "mt-0.5 inline-flex h-4 w-4 flex-none items-center justify-center rounded-full border border-ink-100"
+                  }
+                  aria-hidden="true"
+                >
+                  {uploaded ? "✓" : ""}
+                </span>
+                <span>
+                  {DOCUMENT_TYPE_LABELS[type]}
+                  {!required && <span className="text-ink-500"> (if you have one)</span>}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      <section className="mb-8 rounded-xl3 border border-ink-100 bg-white p-6 shadow-card">
         <h2 className="mb-1 text-sm font-semibold text-ink-900">Upload a document</h2>
         <p className="mb-4 text-sm text-ink-500">
-          PDF, JPG, PNG, HEIC, or WEBP. Your file is uploaded directly and securely — it is never
-          shared outside MO Behavior Therapy's HIPAA-compliant storage.
+          PDF, JPG, PNG, HEIC, or WEBP. Your file is uploaded directly and securely, encrypted in
+          storage — it is never shared outside MO Behavior Therapy's HIPAA-compliant storage, and it
+          is never processed by any AI tool.
         </p>
 
         <div className="mb-4">
@@ -196,7 +254,7 @@ export default function PortalDashboard({ email }: { email: string }) {
                 <div>
                   <p className="text-sm font-medium text-ink-900">{doc.fileName}</p>
                   <p className="text-xs text-ink-500">
-                    {DOCUMENT_TYPE_LABELS[doc.documentType]} · {new Date(doc.createdAt).toLocaleDateString()}
+                    {labelFor(doc.documentType)} · {new Date(doc.createdAt).toLocaleDateString()}
                     {doc.sizeBytes ? ` · ${formatBytes(doc.sizeBytes)}` : ""}
                   </p>
                 </div>

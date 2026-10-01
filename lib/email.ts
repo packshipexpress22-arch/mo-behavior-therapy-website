@@ -459,3 +459,67 @@ export async function sendDocumentUploadInvite(lead: LeadRecord) {
 
   await sendEmail({ to: email, subject: copy.subject, html, text });
 }
+
+/**
+ * Same secure-upload mechanism as sendDocumentUploadInvite() above, but for
+ * a referring professional (pediatrician, neurologist, psychiatrist, school,
+ * etc.) submitting the separate /referral-sources form (see
+ * app/api/referrals/route.ts) rather than a family/caregiver. That form is
+ * English-only today (no language selector — see components/forms/ReferralForm.tsx
+ * and the hardcoded language: "en" in app/api/referrals/route.ts), so this
+ * copy isn't translated yet; extend it the same way as DOC_INVITE_COPY above
+ * if the referral form ever gains a language switcher.
+ *
+ * The document checklist is deliberately different — and shorter — than the
+ * family invite: per the client, a referring professional only ever sends
+ * two things: the diagnosis document referring the child for ABA therapy,
+ * and the child's insurance information. No caregiver ID, IEP, or
+ * psychological evaluation is expected from this sender.
+ */
+export async function sendReferralDocumentUploadInvite(lead: LeadRecord) {
+  if (!isPatientPortalConfigured()) return;
+
+  const d = lead.data as Record<string, string>;
+  const email = d.email;
+  if (!email) return;
+
+  const firstName = (d.contactName || "").split(" ")[0] || "there";
+  const clientFirstName = d.clientFirstName || "your patient";
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
+  const token = createMagicLinkToken(email, DOCUMENT_INVITE_TTL_MS);
+  const link = `${siteUrl}/api/portal/verify?token=${encodeURIComponent(token)}`;
+
+  const html = `
+    <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0F1B2B">
+      <p>Hi ${firstName},</p>
+      <p>Thank you for referring ${clientFirstName} to ${company.shortName}. To help us process this referral, please securely upload the following through our HIPAA-compliant provider portal:</p>
+      <ul>
+        <li>The diagnosis document referring ${clientFirstName} for ABA therapy</li>
+        <li>${clientFirstName}'s insurance information</li>
+      </ul>
+      <p><a href="${link}" style="display:inline-block;padding:12px 24px;background:#2563EB;color:#fff;border-radius:9999px;text-decoration:none;font-weight:600">Upload documents securely</a></p>
+      <p style="font-size:13px;color:#475569">This link is valid for 24 hours and can only be used by you. If it expires, just request a new one on our provider portal sign-in page using this same email address.</p>
+      <p style="font-size:13px;color:#475569">Documents are encrypted and stored in our HIPAA-compliant system — they are never shared outside ${company.shortName}, and no AI tool ever has access to them.</p>
+      <p>Thank you for trusting us with your patient's care.<br/>${company.shortName} Team</p>
+    </div>
+  `;
+
+  const text = [
+    `Hi ${firstName},`,
+    `Thank you for referring ${clientFirstName} to ${company.shortName}. To help us process this referral, please securely upload the following through our HIPAA-compliant provider portal:`,
+    `- The diagnosis document referring ${clientFirstName} for ABA therapy`,
+    `- ${clientFirstName}'s insurance information`,
+    `Upload documents securely: ${link}`,
+    "This link is valid for 24 hours and can only be used by you. If it expires, just request a new one on our provider portal sign-in page using this same email address.",
+    `Documents are encrypted and stored in our HIPAA-compliant system — they are never shared outside ${company.shortName}, and no AI tool ever has access to them.`,
+    `Thank you for trusting us with your patient's care. — ${company.shortName} Team`,
+  ].join("\n\n");
+
+  await sendEmail({
+    to: email,
+    subject: `Securely Share Documents for Your Referral | ${company.shortName}`,
+    html,
+    text,
+  });
+}

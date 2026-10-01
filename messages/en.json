@@ -296,7 +296,8 @@
       "invalidZip": "Please enter a valid 5-digit ZIP code.",
       "consentRequired": "Please review and check the consent box to submit your request.",
       "genericError": "Something went wrong submitting your request. Please try again, or call us at (305) 795-0600.",
-      "success": "Thank you — your request has been received. Our team will be in touch soon. We've also emailed you a secure link to upload supporting documents (like a photo ID and insurance card) whenever you're ready."
+      "success": "Thank you — your request has been received. Our team will be in touch soon.",
+      "successWithUpload": "Thank you — your request has been received. Our team will be in touch soon. We've also emailed you a secure link to upload supporting documents whenever you're ready."
     },
     "leadForm": {
       "title": "Request ABA Services",

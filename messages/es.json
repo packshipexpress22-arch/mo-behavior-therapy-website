@@ -296,7 +296,8 @@
       "invalidZip": "Ingrese un código postal válido de 5 dígitos.",
       "consentRequired": "Por favor revise y marque la casilla de consentimiento para enviar su solicitud.",
       "genericError": "Ocurrió un problema al enviar su solicitud. Inténtelo de nuevo o llámenos al (305) 795-0600.",
-      "success": "Gracias — hemos recibido su solicitud. Nuestro equipo se pondrá en contacto pronto. También le enviamos un correo electrónico con un enlace seguro para subir su documentación (como una identificación con foto y la tarjeta de seguro) cuando usted lo prefiera."
+      "success": "Gracias — hemos recibido su solicitud. Nuestro equipo se pondrá en contacto pronto.",
+      "successWithUpload": "Gracias — hemos recibido su solicitud. Nuestro equipo se pondrá en contacto pronto. También le enviamos un correo electrónico con un enlace seguro para subir su documentación cuando usted lo prefiera."
     },
     "leadForm": {
       "title": "Solicitar Servicios de ABA",

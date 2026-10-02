@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { leadSchema } from "@/lib/validation";
 import { storeLead } from "@/lib/leadStore";
-import { sendInternalNotification, sendClientConfirmation } from "@/lib/email";
+import { sendInternalNotification, sendClientConfirmation, sendDocumentUploadInvite } from "@/lib/email";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
@@ -69,17 +69,22 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Notification + confirmation emails are best-effort: log failures but
-    // never fail the request the visitor is waiting on, and never discard
-    // the lead that's already safely stored.
-    const results = await Promise.allSettled([
-      sendInternalNotification(lead),
-      sendClientConfirmation(lead),
-    ]);
+    // Notification + confirmation + document-upload-invite emails are all
+    // best-effort: log failures but never fail the request the visitor is
+    // waiting on, and never discard the lead that's already safely stored.
+    // sendDocumentUploadInvite() no-ops gracefully if the patient portal
+    // isn't configured for this stage (see lib/phiAuth.ts's
+    // isPatientPortalConfigured()), so this is safe to always include.
+    const emailSteps = [
+      ["internal_notification", sendInternalNotification(lead)],
+      ["client_confirmation", sendClientConfirmation(lead)],
+      ["document_upload_invite", sendDocumentUploadInvite(lead)],
+    ] as const;
+    const results = await Promise.allSettled(emailSteps.map(([, p]) => p));
     results.forEach((r, i) => {
       if (r.status === "rejected") {
         // eslint-disable-next-line no-console
-        console.error(`[leads] email step ${i} failed for ${lead.id}:`, r.reason);
+        console.error(`[leads] email step "${emailSteps[i][0]}" failed for ${lead.id}:`, r.reason);
       }
     });
 

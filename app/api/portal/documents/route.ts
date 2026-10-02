@@ -9,12 +9,19 @@ import { createUploadUrl, documentS3Key, phiStorageConfigured } from "@/lib/phiS
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const DOCUMENT_TYPES = ["medical_evaluation", "insurance", "legal_consent", "other"] as const satisfies readonly DocumentType[];
+const DOCUMENT_TYPES = [
+  "caregiver_id",
+  "insurance_card",
+  "diagnosis_letter",
+  "iep",
+  "psych_evaluation",
+  "other",
+] as const satisfies readonly DocumentType[];
 
 // Conservative allowlist — documents patients realistically upload here
-// (evaluations, insurance cards/letters, signed forms), not arbitrary
-// files. Kept in sync with the accept="" attribute on the upload input in
-// app/portal/PortalDashboard.tsx.
+// (a photo ID, insurance card, diagnosis letter, IEP, psych evaluation),
+// not arbitrary files. Kept in sync with the accept="" attribute on the
+// upload input in app/portal/PortalDashboard.tsx.
 const ALLOWED_CONTENT_TYPES = new Set([
   "application/pdf",
   "image/jpeg",

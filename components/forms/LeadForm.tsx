@@ -107,7 +107,7 @@ export default function LeadForm() {
   if (status === "success") {
     return (
       <div className="rounded-xl3 border border-brand-green/30 bg-brand-green-light p-8 text-center">
-        <p className="text-lg font-semibold text-ink-900">{t("validation.success")}</p>
+        <p className="text-lg font-semibold text-ink-900">{t("validation.successWithUpload")}</p>
       </div>
     );
   }

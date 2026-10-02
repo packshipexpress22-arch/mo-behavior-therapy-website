@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { referralSchema } from "@/lib/validation";
 import { storeLead } from "@/lib/leadStore";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, sendReferralDocumentUploadInvite } from "@/lib/email";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { company } from "@/data/company";
 
@@ -53,13 +53,26 @@ export async function POST(req: NextRequest) {
       source: { page: "/referral-sources", utm: {}, referrer: "" },
     });
 
-    await sendEmail({
-      to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
-      subject: `NEW REFERRAL – ${data.professionalName}`,
-      html: `<h2>New Referral</h2><pre>${JSON.stringify(data, null, 2)}</pre><p>Lead ID: ${lead.id}</p>`,
-      text: `New referral from ${data.professionalName}\n${JSON.stringify(data, null, 2)}\nLead ID: ${lead.id}`,
-      replyTo: data.email,
-    }).catch((err) => console.error("[referrals] email failed:", err));
+    // Internal notification + the professional's own document-upload invite
+    // are both best-effort: a failure here never costs the already-stored
+    // referral. sendReferralDocumentUploadInvite() no-ops gracefully if the
+    // patient/provider portal isn't configured for this stage.
+    const emailSteps = [
+      ["internal_notification", sendEmail({
+        to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
+        subject: `NEW REFERRAL – ${data.professionalName}`,
+        html: `<h2>New Referral</h2><pre>${JSON.stringify(data, null, 2)}</pre><p>Lead ID: ${lead.id}</p>`,
+        text: `New referral from ${data.professionalName}\n${JSON.stringify(data, null, 2)}\nLead ID: ${lead.id}`,
+        replyTo: data.email,
+      })],
+      ["document_upload_invite", sendReferralDocumentUploadInvite(lead)],
+    ] as const;
+    const results = await Promise.allSettled(emailSteps.map(([, p]) => p));
+    results.forEach((r, i) => {
+      if (r.status === "rejected") {
+        console.error(`[referrals] email step "${emailSteps[i][0]}" failed for ${lead.id}:`, r.reason);
+      }
+    });
 
     return NextResponse.json({ ok: true, leadId: lead.id });
   } catch (err) {

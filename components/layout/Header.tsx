@@ -68,7 +68,10 @@ export default function Header() {
       </div>
 
       {mobileOpen && (
-        <div id="mobile-nav" className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-ink-100 bg-white px-4 py-4 lg:hidden">
+        <div
+          id="mobile-nav"
+          className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-ink-100 bg-white px-4 py-4 lg:hidden"
+        >
           <nav className="flex flex-col gap-1" aria-label="Mobile">
             {primaryNav.map((item) => (
               <Link

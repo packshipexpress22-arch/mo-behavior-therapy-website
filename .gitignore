@@ -11,3 +11,4 @@ data/leads.local.json
 .sst
 sst-env.d.ts
 
+tsconfig.tsbuildinfo

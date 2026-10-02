@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyPassword, createSessionToken, isAdminConfigured, ADMIN_COOKIE_NAME } from "@/lib/adminAuth";
+import { verifyPassword, createSessionToken, ADMIN_COOKIE_NAME } from "@/lib/adminAuth";
+import { getAdminCredentials } from "@/lib/adminCredentials";
 
 export const runtime = "nodejs";
 
@@ -21,18 +22,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  if (!isAdminConfigured()) {
-    return NextResponse.json({ error: "not_configured" }, { status: 503 });
-  }
-
   const body = await req.json().catch(() => null);
   const username = typeof body?.username === "string" ? body.username : "";
   const password = typeof body?.password === "string" ? body.password : "";
 
-  const adminUser = process.env.ADMIN_USER as string;
-  const adminHash = process.env.ADMIN_PASSWORD_HASH as string;
+  // Credentials are read from DynamoDB (bootstrapped from the
+  // ADMIN_USER/ADMIN_PASSWORD_HASH build-time secrets on first use) rather
+  // than straight from process.env, so a password changed via
+  // /api/admin/password takes effect immediately - no redeploy needed. See
+  // lib/adminCredentials.ts.
+  const creds = await getAdminCredentials();
+  if (!creds) {
+    return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  }
 
-  if (username !== adminUser || !verifyPassword(password, adminHash)) {
+  if (username !== creds.username || !verifyPassword(password, creds.passwordHash)) {
     return NextResponse.json({ error: "invalid_credentials" }, { status: 401 });
   }
 

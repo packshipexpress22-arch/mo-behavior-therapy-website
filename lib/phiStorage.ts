@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, HeadObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // PHI file storage — S3 only, accessed exclusively via short-lived
@@ -14,31 +14,32 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const BUCKET_NAME = process.env.PHI_BUCKET;
 const UPLOAD_URL_TTL_SECONDS = 5 * 60; // 5 minutes — used immediately by the browser
+const DOWNLOAD_URL_TTL_SECONDS = 5 * 60; // 5 minutes — generated on demand by an admin click, never stored/emailed
 
 export function phiStorageConfigured(): boolean {
-  return Boolean(BUCKET_NAME);
+    return Boolean(BUCKET_NAME);
 }
 
 const client = BUCKET_NAME ? new S3Client({}) : null;
 
 function requireClient() {
-  if (!client || !BUCKET_NAME) {
-    throw new Error("phiStorage: PHI_BUCKET is not configured");
-  }
-  return client;
+    if (!client || !BUCKET_NAME) {
+          throw new Error("phiStorage: PHI_BUCKET is not configured");
+    }
+    return client;
 }
 
 /** Strips anything that isn't safe in an S3 key or a Content-Disposition
  * filename — no path separators, no control characters. Keeps the original
  * extension where present. */
 export function sanitizeFileName(name: string): string {
-  const trimmed = name.trim().slice(-180); // guard against absurd lengths
+    const trimmed = name.trim().slice(-180); // guard against absurd lengths
   const cleaned = trimmed.replace(/[^a-zA-Z0-9._-]+/g, "_");
-  return cleaned || "document";
+    return cleaned || "document";
 }
 
 export function documentS3Key(patientId: string, documentId: string, fileName: string): string {
-  // patientId is an email (see lib/phiAuth.ts) — safe to use directly as a
+    // patientId is an email (see lib/phiAuth.ts) — safe to use directly as a
   // key segment since it's already validated by zod's email check before
   // this is ever called, but we still avoid raw "/" by construction (email
   // local/domain parts never contain "/").
@@ -46,26 +47,48 @@ export function documentS3Key(patientId: string, documentId: string, fileName: s
 }
 
 export async function createUploadUrl(args: {
-  s3Key: string;
-  contentType: string;
+    s3Key: string;
+    contentType: string;
 }): Promise<string> {
-  const c = requireClient();
-  const command = new PutObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: args.s3Key,
-    ContentType: args.contentType,
-  });
-  return getSignedUrl(c, command, { expiresIn: UPLOAD_URL_TTL_SECONDS });
+    const c = requireClient();
+    const command = new PutObjectCommand({
+          Bucket: BUCKET_NAME,
+          Key: args.s3Key,
+          ContentType: args.contentType,
+    });
+    return getSignedUrl(c, command, { expiresIn: UPLOAD_URL_TTL_SECONDS });
+}
+
+/**
+ * Admin-only: a short-lived presigned GET URL so a logged-in staff member
+ * can download one document straight from S3 (see
+ * app/api/admin/documents/[id]/download/route.ts). The file bytes never
+ * pass through this app's own response body, and this URL is generated
+ * fresh on each click and never persisted or put in an email — only a
+ * generic "go check the admin dashboard" link ever leaves this system by
+ * email (see lib/email.ts's sendDocumentUploadedNotification).
+ */
+export async function createDownloadUrl(args: {
+    s3Key: string;
+    fileName: string;
+}): Promise<string> {
+    const c = requireClient();
+    const command = new GetObjectCommand({
+          Bucket: BUCKET_NAME,
+          Key: args.s3Key,
+          ResponseContentDisposition: `attachment; filename="${sanitizeFileName(args.fileName)}"`,
+    });
+    return getSignedUrl(c, command, { expiresIn: DOWNLOAD_URL_TTL_SECONDS });
 }
 
 /** Confirms the object actually landed in S3 (guards against a client that
  * calls the "confirm" API without really uploading) and returns its size. */
 export async function headUploadedObject(s3Key: string): Promise<{ sizeBytes: number } | null> {
-  const c = requireClient();
-  try {
-    const res = await c.send(new HeadObjectCommand({ Bucket: BUCKET_NAME, Key: s3Key }));
-    return { sizeBytes: res.ContentLength ?? 0 };
-  } catch {
-    return null;
-  }
+    const c = requireClient();
+    try {
+          const res = await c.send(new HeadObjectCommand({ Bucket: BUCKET_NAME, Key: s3Key }));
+          return { sizeBytes: res.ContentLength ?? 0 };
+    } catch {
+          return null;
+    }
 }

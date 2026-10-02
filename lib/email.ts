@@ -523,3 +523,68 @@ export async function sendReferralDocumentUploadInvite(lead: LeadRecord) {
     text,
   });
 }
+
+
+// Mirrors app/portal/PortalDashboard.tsx's DOCUMENT_TYPE_LABELS - kept as a
+// separate copy rather than a shared import because that file is a client
+// component and this one is server-only; duplicating a 6-line label map is
+// cheaper than threading a shared module across the client/server boundary
+// for something this small.
+const ADMIN_DOCUMENT_TYPE_LABELS: Record<string, string> = {
+    caregiver_id: "Caregiver photo ID",
+    insurance_card: "Client's insurance card",
+    diagnosis_letter: "Diagnosis letter",
+    iep: "IEP/504",
+    psych_evaluation: "Psychological evaluation",
+    other: "Other document",
+};
+
+/**
+ * Staff notification sent right after a patient/caregiver's upload is
+ * confirmed in S3 (see app/api/portal/documents/[id]/confirm/route.ts).
+ *
+ * Deliberately carries no PHI beyond what the team already receives in the
+ * original lead-inquiry email (the patient's contact email) and a
+ * controlled document-type label picked from a fixed list - never the
+ * uploader-supplied file name (which a family could name anything, up to
+ * and including a string that itself reads like clinical narrative) and
+ * never the file content or a direct link to it. Staff click through to the
+ * admin dashboard (behind login) to actually view/download the document;
+ * the file bytes never travel over email.
+ */
+export async function sendDocumentUploadedNotification(doc: {
+    patientId: string;
+    documentType: string;
+}) {
+    const label = ADMIN_DOCUMENT_TYPE_LABELS[doc.documentType] || ADMIN_DOCUMENT_TYPE_LABELS.other;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
+    const adminLink = `${siteUrl}/admin`;
+
+  const subject = `New document uploaded - ${label} - ${doc.patientId}`;
+
+  const html = `
+      <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0F1B2B">
+            <p>A new document was uploaded to the patient portal.</p>
+                  <table cellpadding="4" cellspacing="0" style="font-size:14px">
+                          <tr><td style="font-weight:600;padding-right:12px">Patient email</td><td>${doc.patientId}</td></tr>
+                                  <tr><td style="font-weight:600;padding-right:12px">Document type</td><td>${label}</td></tr>
+                                        </table>
+                                              <p><a href="${adminLink}" style="display:inline-block;padding:10px 20px;background:#2563EB;color:#fff;border-radius:9999px;text-decoration:none;font-weight:600">Open admin dashboard</a></p>
+                                                    <p style="font-size:13px;color:#475569">Sign in and open the "Documents" tab to securely view or download it. This email never carries the file itself.</p>
+                                                        </div>
+                                                          `;
+
+  const text = [
+        "A new document was uploaded to the patient portal.",
+        `Patient email: ${doc.patientId}`,
+        `Document type: ${label}`,
+        `Open admin dashboard: ${adminLink}`,
+      ].join("\n");
+
+  await sendEmail({
+        to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
+        subject,
+        html,
+        text,
+  });
+}

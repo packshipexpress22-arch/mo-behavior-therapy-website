@@ -108,8 +108,43 @@ function displayName(lead: Lead) {
   return lead.contactName || lead.clientFirstName || lead.email || lead.phone || "(no name)";
 }
 
+// PHI document metadata only — see app/api/admin/documents/route.ts and
+// lib/phiDocuments.ts. The file bytes themselves never pass through this
+// component; "Download" below asks the API for a fresh, short-lived S3 URL
+// on each click and opens that directly.
+type PhiDocument = {
+  patientId: string;
+  documentId: string;
+  fileName: string;
+  contentType: string;
+  documentType: string;
+  status: "pending_upload" | "uploaded";
+  sizeBytes: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Mirrors app/portal/PortalDashboard.tsx's DOCUMENT_TYPE_LABELS and
+// lib/email.ts's ADMIN_DOCUMENT_TYPE_LABELS.
+const DOCUMENT_TYPE_LABELS: Record<string, string> = {
+  caregiver_id: "Caregiver photo ID",
+  insurance_card: "Insurance card",
+  diagnosis_letter: "Diagnosis letter",
+  iep: "IEP/504",
+  psych_evaluation: "Psychological evaluation",
+  other: "Other document",
+};
+
+function formatBytes(n: number | null) {
+  if (!n) return "—";
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export default function AdminDashboard({ username }: { username: string }) {
   const router = useRouter();
+  const [tab, setTab] = useState<"leads" | "documents">("leads");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -122,6 +157,12 @@ export default function AdminDashboard({ username }: { username: string }) {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
   const [draftAssignee, setDraftAssignee] = useState<Record<string, string>>({});
+
+  const [documents, setDocuments] = useState<PhiDocument[]>([]);
+  const [docsLoading, setDocsLoading] = useState(false);
+  const [docsLoaded, setDocsLoaded] = useState(false);
+  const [docsError, setDocsError] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const fetchLeads = useCallback(async () => {
     setLoading(true);
@@ -202,11 +243,68 @@ export default function AdminDashboard({ username }: { username: string }) {
     router.refresh();
   }
 
+  const fetchDocuments = useCallback(async () => {
+    setDocsLoading(true);
+    setDocsError(null);
+    try {
+      const res = await fetch("/api/admin/documents");
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (res.status === 503) {
+        setDocsError("PHI document storage isn't configured for this stage yet.");
+        setDocuments([]);
+        return;
+      }
+      if (!res.ok) {
+        setDocsError("Couldn't load documents. Please try again.");
+        return;
+      }
+      const data = (await res.json()) as { documents: PhiDocument[] };
+      setDocuments(data.documents);
+    } catch {
+      setDocsError("Couldn't load documents. Please check your connection and try again.");
+    } finally {
+      setDocsLoading(false);
+      setDocsLoaded(true);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (tab === "documents" && !docsLoaded) {
+      void fetchDocuments();
+    }
+  }, [tab, docsLoaded, fetchDocuments]);
+
+  async function downloadDocument(doc: PhiDocument) {
+    setDownloadingId(doc.documentId);
+    try {
+      const res = await fetch(
+        `/api/admin/documents/${doc.documentId}/download?patientId=${encodeURIComponent(doc.patientId)}`
+      );
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (!res.ok) {
+        setDocsError("Couldn't generate a download link. Please try again.");
+        return;
+      }
+      const data = (await res.json()) as { url: string };
+      // Opens the short-lived presigned S3 URL directly in a new tab — the
+      // file bytes never pass through this app's own server response.
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    } finally {
+      setDownloadingId(null);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-ink-900">Lead dashboard</h1>
+          <h1 className="text-xl font-semibold text-ink-900">Admin dashboard</h1>
           <p className="text-sm text-ink-500">Signed in as {username}</p>
         </div>
         <button
@@ -217,6 +315,29 @@ export default function AdminDashboard({ username }: { username: string }) {
         </button>
       </div>
 
+      <div className="mb-6 flex gap-2 border-b border-ink-100">
+        <button
+          onClick={() => setTab("leads")}
+          className={cn(
+            "border-b-2 px-3 pb-2 text-sm font-medium",
+            tab === "leads" ? "border-brand-blue text-brand-blue" : "border-transparent text-ink-500 hover:text-ink-900"
+          )}
+        >
+          Leads
+        </button>
+        <button
+          onClick={() => setTab("documents")}
+          className={cn(
+            "border-b-2 px-3 pb-2 text-sm font-medium",
+            tab === "documents" ? "border-brand-blue text-brand-blue" : "border-transparent text-ink-500 hover:text-ink-900"
+          )}
+        >
+          Documents
+        </button>
+      </div>
+
+      {tab === "leads" && (
+      <>
       <div className="mb-6 flex flex-wrap items-end gap-3 rounded-xl3 border border-ink-100 bg-white p-4">
         <div>
           <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="filter-status">
@@ -341,6 +462,74 @@ export default function AdminDashboard({ username }: { username: string }) {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+      </>
+      )}
+
+      {tab === "documents" && (
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <p className="text-sm text-ink-500">
+              Documents uploaded by patients/caregivers through the secure portal. Files stay in
+              encrypted S3 storage — "Download" mints a one-time link valid for 5 minutes.
+            </p>
+            <button
+              onClick={() => fetchDocuments()}
+              className="rounded-xl border border-ink-100 px-3 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
+            >
+              Refresh
+            </button>
+          </div>
+
+          {docsError && (
+            <div className="mb-4 rounded-xl border border-brand-coral/30 bg-brand-coral/10 p-3 text-sm text-brand-coral">
+              {docsError}
+            </div>
+          )}
+
+          {docsLoading && !docsError && <p className="text-sm text-ink-500">Loading…</p>}
+
+          {!docsLoading && !docsError && documents.length === 0 && (
+            <p className="text-sm text-ink-500">No documents uploaded yet.</p>
+          )}
+
+          {!docsLoading && documents.length > 0 && (
+            <div className="overflow-hidden rounded-xl3 border border-ink-100 bg-white">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-ink-100 bg-ink-100/50 text-xs uppercase tracking-wide text-ink-500">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Uploaded</th>
+                    <th className="px-4 py-3 font-medium">Patient email</th>
+                    <th className="px-4 py-3 font-medium">Document type</th>
+                    <th className="px-4 py-3 font-medium">Size</th>
+                    <th className="px-4 py-3 font-medium" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {documents.map((doc) => (
+                    <tr key={`${doc.patientId}:${doc.documentId}`} className="border-b border-ink-100 last:border-0">
+                      <td className="px-4 py-3 text-ink-500">{formatDate(doc.updatedAt)}</td>
+                      <td className="px-4 py-3 text-ink-900">{doc.patientId}</td>
+                      <td className="px-4 py-3 text-ink-900">
+                        {DOCUMENT_TYPE_LABELS[doc.documentType] ?? DOCUMENT_TYPE_LABELS.other}
+                      </td>
+                      <td className="px-4 py-3 text-ink-500">{formatBytes(doc.sizeBytes)}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          onClick={() => downloadDocument(doc)}
+                          disabled={downloadingId === doc.documentId}
+                          className="rounded-full border border-ink-100 px-3 py-1.5 text-xs font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue disabled:opacity-60"
+                        >
+                          {downloadingId === doc.documentId ? "Opening…" : "Download"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
     </div>

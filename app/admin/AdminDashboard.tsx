@@ -307,12 +307,20 @@ export default function AdminDashboard({ username }: { username: string }) {
           <h1 className="text-xl font-semibold text-ink-900">Admin dashboard</h1>
           <p className="text-sm text-ink-500">Signed in as {username}</p>
         </div>
-        <button
-          onClick={handleLogout}
-          className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
-        >
-          Sign out
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => router.push("/admin/change-password")}
+            className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
+          >
+            Change password
+          </button>
+          <button
+            onClick={handleLogout}
+            className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
 
       <div className="mb-6 flex gap-2 border-b border-ink-100">

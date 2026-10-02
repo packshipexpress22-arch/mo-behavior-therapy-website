@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     const results = await Promise.allSettled(emailSteps.map(([, p]) => p));
     results.forEach((r, i) => {
       if (r.status === "rejected") {
-        console.error(`[referrals] email step "${emailSteps[i][0]}" failed for ${lead.id}:`, r.reason);
+        console.error(`[referrals] email step "${emailSteps[i]?.[0]}" failed for ${lead.id}:`, r.reason);
       }
     });
 

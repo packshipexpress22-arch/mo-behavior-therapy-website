@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     results.forEach((r, i) => {
       if (r.status === "rejected") {
         // eslint-disable-next-line no-console
-        console.error(`[leads] email step "${emailSteps[i][0]}" failed for ${lead.id}:`, r.reason);
+        console.error(`[leads] email step "${emailSteps[i]?.[0]}" failed for ${lead.id}:`, r.reason);
       }
     });
 

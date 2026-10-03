@@ -83,6 +83,11 @@ export default $config({
             "dynamodb:PutItem",
             "dynamodb:UpdateItem",
             "dynamodb:Query",
+            // "Scan" is needed by lib/phiDocuments.ts's listAllDocuments()
+            // (the admin dashboard's "Documents" tab) - without it, that
+            // Scan throws AccessDeniedException and the tab shows
+            // "Couldn't load documents." (found + fixed 2026-10-02).
+            "dynamodb:Scan",
           ],
           resources: [`arn:aws:dynamodb:${awsRegion}:${awsAccountId}:table/${phiTableName}`],
         }),

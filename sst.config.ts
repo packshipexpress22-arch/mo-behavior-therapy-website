@@ -122,6 +122,11 @@ export default $config({
       environment: {
         LEAD_STORE: "file",
         EMAIL_PROVIDER: "resend",
+        // Logs the submitter's IP address alongside their contact-consent
+        // record (see app/api/leads/route.ts's `consent.ip` field). Off by
+        // default; turned on 2026-10-02 at the user's request so the
+        // consent record captures IP too.
+        LOG_IP_ADDRESSES: "true",
         NEXT_PUBLIC_SITE_URL: "https://mobehaviortherapy.com",
         NEXT_PUBLIC_COMPANY_PHONE: "+13057950600",
         NEXT_PUBLIC_COMPANY_PHONE_DISPLAY: "(305) 795-0600",

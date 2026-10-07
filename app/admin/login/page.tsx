@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
@@ -91,6 +92,12 @@ export default function AdminLoginPage() {
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>
+
+        <p className="mt-4 text-center text-xs text-ink-500">
+          <Link href="/admin/change-password" className="font-medium hover:underline">
+            Change password
+          </Link>
+        </p>
       </form>
     </main>
   );

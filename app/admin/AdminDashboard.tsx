@@ -50,6 +50,7 @@ type Lead = {
   positionAppliedFor: string | null;
   consentGiven: boolean;
   consentTimestamp: string;
+  consentIp: string | null;
   sourcePage: string | null;
   utmSource: string | null;
   utmCampaign: string | null;
@@ -658,6 +659,7 @@ function FragmentRow({
                 <div className="text-xs font-medium text-ink-500">Consent</div>
                 <div className="text-sm text-ink-900">
                   {lead.consentGiven ? "Given" : "Not given"} · {formatDate(lead.consentTimestamp)}
+                  {lead.consentIp ? \ · IP: ${lead.consentIp}` : ""}`
                 </div>
               </div>
               <div>

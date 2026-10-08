@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import SignaturesPanel from "./SignaturesPanel";
 
 type LeadKind = "family" | "referral" | "career";
 type LeadStatus =
@@ -145,7 +146,7 @@ function formatBytes(n: number | null) {
 
 export default function AdminDashboard({ username }: { username: string }) {
   const router = useRouter();
-  const [tab, setTab] = useState<"leads" | "documents">("leads");
+  const [tab, setTab] = useState<"leads" | "documents" | "signatures">("leads");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -343,137 +344,146 @@ export default function AdminDashboard({ username }: { username: string }) {
         >
           Documents
         </button>
-      </div>
-
-      {tab === "leads" && (
-      <>
-      <div className="mb-6 flex flex-wrap items-end gap-3 rounded-xl3 border border-ink-100 bg-white p-4">
-        <div>
-          <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="filter-status">
-            Status
-          </label>
-          <select
-            id="filter-status"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-xl border border-ink-100 px-3 py-2 text-sm outline-none focus-visible:border-brand-blue"
-          >
-            <option value="">All</option>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s.replaceAll("_", " ")}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="filter-kind">
-            Kind
-          </label>
-          <select
-            id="filter-kind"
-            value={kindFilter}
-            onChange={(e) => setKindFilter(e.target.value)}
-            className="rounded-xl border border-ink-100 px-3 py-2 text-sm outline-none focus-visible:border-brand-blue"
-          >
-            <option value="">All</option>
-            <option value="family">Family</option>
-            <option value="referral">Referral</option>
-            <option value="career">Career</option>
-          </select>
-        </div>
-        <form
-          className="flex items-end gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setQ(qInput.trim());
-          }}
-        >
-          <div>
-            <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="filter-q">
-              Search
-            </label>
-            <input
-              id="filter-q"
-              value={qInput}
-              onChange={(e) => setQInput(e.target.value)}
-              placeholder="Name, email, phone, city, ZIP…"
-              className="w-64 rounded-xl border border-ink-100 px-3 py-2 text-sm outline-none focus-visible:border-brand-blue"
-            />
-          </div>
-          <button
-            type="submit"
-            className="rounded-xl border border-ink-100 px-3 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
-          >
-            Search
-          </button>
-        </form>
         <button
-          onClick={() => fetchLeads()}
-          className="ml-auto rounded-xl border border-ink-100 px-3 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
+          onClick={() => setTab("signatures")}
+          className={cn(
+            "border-b-2 px-3 pb-2 text-sm font-medium",
+            tab === "signatures" ? "border-brand-blue text-brand-blue" : "border-transparent text-ink-500 hover:text-ink-900"
+          )}
         >
-          Refresh
+          Signatures
         </button>
       </div>
 
-      {loadError && (
-        <div className="mb-4 rounded-xl border border-brand-coral/30 bg-brand-coral/10 p-3 text-sm text-brand-coral">
-          {loadError}
-        </div>
-      )}
-
-      {loading && !loadError && <p className="text-sm text-ink-500">Loading…</p>}
-
-      {!loading && !loadError && leads.length === 0 && (
-        <p className="text-sm text-ink-500">No leads match these filters.</p>
-      )}
-
-      {!loading && leads.length > 0 && (
-        <div className="overflow-hidden rounded-xl3 border border-ink-100 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-ink-100 bg-ink-100/50 text-xs uppercase tracking-wide text-ink-500">
-              <tr>
-                <th className="px-4 py-3 font-medium">Received</th>
-                <th className="px-4 py-3 font-medium">Kind</th>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Contact</th>
-                <th className="px-4 py-3 font-medium">Location</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium" />
-              </tr>
-            </thead>
-            <tbody>
-              {leads.map((lead) => (
-                <FragmentRow
-                  key={lead.id}
-                  lead={lead}
-                  expanded={expandedId === lead.id}
-                  saving={savingId === lead.id}
-                  confirmingDelete={confirmDeleteId === lead.id}
-                  notesDraft={draftNotes[lead.id] ?? lead.notes}
-                  assigneeDraft={draftAssignee[lead.id] ?? lead.assignedTo ?? ""}
-                  onToggle={() => setExpandedId((cur) => (cur === lead.id ? null : lead.id))}
-                  onStatusChange={(status) => updateLead(lead.id, { status })}
-                  onNotesChange={(notes) => setDraftNotes((d) => ({ ...d, [lead.id]: notes }))}
-                  onAssigneeChange={(assignedTo) =>
-                    setDraftAssignee((d) => ({ ...d, [lead.id]: assignedTo }))
-                  }
-                  onSaveDetails={() =>
-                    updateLead(lead.id, {
-                      notes: draftNotes[lead.id] ?? lead.notes,
-                      assignedTo: draftAssignee[lead.id] ?? lead.assignedTo ?? "",
-                    })
-                  }
-                  onDeleteClick={() => setConfirmDeleteId(lead.id)}
-                  onDeleteCancel={() => setConfirmDeleteId(null)}
-                  onDeleteConfirm={() => deleteLead(lead.id)}
+      {tab === "leads" && (
+        <>
+          <div className="mb-6 flex flex-wrap items-end gap-3 rounded-xl3 border border-ink-100 bg-white p-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="filter-status">
+                Status
+              </label>
+              <select
+                id="filter-status"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-xl border border-ink-100 px-3 py-2 text-sm outline-none focus-visible:border-brand-blue"
+              >
+                <option value="">All</option>
+                {STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {s.replaceAll("_", " ")}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="filter-kind">
+                Kind
+              </label>
+              <select
+                id="filter-kind"
+                value={kindFilter}
+                onChange={(e) => setKindFilter(e.target.value)}
+                className="rounded-xl border border-ink-100 px-3 py-2 text-sm outline-none focus-visible:border-brand-blue"
+              >
+                <option value="">All</option>
+                <option value="family">Family</option>
+                <option value="referral">Referral</option>
+                <option value="career">Career</option>
+              </select>
+            </div>
+            <form
+              className="flex items-end gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setQ(qInput.trim());
+              }}
+            >
+              <div>
+                <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="filter-q">
+                  Search
+                </label>
+                <input
+                  id="filter-q"
+                  value={qInput}
+                  onChange={(e) => setQInput(e.target.value)}
+                  placeholder="Name, email, phone, city, ZIP…"
+                  className="w-64 rounded-xl border border-ink-100 px-3 py-2 text-sm outline-none focus-visible:border-brand-blue"
                 />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      </>
+              </div>
+              <button
+                type="submit"
+                className="rounded-xl border border-ink-100 px-3 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
+              >
+                Search
+              </button>
+            </form>
+            <button
+              onClick={() => fetchLeads()}
+              className="ml-auto rounded-xl border border-ink-100 px-3 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
+            >
+              Refresh
+            </button>
+          </div>
+
+          {loadError && (
+            <div className="mb-4 rounded-xl border border-brand-coral/30 bg-brand-coral/10 p-3 text-sm text-brand-coral">
+              {loadError}
+            </div>
+          )}
+
+          {loading && !loadError && <p className="text-sm text-ink-500">Loading…</p>}
+
+          {!loading && !loadError && leads.length === 0 && (
+            <p className="text-sm text-ink-500">No leads match these filters.</p>
+          )}
+
+          {!loading && leads.length > 0 && (
+            <div className="overflow-hidden rounded-xl3 border border-ink-100 bg-white">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-ink-100 bg-ink-100/50 text-xs uppercase tracking-wide text-ink-500">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Received</th>
+                    <th className="px-4 py-3 font-medium">Kind</th>
+                    <th className="px-4 py-3 font-medium">Name</th>
+                    <th className="px-4 py-3 font-medium">Contact</th>
+                    <th className="px-4 py-3 font-medium">Location</th>
+                    <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-4 py-3 font-medium" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {leads.map((lead) => (
+                    <FragmentRow
+                      key={lead.id}
+                      lead={lead}
+                      expanded={expandedId === lead.id}
+                      saving={savingId === lead.id}
+                      confirmingDelete={confirmDeleteId === lead.id}
+                      notesDraft={draftNotes[lead.id] ?? lead.notes}
+                      assigneeDraft={draftAssignee[lead.id] ?? lead.assignedTo ?? ""}
+                      onToggle={() => setExpandedId((cur) => (cur === lead.id ? null : lead.id))}
+                      onStatusChange={(status) => updateLead(lead.id, { status })}
+                      onNotesChange={(notes) => setDraftNotes((d) => ({ ...d, [lead.id]: notes }))}
+                      onAssigneeChange={(assignedTo) =>
+                        setDraftAssignee((d) => ({ ...d, [lead.id]: assignedTo }))
+                      }
+                      onSaveDetails={() =>
+                        updateLead(lead.id, {
+                          notes: draftNotes[lead.id] ?? lead.notes,
+                          assignedTo: draftAssignee[lead.id] ?? lead.assignedTo ?? "",
+                        })
+                      }
+                      onDeleteClick={() => setConfirmDeleteId(lead.id)}
+                      onDeleteCancel={() => setConfirmDeleteId(null)}
+                      onDeleteConfirm={() => deleteLead(lead.id)}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
 
       {tab === "documents" && (
@@ -541,6 +551,8 @@ export default function AdminDashboard({ username }: { username: string }) {
           )}
         </div>
       )}
+
+      {tab === "signatures" && <SignaturesPanel />}
     </div>
   );
 }

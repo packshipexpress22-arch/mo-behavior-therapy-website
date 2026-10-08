@@ -524,19 +524,18 @@ export async function sendReferralDocumentUploadInvite(lead: LeadRecord) {
   });
 }
 
-
 // Mirrors app/portal/PortalDashboard.tsx's DOCUMENT_TYPE_LABELS - kept as a
 // separate copy rather than a shared import because that file is a client
 // component and this one is server-only; duplicating a 6-line label map is
 // cheaper than threading a shared module across the client/server boundary
 // for something this small.
 const ADMIN_DOCUMENT_TYPE_LABELS: Record<string, string> = {
-    caregiver_id: "Caregiver photo ID",
-    insurance_card: "Client's insurance card",
-    diagnosis_letter: "Diagnosis letter",
-    iep: "IEP/504",
-    psych_evaluation: "Psychological evaluation",
-    other: "Other document",
+  caregiver_id: "Caregiver photo ID",
+  insurance_card: "Client's insurance card",
+  diagnosis_letter: "Diagnosis letter",
+  iep: "IEP/504",
+  psych_evaluation: "Psychological evaluation",
+  other: "Other document",
 };
 
 /**
@@ -553,38 +552,217 @@ const ADMIN_DOCUMENT_TYPE_LABELS: Record<string, string> = {
  * the file bytes never travel over email.
  */
 export async function sendDocumentUploadedNotification(doc: {
-    patientId: string;
-    documentType: string;
+  patientId: string;
+  documentType: string;
 }) {
-    const label = ADMIN_DOCUMENT_TYPE_LABELS[doc.documentType] || ADMIN_DOCUMENT_TYPE_LABELS.other;
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
-    const adminLink = `${siteUrl}/admin`;
+  const label = ADMIN_DOCUMENT_TYPE_LABELS[doc.documentType] || ADMIN_DOCUMENT_TYPE_LABELS.other;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
+  const adminLink = `${siteUrl}/admin`;
 
   const subject = `New document uploaded - ${label} - ${doc.patientId}`;
 
   const html = `
-      <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0F1B2B">
-            <p>A new document was uploaded to the patient portal.</p>
-                  <table cellpadding="4" cellspacing="0" style="font-size:14px">
-                          <tr><td style="font-weight:600;padding-right:12px">Patient email</td><td>${doc.patientId}</td></tr>
-                                  <tr><td style="font-weight:600;padding-right:12px">Document type</td><td>${label}</td></tr>
-                                        </table>
-                                              <p><a href="${adminLink}" style="display:inline-block;padding:10px 20px;background:#2563EB;color:#fff;border-radius:9999px;text-decoration:none;font-weight:600">Open admin dashboard</a></p>
-                                                    <p style="font-size:13px;color:#475569">Sign in and open the "Documents" tab to securely view or download it. This email never carries the file itself.</p>
-                                                        </div>
-                                                          `;
+    <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0F1B2B">
+      <p>A new document was uploaded to the patient portal.</p>
+      <table cellpadding="4" cellspacing="0" style="font-size:14px">
+        <tr><td style="font-weight:600;padding-right:12px">Patient email</td><td>${doc.patientId}</td></tr>
+        <tr><td style="font-weight:600;padding-right:12px">Document type</td><td>${label}</td></tr>
+      </table>
+      <p><a href="${adminLink}" style="display:inline-block;padding:10px 20px;background:#2563EB;color:#fff;border-radius:9999px;text-decoration:none;font-weight:600">Open admin dashboard</a></p>
+      <p style="font-size:13px;color:#475569">Sign in and open the "Documents" tab to securely view or download it. This email never carries the file itself.</p>
+    </div>
+  `;
 
   const text = [
-        "A new document was uploaded to the patient portal.",
-        `Patient email: ${doc.patientId}`,
-        `Document type: ${label}`,
-        `Open admin dashboard: ${adminLink}`,
-      ].join("\n");
+    "A new document was uploaded to the patient portal.",
+    `Patient email: ${doc.patientId}`,
+    `Document type: ${label}`,
+    `Open admin dashboard: ${adminLink}`,
+  ].join("\n");
 
   await sendEmail({
-        to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
-        subject,
-        html,
-        text,
+    to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
+    subject,
+    html,
+    text,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// E-signature requests (added 2026-10-08) — see lib/signatureEnvelopes.ts.
+// Mirrors the document-upload-invite pattern above (a signed, one-time link
+// emailed to the client), but the link goes to /sign/[envelopeId] instead of
+// the patient portal, and is scoped to exactly one envelope rather than an
+// open-ended account (see lib/signatureAuth.ts for why this is a separate
+// token/secret from the patient portal's magic link).
+// ---------------------------------------------------------------------------
+
+type SignatureInviteCopy = {
+  subject: string;
+  greeting: string;
+  intro: string;
+  button: string;
+  expiry: string;
+  security: string;
+  closing: string;
+  signOff: string;
+};
+
+function signatureInviteCopyFor(language: string, documentTitle: string): SignatureInviteCopy {
+  const table: Record<string, SignatureInviteCopy> = {
+    en: {
+      subject: `Please review and sign: ${documentTitle} | MO Behavior Therapy`,
+      greeting: "Hi {firstName},",
+      intro: `Please review and sign the following document: "${documentTitle}".`,
+      button: "Review & sign securely",
+      expiry: "This link is valid for 7 days and can only be used by you.",
+      security:
+        "This document is handled through our HIPAA-compliant system — it is never shared outside MO Behavior Therapy, and no AI tool ever has access to it.",
+      closing: "Thank you for trusting us with your family's care.",
+      signOff: "MO Behavior Therapy Team",
+    },
+    es: {
+      subject: `Por favor revise y firme: ${documentTitle} | MO Behavior Therapy`,
+      greeting: "Hola {firstName},",
+      intro: `Por favor revise y firme el siguiente documento: "${documentTitle}".`,
+      button: "Revisar y firmar de forma segura",
+      expiry: "Este enlace es válido por 7 días y solo usted puede usarlo.",
+      security:
+        "Este documento se maneja a través de nuestro sistema que cumple con HIPAA — nunca se comparte fuera de MO Behavior Therapy, y ninguna herramienta de inteligencia artificial tiene acceso a él.",
+      closing: "Gracias por confiarnos el cuidado de su familia.",
+      signOff: "Equipo de MO Behavior Therapy",
+    },
+    ht: {
+      subject: `Tanpri revize epi siyen: ${documentTitle} | MO Behavior Therapy`,
+      greeting: "Bonjou {firstName},",
+      intro: `Tanpri revize epi siyen dokiman sa a: "${documentTitle}".`,
+      button: "Revize epi siyen an sekirite",
+      expiry: "Lyen sa a valab pou 7 jou e se sèlman ou ki ka itilize li.",
+      security:
+        "Dokiman sa a jere nan sistèm nou an ki konfòm ak HIPAA — li pa janm pataje deyò MO Behavior Therapy, e okenn zouti entèlijans atifisyèl pa janm gen aksè a li.",
+      closing: "Mèsi paske ou fè nou konfyans pou swen fanmi ou.",
+      signOff: "Ekip MO Behavior Therapy",
+    },
+    pt: {
+      subject: `Por favor, revise e assine: ${documentTitle} | MO Behavior Therapy`,
+      greeting: "Olá {firstName},",
+      intro: `Por favor, revise e assine o seguinte documento: "${documentTitle}".`,
+      button: "Revisar e assinar com segurança",
+      expiry: "Este link é válido por 7 dias e só pode ser usado por você.",
+      security:
+        "Este documento é tratado por meio do nosso sistema compatível com a HIPAA — nunca é compartilhado fora da MO Behavior Therapy, e nenhuma ferramenta de IA tem acesso a ele.",
+      closing: "Obrigado por confiar a nós o cuidado da sua família.",
+      signOff: "Equipe MO Behavior Therapy",
+    },
+    fr: {
+      subject: `Veuillez examiner et signer : ${documentTitle} | MO Behavior Therapy`,
+      greeting: "Bonjour {firstName},",
+      intro: `Veuillez examiner et signer le document suivant : « ${documentTitle} ».`,
+      button: "Examiner et signer en toute sécurité",
+      expiry: "Ce lien est valable 7 jours et ne peut être utilisé que par vous.",
+      security:
+        "Ce document est traité via notre système conforme à la loi HIPAA — il n'est jamais partagé en dehors de MO Behavior Therapy, et aucun outil d'intelligence artificielle n'y a accès.",
+      closing: "Merci de nous confier le suivi de votre famille.",
+      signOff: "L'équipe MO Behavior Therapy",
+    },
+    de: {
+      subject: `Bitte prüfen und unterschreiben Sie: ${documentTitle} | MO Behavior Therapy`,
+      greeting: "Hallo {firstName},",
+      intro: `Bitte prüfen und unterschreiben Sie das folgende Dokument: „${documentTitle}“.`,
+      button: "Sicher prüfen & unterschreiben",
+      expiry: "Dieser Link ist 7 Tage gültig und kann nur von Ihnen verwendet werden.",
+      security:
+        "Dieses Dokument wird über unser HIPAA-konformes System verarbeitet — es wird niemals außerhalb von MO Behavior Therapy weitergegeben, und kein KI-Tool hat jemals Zugriff darauf.",
+      closing: "Vielen Dank, dass Sie uns die Betreuung Ihrer Familie anvertrauen.",
+      signOff: "Ihr MO Behavior Therapy Team",
+    },
+  };
+  return table[language] || table.en!;
+}
+
+/**
+ * Emails a client the one-time link to review and sign a document (an
+ * envelope created from an admin-authored template — see
+ * app/api/admin/signature-envelopes/route.ts). `link` is built by the
+ * caller from lib/signatureAuth.ts's createSignatureAccessToken(), the same
+ * way sendDocumentUploadInvite() above builds its own link from
+ * lib/phiAuth.ts's createMagicLinkToken() — kept as a parameter here rather
+ * than generated inside this function so lib/email.ts never needs to
+ * depend on lib/signatureAuth.ts/lib/signatureEnvelopes.ts for its own
+ * token logic, mirroring this file's existing separation of concerns.
+ */
+export async function sendSignatureRequestInvite(args: {
+  clientName: string;
+  clientEmail: string;
+  documentTitle: string;
+  link: string;
+  language?: string;
+}) {
+  const copy = signatureInviteCopyFor(args.language || "en", args.documentTitle);
+  const firstName = (args.clientName || "").split(" ")[0] || "there";
+
+  const html = `
+    <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0F1B2B">
+      <p>${interpolate(copy.greeting, { firstName })}</p>
+      <p>${copy.intro}</p>
+      <p><a href="${args.link}" style="display:inline-block;padding:12px 24px;background:#2563EB;color:#fff;border-radius:9999px;text-decoration:none;font-weight:600">${copy.button}</a></p>
+      <p style="font-size:13px;color:#475569">${copy.expiry}</p>
+      <p style="font-size:13px;color:#475569">${copy.security}</p>
+      <p>${copy.closing}<br/>${copy.signOff}</p>
+    </div>
+  `;
+
+  const text = [
+    interpolate(copy.greeting, { firstName }),
+    copy.intro,
+    `${copy.button}: ${args.link}`,
+    copy.expiry,
+    copy.security,
+    `${copy.closing} — ${copy.signOff}`,
+  ].join("\n\n");
+
+  await sendEmail({ to: args.clientEmail, subject: copy.subject, html, text });
+}
+
+/**
+ * Staff notification sent right after a client completes (fills in and
+ * signs) an envelope — see app/api/sign/[envelopeId]/submit/route.ts.
+ * Same PHI-safe shape as sendDocumentUploadedNotification above: no field
+ * values, no signature image, only a controlled label and a link to the
+ * admin dashboard where staff download the signed PDF.
+ */
+export async function sendSignatureCompletedNotification(args: {
+  clientEmail: string;
+  documentTitle: string;
+}) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
+  const adminLink = `${siteUrl}/admin`;
+
+  const subject = `Document signed - ${args.documentTitle} - ${args.clientEmail}`;
+
+  const html = `
+    <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0F1B2B">
+      <p>A client has completed and signed a document.</p>
+      <table cellpadding="4" cellspacing="0" style="font-size:14px">
+        <tr><td style="font-weight:600;padding-right:12px">Client email</td><td>${args.clientEmail}</td></tr>
+        <tr><td style="font-weight:600;padding-right:12px">Document</td><td>${args.documentTitle}</td></tr>
+      </table>
+      <p><a href="${adminLink}" style="display:inline-block;padding:10px 20px;background:#2563EB;color:#fff;border-radius:9999px;text-decoration:none;font-weight:600">Open admin dashboard</a></p>
+      <p style="font-size:13px;color:#475569">Sign in and open the "Signatures" tab to securely view or download the signed PDF. This email never carries the document itself.</p>
+    </div>
+  `;
+
+  const text = [
+    "A client has completed and signed a document.",
+    `Client email: ${args.clientEmail}`,
+    `Document: ${args.documentTitle}`,
+    `Open admin dashboard: ${adminLink}`,
+  ].join("\n");
+
+  await sendEmail({
+    to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
+    subject,
+    html,
+    text,
   });
 }

@@ -21,12 +21,42 @@ export default $config({
       },
     });
 
+    // E-signature feature (added 2026-10-08) — two new, SST-managed
+    // DynamoDB tables, same pattern as MoLeadsTable above: `link`-ing an
+    // sst.aws.Dynamo resource automatically grants the Nextjs function
+    // least-privilege CRUD on it, no manual IAM permission list needed
+    // (unlike the PhiDocuments Linkable below, which wraps a table that
+    // was created manually, outside SST's management).
+    //
+    // SignatureTemplatesTable: admin-authored document templates (title,
+    // fillable fields, signature label) — see lib/signatureTemplates.ts.
+    const signatureTemplatesTable = new sst.aws.Dynamo("SignatureTemplatesTable", {
+      fields: { id: "string" },
+      primaryIndex: { hashKey: "id" },
+    });
+
+    // SignatureEnvelopesTable: one send of one template to one client —
+    // see lib/signatureEnvelopes.ts. Key shape mirrors the PhiDocuments
+    // table (patientId + a nanoid sort key) so a future patient-facing
+    // "documents to sign" list could query it the same way.
+    const signatureEnvelopesTable = new sst.aws.Dynamo("SignatureEnvelopesTable", {
+      fields: { patientId: "string", envelopeId: "string" },
+      primaryIndex: { hashKey: "patientId", rangeKey: "envelopeId" },
+    });
+
+    // Signature-request link signing secret — same dependency-free HMAC
+    // mechanism as the admin/patient-portal secrets below, deliberately a
+    // separate value so a signing link can never double as an admin or
+    // patient-portal session (see lib/signatureAuth.ts).
+    // npx sst secret set SignatureSessionSecret <random-hex> --stage <stage>
+    const signatureSessionSecret = new sst.Secret("SignatureSessionSecret");
+
     // Admin panel credentials — stored as SST secrets (encrypted in AWS,
     // never written into this file or committed to git). Set the actual
     // values per stage with:
-    //   npx sst secret set AdminUser <username> --stage <stage>
-    //   npx sst secret set AdminPasswordHash <scrypt$salt$hash> --stage <stage>
-    //   npx sst secret set AdminSessionSecret <random-hex> --stage <stage>
+    // npx sst secret set AdminUser <username> --stage <stage>
+    // npx sst secret set AdminPasswordHash <scrypt$salt$hash> --stage <stage>
+    // npx sst secret set AdminSessionSecret <random-hex> --stage <stage>
     // If unset for a stage, the admin panel stays disabled (its existing
     // graceful-degradation behavior — see lib/adminAuth.ts / app/admin).
     const adminUser = new sst.Secret("AdminUser");
@@ -36,7 +66,7 @@ export default $config({
     // Patient portal (Paso 6) — magic-link session signing secret, same
     // mechanism as the admin secrets above, deliberately separate value so
     // an admin session token can never double as a patient session token.
-    //   npx sst secret set PatientSessionSecret <random-hex> --stage <stage>
+    // npx sst secret set PatientSessionSecret <random-hex> --stage <stage>
     const patientSessionSecret = new sst.Secret("PatientSessionSecret");
 
     // Email delivery — Resend (same provider/domain already verified for
@@ -46,7 +76,7 @@ export default $config({
     // sendEmail(), used by both). If unset, sendEmail() throws and callers
     // swallow the error (see app/api/portal/request-link/route.ts) rather
     // than surfacing a 500 to the user.
-    //   npx sst secret set ResendApiKey <key> --stage <stage>
+    // npx sst secret set ResendApiKey <key> --stage <stage>
     const resendApiKey = new sst.Secret("ResendApiKey");
 
     // PHI storage (Paso 2/3) — the S3 bucket and DynamoDB table were
@@ -110,6 +140,9 @@ export default $config({
         resendApiKey,
         phiBucket,
         phiTable,
+        signatureTemplatesTable,
+        signatureEnvelopesTable,
+        signatureSessionSecret,
       ],
       domain:
         $app.stage === "production"
@@ -125,7 +158,8 @@ export default $config({
         // Logs the submitter's IP address alongside their contact-consent
         // record (see app/api/leads/route.ts's `consent.ip` field). Off by
         // default; turned on 2026-10-02 at the user's request so the
-        // consent record captures IP too.
+        // consent record captures IP too. Also reused by the e-signature
+        // feature's audit trail (see app/api/sign/[envelopeId]/submit/route.ts).
         LOG_IP_ADDRESSES: "true",
         NEXT_PUBLIC_SITE_URL: "https://mobehaviortherapy.com",
         NEXT_PUBLIC_COMPANY_PHONE: "+13057950600",
@@ -139,6 +173,9 @@ export default $config({
         RESEND_API_KEY: resendApiKey.value,
         PHI_BUCKET: phiBucketName,
         PHI_TABLE: phiTableName,
+        SIGNATURE_TEMPLATES_TABLE: signatureTemplatesTable.name,
+        SIGNATURE_ENVELOPES_TABLE: signatureEnvelopesTable.name,
+        SIGNATURE_SESSION_SECRET: signatureSessionSecret.value,
       },
     });
 

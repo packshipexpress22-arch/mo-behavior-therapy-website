@@ -13,10 +13,14 @@ export const leadSchema = z.object({
     .regex(/^[\d\s()+.-]{7,20}$/, "invalid_phone"),
   email: z.string().trim().email("invalid_email"),
   city: z.string().trim().max(80).optional(),
+  // Accepts plain 5-digit ZIP or ZIP+4 (with a dash or space, or none) —
+  // the contact form has no client-side ZIP format check, so visitors who
+  // type the +4 extension (very common in the US) were silently hitting a
+  // 422 here and seeing an unhelpful generic submit error.
   zip: z
     .string()
     .trim()
-    .regex(/^\d{5}$/, "invalid_zip")
+    .regex(/^\d{5}([-\s]?\d{4})?$/, "invalid_zip")
     .optional()
     .or(z.literal("")),
   county: z.string().trim().max(80).optional(),
@@ -54,7 +58,7 @@ export const referralSchema = z.object({
   clientZip: z
     .string()
     .trim()
-    .regex(/^\d{5}$/)
+    .regex(/^\d{5}([-\s]?\d{4})?$/)
     .optional()
     .or(z.literal("")),
   notes: z.string().trim().max(1000).optional(),

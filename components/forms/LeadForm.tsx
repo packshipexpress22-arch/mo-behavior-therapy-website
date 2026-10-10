@@ -74,6 +74,10 @@ export default function LeadForm() {
     if (!fields.contactName) newErrors.contactName = true;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) newErrors.email = true;
     if (!/^[\d\s()+.-]{7,20}$/.test(fields.phone)) newErrors.phone = true;
+    // Accepts plain 5-digit ZIP or ZIP+4 — matches the server's leadSchema
+    // regex (lib/validation.ts) so a visitor who types the +4 extension
+    // sees an inline error immediately instead of a failed submission.
+    if (fields.zip && !/^\d{5}([-\s]?\d{4})?$/.test(fields.zip.trim())) newErrors.zip = true;
     if (!consent) newErrors.consent = true;
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -225,10 +229,11 @@ export default function LeadForm() {
           <input
             id="zip"
             inputMode="numeric"
-            className={inputClass}
+            className={cn(inputClass, errors.zip && "border-brand-coral")}
             value={fields.zip}
             onChange={(e) => set("zip", e.target.value)}
           />
+          {errors.zip && <p className="mt-1 text-xs text-brand-coral">{t("validation.invalidZip")}</p>}
         </div>
       </fieldset>
 
@@ -368,11 +373,7 @@ export default function LeadForm() {
       <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
 
       {status === "error" && <p className="text-sm text-brand-coral">{t("validation.genericError")}</p>}
-      {status === "captcha_error" && (
-        <p className="text-sm text-brand-coral">
-          Please complete the verification check above and try again.
-        </p>
-      )}
+      {status === "captcha_error" && <p className="text-sm text-brand-coral">{t("validation.captchaError")}</p>}
 
       <button
         type="submit"

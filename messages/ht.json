@@ -295,6 +295,8 @@
       "invalidPhone": "Tanpri antre yon nimewo telefòn valab.",
       "invalidZip": "Tanpri antre yon kòd postal 5 chif valab.",
       "consentRequired": "Tanpri revize epi mete tik nan kaz konsantman an pou soumèt demand ou.",
+      "invalidZip": "Tanpri antre yon kòd postal valab ki gen 5 chif.",
+      "captchaError": "Tanpri konplete verifikasyon ki pi wo a epi eseye ankò.",
       "genericError": "Gen yon pwoblèm ki fèt lè n ap soumèt demand ou. Tanpri eseye ankò, oswa rele nou nan (305) 795-0600.",
       "success": "Mèsi — nou resevwa demand ou. Ekip nou an ap kontakte ou byento.",
       "successWithUpload": "Mèsi — nou resevwa demand ou. Ekip nou an ap kontakte ou byento. Nou voye tou yon imel ak yon lyen sekirize pou ou telechaje dokiman ou yo nenpòt lè ou pare."

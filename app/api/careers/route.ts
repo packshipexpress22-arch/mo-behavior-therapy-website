@@ -4,11 +4,21 @@ import { storeLead } from "@/lib/leadStore";
 import { sendEmail } from "@/lib/email";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { company } from "@/data/company";
+import { escapeHtml } from "@/lib/utils";
+import { createRateLimiter } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
+// Same per-IP limit as /api/leads — this endpoint previously had none at
+// all beyond the honeypot. See lib/rateLimit.ts.
+const rateLimited = createRateLimiter(8);
+
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  if (rateLimited(ip)) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "invalid_body" }, { status: 400 });
   if (body.companyWebsite) return NextResponse.json({ ok: true });
@@ -45,7 +55,10 @@ export async function POST(req: NextRequest) {
     await sendEmail({
       to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
       subject: `NEW APPLICATION – ${parsed.data.positionAppliedFor} – ${parsed.data.applicantName}`,
-      html: `<h2>New Job Application</h2><pre>${JSON.stringify(parsed.data, null, 2)}</pre><p>Lead ID: ${lead.id}</p>`,
+      // JSON.stringify does not HTML-escape "<"/">" — escape the whole
+      // block so a crafted field value (e.g. in `message`) can't render as
+      // a live link/image/tracking-pixel in the staff member's inbox.
+      html: `<h2>New Job Application</h2><pre>${escapeHtml(JSON.stringify(parsed.data, null, 2))}</pre><p>Lead ID: ${lead.id}</p>`,
       text: `New application: ${JSON.stringify(parsed.data, null, 2)}\nLead ID: ${lead.id}`,
       replyTo: parsed.data.email,
     }).catch((err) => console.error("[careers] email failed:", err));

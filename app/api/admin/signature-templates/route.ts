@@ -12,6 +12,7 @@ import {
   type PositionedField,
   type PositionedFieldType,
 } from "@/lib/signatureTemplates";
+import { isValidSignatureSourcePdfKey } from "@/lib/phiStorage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -113,6 +114,12 @@ export async function POST(req: NextRequest) {
   const kind: TemplateKind = body.kind === "pdf" ? "pdf" : "blocks";
   if (kind === "pdf" && (typeof body.sourcePdfKey !== "string" || !body.sourcePdfKey)) {
     return NextResponse.json({ error: "missing_source_pdf" }, { status: 422 });
+  }
+  // See lib/phiStorage.ts's isValidSignatureSourcePdfKey: without this, any
+  // string the admin client sends is trusted as an S3 key into the same
+  // bucket that stores real patient PHI.
+  if (kind === "pdf" && !isValidSignatureSourcePdfKey(body.sourcePdfKey)) {
+    return NextResponse.json({ error: "invalid_source_pdf_key" }, { status: 422 });
   }
 
   const template = await createTemplate({

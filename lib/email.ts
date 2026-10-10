@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { company } from "@/data/company";
-import { interpolate } from "@/lib/utils";
+import { interpolate, escapeHtml } from "@/lib/utils";
 import type { LeadRecord } from "@/lib/leadStore";
 import { createMagicLinkToken, isPatientPortalConfigured, DOCUMENT_INVITE_TTL_MS } from "@/lib/phiAuth";
 
@@ -105,10 +105,13 @@ export async function sendInternalNotification(lead: LeadRecord) {
     <table cellpadding="4" cellspacing="0" style="font-family:sans-serif;font-size:14px">
       ${rows
         .filter(([, v]) => v !== undefined && v !== "")
-        .map(([label, value]) => `<tr><td style="font-weight:600;padding-right:12px">${label}</td><td>${value}</td></tr>`)
+        .map(
+          ([label, value]) =>
+            `<tr><td style="font-weight:600;padding-right:12px">${escapeHtml(label)}</td><td>${escapeHtml(value)}</td></tr>`
+        )
         .join("")}
     </table>
-    ${d.message ? `<p><strong>Message:</strong> ${d.message}</p>` : ""}
+    ${d.message ? `<p><strong>Message:</strong> ${escapeHtml(d.message)}</p>` : ""}
   `;
 
   const text = rows

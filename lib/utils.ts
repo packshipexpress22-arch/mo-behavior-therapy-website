@@ -13,6 +13,30 @@ export function mailHref(email: string) {
   return `mailto:${email}`;
 }
 
+/** Escapes a string for safe interpolation into an HTML email body. Lead,
+ * referral, and careers submissions include free-text fields that get
+ * rendered into HTML notification emails (lib/email.ts, app/api/referrals,
+ * app/api/careers) — without this, a submitter could embed a fake link,
+ * styled content, or a tracking pixel that renders live in a staff member's
+ * inbox. Always escape user-supplied values before interpolating them into
+ * an HTML string; plain-text email bodies don't need this. */
+export function escapeHtml(value: unknown): string {
+  return String(value ?? "").replace(/[&<>"']/g, (c) => {
+    switch (c) {
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      default:
+        return "&#39;";
+    }
+  });
+}
+
 /** Very small helper for interpolating ICU-lite `{token}` strings coming out
  * of next-intl when we need the raw string outside of <FormattedMessage>
  * (e.g. building an email subject line server-side). */

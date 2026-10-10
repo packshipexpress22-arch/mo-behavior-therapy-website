@@ -3,20 +3,13 @@ import { leadSchema } from "@/lib/validation";
 import { storeLead } from "@/lib/leadStore";
 import { sendInternalNotification, sendClientConfirmation, sendDocumentUploadInvite } from "@/lib/email";
 import { verifyTurnstileToken } from "@/lib/turnstile";
+import { createRateLimiter } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
-const hits = new Map<string, { count: number; resetAt: number }>();
-function rateLimited(ip: string) {
-  const now = Date.now();
-  const entry = hits.get(ip);
-  if (!entry || now > entry.resetAt) {
-    hits.set(ip, { count: 1, resetAt: now + 60_000 });
-    return false;
-  }
-  entry.count += 1;
-  return entry.count > 8; // 8 lead submissions/min/IP is generous for real traffic, tight for bots
-}
+// 8 lead submissions/min/IP is generous for real traffic, tight for bots.
+// See lib/rateLimit.ts for the known in-memory/per-Lambda-instance caveat.
+const rateLimited = createRateLimiter(8);
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";

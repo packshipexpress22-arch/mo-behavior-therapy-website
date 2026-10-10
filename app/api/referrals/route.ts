@@ -4,8 +4,14 @@ import { storeLead } from "@/lib/leadStore";
 import { sendEmail, sendReferralDocumentUploadInvite } from "@/lib/email";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { company } from "@/data/company";
+import { escapeHtml } from "@/lib/utils";
+import { createRateLimiter } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
+
+// Same per-IP limit as /api/leads — this endpoint previously had none at
+// all beyond the honeypot. See lib/rateLimit.ts.
+const rateLimited = createRateLimiter(8);
 
 // Kept as its own endpoint (and its own form — see components/forms/ReferralForm.tsx)
 // deliberately separate from /api/leads: referring professionals are not
@@ -13,6 +19,10 @@ export const runtime = "nodejs";
 // prospective client.
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  if (rateLimited(ip)) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "invalid_body" }, { status: 400 });
   if (body.companyWebsite) return NextResponse.json({ ok: true });
@@ -61,7 +71,10 @@ export async function POST(req: NextRequest) {
       ["internal_notification", sendEmail({
         to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
         subject: `NEW REFERRAL – ${data.professionalName}`,
-        html: `<h2>New Referral</h2><pre>${JSON.stringify(data, null, 2)}</pre><p>Lead ID: ${lead.id}</p>`,
+        // JSON.stringify does not HTML-escape "<"/">" — escape the whole
+        // block so a crafted field value (e.g. in `notes`) can't render as
+        // a live link/image/tracking-pixel in the staff member's inbox.
+        html: `<h2>New Referral</h2><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre><p>Lead ID: ${lead.id}</p>`,
         text: `New referral from ${data.professionalName}\n${JSON.stringify(data, null, 2)}\nLead ID: ${lead.id}`,
         replyTo: data.email,
       })],

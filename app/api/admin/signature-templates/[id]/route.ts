@@ -11,7 +11,7 @@ import {
   type PositionedField,
   type PositionedFieldType,
 } from "@/lib/signatureTemplates";
-import { createViewUrl } from "@/lib/phiStorage";
+import { createViewUrl, isValidSignatureSourcePdfKey } from "@/lib/phiStorage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -107,7 +107,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (typeof body.active === "boolean") patch.active = body.active;
   if (body.kind === "blocks" || body.kind === "pdf") patch.kind = body.kind;
   if (body.blocks !== undefined) patch.blocks = sanitizeBlocks(body.blocks);
-  if (typeof body.sourcePdfKey === "string") patch.sourcePdfKey = body.sourcePdfKey;
+  if (typeof body.sourcePdfKey === "string") {
+    if (!isValidSignatureSourcePdfKey(body.sourcePdfKey)) {
+      return NextResponse.json({ error: "invalid_source_pdf_key" }, { status: 422 });
+    }
+    patch.sourcePdfKey = body.sourcePdfKey;
+  }
   if (typeof body.sourcePdfFileName === "string") patch.sourcePdfFileName = body.sourcePdfFileName;
   if (typeof body.pageCount === "number") patch.pageCount = body.pageCount;
   if (body.fields !== undefined) patch.fields = sanitizeFields(body.fields);

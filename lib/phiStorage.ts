@@ -71,6 +71,24 @@ export function signatureSourcePdfKey(uploadId: string, fileName: string): strin
   return `signature-sources/${uploadId}/${sanitizeFileName(fileName)}`;
 }
 
+/**
+ * Security check for a `sourcePdfKey` the admin CLIENT supplies when
+ * creating/editing a PDF-kind signature template (see
+ * app/api/admin/signature-templates/route.ts and [id]/route.ts). Without
+ * this, any string the client sends is trusted as-is, and since this bucket
+ * also stores real patient PHI under `patients/<email>/...`, a compromised
+ * admin session (stolen cookie, XSS) could point a template at another
+ * patient's document — which the public, no-login /sign/[envelopeId] page
+ * would then happily serve a presigned view URL for, bypassing the patient
+ * portal's own auth entirely. Only accept keys actually shaped like ones
+ * signatureSourcePdfKey() produces: the fixed prefix, a single path
+ * segment for the uploadId, then a sanitized filename — no "..", no extra
+ * "/", nothing reaching into `patients/` or `signatures/`.
+ */
+export function isValidSignatureSourcePdfKey(key: string): boolean {
+  return /^signature-sources\/[A-Za-z0-9_-]{1,64}\/[A-Za-z0-9._-]{1,200}$/.test(key);
+}
+
 export async function createUploadUrl(args: {
   s3Key: string;
   contentType: string;

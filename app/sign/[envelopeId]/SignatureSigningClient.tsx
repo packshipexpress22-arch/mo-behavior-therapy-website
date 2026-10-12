@@ -100,7 +100,7 @@ function PdfFillViewer({
       setCanvasSize({ width: viewport.width, height: viewport.height });
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      await pdfPage.render({ canvasContext: ctx, viewport }).promise;
+      await pdfPage.render({ canvas, canvasContext: ctx, viewport }).promise;
       setRenderError(null);
     } catch {
       setRenderError("No se pudo mostrar esta página.");

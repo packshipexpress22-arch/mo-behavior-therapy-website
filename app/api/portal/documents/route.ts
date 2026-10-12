@@ -45,7 +45,7 @@ export async function GET() {
   const session = requireSession();
   if (!session) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const docs = await listDocumentsForPatient(session.patientId);
+  const docs = await listDocumentsForPatient(session.patientId, session.leadId);
   return NextResponse.json({ documents: docs });
 }
 
@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
   await putDocument({
     patientId: session.patientId,
     documentId,
+    leadId: session.leadId,
     fileName,
     contentType,
     documentType,

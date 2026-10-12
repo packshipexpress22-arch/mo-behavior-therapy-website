@@ -55,6 +55,15 @@ export type DocumentStatus = "pending_upload" | "uploaded";
 export type PhiDocument = {
     patientId: string;
     documentId: string;
+    // Added 2026-10-12 — which lead/referral this document belongs to (see
+    // lib/phiAuth.ts's same-dated update note). Nullable because the
+    // DynamoDB table's physical key is still just (patientId, documentId) —
+    // this is an added attribute, not a key change — and because documents
+    // written before this fix carry no leadId at all. listDocumentsForPatient()
+    // filters on it so one email reused across multiple cases (a provider
+    // referring several different children, or a parent referring two kids)
+    // never mixes those cases' documents together again.
+    leadId: string | null;
     fileName: string;
     contentType: string;
     documentType: DocumentType;
@@ -85,7 +94,22 @@ export async function getDocument(patientId: string, documentId: string): Promis
     return (res.Item as PhiDocument) ?? null;
 }
 
-export async function listDocumentsForPatient(patientId: string): Promise<PhiDocument[]> {
+/**
+ * `leadId` scopes the result to one case, matching the session that
+ * requested it (see app/api/portal/documents/route.ts). When `leadId` is a
+ * string, only documents written with that same leadId are returned — a
+ * document from a different case under the same email, or a legacy
+ * document written before leadId existed (leadId === undefined on the
+ * stored item), is correctly excluded rather than silently shown.
+ * `leadId === null` (no case could be determined for this session — see
+ * lib/phiAuth.ts) deliberately returns nothing rather than falling back to
+ * "every document under this email", which is the exact cross-case mixing
+ * this filtering exists to prevent.
+ */
+export async function listDocumentsForPatient(
+    patientId: string,
+    leadId: string | null
+): Promise<PhiDocument[]> {
     const c = requireClient();
     const res = await c.send(
           new QueryCommand({
@@ -95,7 +119,8 @@ export async function listDocumentsForPatient(patientId: string): Promise<PhiDoc
                   ScanIndexForward: false,
           })
         );
-    const items = (res.Items as PhiDocument[]) ?? [];
+    let items = (res.Items as PhiDocument[]) ?? [];
+    items = leadId === null ? [] : items.filter((d) => d.leadId === leadId);
     // documentId (nanoid) isn't chronologically sortable, so sort explicitly.
   return items.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }

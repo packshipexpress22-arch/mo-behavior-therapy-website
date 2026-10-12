@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createMagicLinkToken, isPatientPortalConfigured } from "@/lib/phiAuth";
 import { sendEmail } from "@/lib/email";
 import { company } from "@/data/company";
+import { findLatestLeadIdByEmail } from "@/lib/leadStore";
 
 export const runtime = "nodejs";
 
@@ -42,8 +43,21 @@ export async function POST(req: NextRequest) {
   const email = parsed.data.email.trim().toLowerCase();
   if (rateLimited(emailAttempts, email, 5)) return genericOk;
 
+  // Scope this link to the same case an emailed invite would have used —
+  // otherwise this manual "resend my link" path is the one place left
+  // where the old bug (a reused email resolving to whichever case's
+  // documents happen to be newest) could still happen. Best-effort: if the
+  // lookup fails for any reason, still send an (unscoped) link rather than
+  // failing sign-in entirely.
+  let leadId: string | null = null;
+  try {
+    leadId = await findLatestLeadIdByEmail(email);
+  } catch (err) {
+    console.error("[portal/request-link] findLatestLeadIdByEmail failed:", err);
+  }
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
-  const token = createMagicLinkToken(email);
+  const token = createMagicLinkToken(email, undefined, leadId);
   const link = `${siteUrl}/api/portal/verify?token=${encodeURIComponent(token)}`;
 
   const html = `

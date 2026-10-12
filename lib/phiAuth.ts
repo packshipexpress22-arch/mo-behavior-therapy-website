@@ -18,6 +18,17 @@ import { randomBytes, timingSafeEqual, createHmac } from "crypto";
 //      exchanged exactly once (by hitting /api/portal/verify) for #2.
 //   2. "session" token — longer-lived (7 days), stored in an httpOnly
 //      cookie after verification, checked on every /portal/* request.
+//
+// Update 2026-10-12: both tokens now also carry an optional `leadId`. Before
+// this, the portal's only notion of identity was the email address, so the
+// SAME email reused across multiple distinct requests (a provider like SOMA
+// referring several different children, or one parent referring two kids)
+// all landed on the exact same document list — whichever link you clicked,
+// or whenever you re-signed-in, you'd see whatever was uploaded for the
+// MOST RECENT case under that email, not the one you meant. `leadId` scopes
+// a session to the one referral/intake it was issued for, so
+// lib/phiDocuments.ts can filter by (patientId, leadId) instead of just
+// patientId. See listDocumentsForPatient() and app/api/portal/documents/route.ts.
 
 export const PATIENT_COOKIE_NAME = "mo_patient_session";
 const MAGIC_LINK_TTL_MS = 15 * 60 * 1000; // 15 minutes — interactive /portal/login request
@@ -63,26 +74,40 @@ export function patientIdFromEmail(email: string): string {
  * ttlMs defaults to the 15-minute interactive window; pass
  * DOCUMENT_INVITE_TTL_MS for an emailed invite instead. The chosen TTL is
  * baked into the signed payload itself (see verifyMagicLinkToken), so callers
- * never need to track which TTL a given token used. */
-export function createMagicLinkToken(email: string, ttlMs: number = MAGIC_LINK_TTL_MS): string {
+ * never need to track which TTL a given token used. `leadId` (a lead's own
+ * id, e.g. from lib/leadStore.ts) scopes the resulting session to that one
+ * request — pass it whenever the caller knows which lead this link is for
+ * (every emailed invite does); omit it only for the generic, not-tied-to-one-
+ * case /portal/login flow. leadId is a nanoid-based id and never contains
+ * "|", same as email. */
+export function createMagicLinkToken(
+  email: string,
+  ttlMs: number = MAGIC_LINK_TTL_MS,
+  leadId?: string | null
+): string {
   const normalized = normalizeEmail(email);
   if (normalized.includes("|")) {
     throw new Error("email must not contain '|'");
   }
+  if (leadId && leadId.includes("|")) {
+    throw new Error("leadId must not contain '|'");
+  }
   const nonce = randomBytes(9).toString("base64url");
   const expiresAt = Date.now() + ttlMs;
-  const payload = `${normalized}|${expiresAt}|${nonce}`;
+  const payload = `${normalized}|${leadId ?? ""}|${expiresAt}|${nonce}`;
   return `${payload}|${sign(payload)}`;
 }
 
-export function verifyMagicLinkToken(token: string | undefined | null): { email: string } | null {
+export function verifyMagicLinkToken(
+  token: string | undefined | null
+): { email: string; leadId: string | null } | null {
   if (!token) return null;
   const parts = token.split("|");
-  if (parts.length !== 4) return null;
-  const [email, expiresAtStr, nonce, sig] = parts;
+  if (parts.length !== 5) return null;
+  const [email, leadIdRaw, expiresAtStr, nonce, sig] = parts;
   if (!email || !expiresAtStr || !nonce || !sig) return null;
 
-  const payload = `${email}|${expiresAtStr}|${nonce}`;
+  const payload = `${email}|${leadIdRaw}|${expiresAtStr}|${nonce}`;
   let expectedSig: string;
   try {
     expectedSig = sign(payload);
@@ -99,26 +124,26 @@ export function verifyMagicLinkToken(token: string | undefined | null): { email:
   const expiresAt = Number(expiresAtStr);
   if (!Number.isFinite(expiresAt) || Date.now() > expiresAt) return null;
 
-  return { email };
+  return { email, leadId: leadIdRaw || null };
 }
 
-export function createPatientSessionToken(email: string): string {
+export function createPatientSessionToken(email: string, leadId?: string | null): string {
   const normalized = normalizeEmail(email);
   const expiresAt = Date.now() + SESSION_TTL_MS;
-  const payload = `${normalized}|${expiresAt}`;
+  const payload = `${normalized}|${leadId ?? ""}|${expiresAt}`;
   return `${payload}|${sign(payload)}`;
 }
 
 export function verifyPatientSessionToken(
   token: string | undefined | null
-): { email: string; patientId: string } | null {
+): { email: string; patientId: string; leadId: string | null } | null {
   if (!token) return null;
   const parts = token.split("|");
-  if (parts.length !== 3) return null;
-  const [email, expiresAtStr, sig] = parts;
+  if (parts.length !== 4) return null;
+  const [email, leadIdRaw, expiresAtStr, sig] = parts;
   if (!email || !expiresAtStr || !sig) return null;
 
-  const payload = `${email}|${expiresAtStr}`;
+  const payload = `${email}|${leadIdRaw}|${expiresAtStr}`;
   let expectedSig: string;
   try {
     expectedSig = sign(payload);
@@ -135,5 +160,5 @@ export function verifyPatientSessionToken(
   const expiresAt = Number(expiresAtStr);
   if (!Number.isFinite(expiresAt) || Date.now() > expiresAt) return null;
 
-  return { email, patientId: patientIdFromEmail(email) };
+  return { email, patientId: patientIdFromEmail(email), leadId: leadIdRaw || null };
 }

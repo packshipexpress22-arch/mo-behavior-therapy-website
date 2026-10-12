@@ -3,7 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { prisma, ensureLeadSchema } from "./prisma";
 import type { Lead as PrismaLead } from "@prisma/client";
-import { dynamoLeadsConfigured, putLead, type FlatLead } from "./dynamoLeads";
+import { dynamoLeadsConfigured, putLead, listLeads, type FlatLead } from "./dynamoLeads";
 
 // Pluggable lead storage, tried in this order:
 //   1. DynamoDB (LEADS_TABLE set) — the AWS Lambda deploy path, see
@@ -168,6 +168,46 @@ function fromFlatLead(row: FlatLead): LeadRecord {
     language: row.language,
     data,
   };
+}
+
+/**
+ * Looks up the most recently created lead for a given email, across every
+ * kind (family intake, referral, career) — used by
+ * app/api/portal/request-link/route.ts to scope a freshly-requested magic
+ * link to a specific case the same way an emailed invite already is (see
+ * lib/phiAuth.ts's 2026-10-12 update note), instead of leaving that
+ * recovery path as the one way left to land on a mixed-together document
+ * list. Returns null if no lead has ever used this email (e.g. a typo, or a
+ * portal visitor who was never actually a lead) — callers should fall back
+ * to an email-only, no-leadId session rather than failing the request.
+ */
+export async function findLatestLeadIdByEmail(email: string): Promise<string | null> {
+  const normalized = email.trim().toLowerCase();
+
+  if (dynamoLeadsConfigured()) {
+    // gsi1 is already sorted newest-first (see dynamoLeads.ts); filter down
+    // to an exact, case-insensitive email match ourselves since listLeads'
+    // own `q` filter is a loose substring match across several fields.
+    const matches = (await listLeads({ limit: 500 })).filter(
+      (l) => (l.email ?? "").trim().toLowerCase() === normalized
+    );
+    return matches[0]?.id ?? null;
+  }
+
+  if (process.env.DATABASE_URL) {
+    await ensureLeadSchema();
+    const row = await prisma.lead.findFirst({
+      where: { email: { equals: normalized, mode: "insensitive" } },
+      orderBy: { createdAt: "desc" },
+    });
+    return row?.id ?? null;
+  }
+
+  const records = await readFileStore();
+  const matches = records
+    .filter((r) => ((r.data as Record<string, string>).email ?? "").trim().toLowerCase() === normalized)
+    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  return matches[0]?.id ?? null;
 }
 
 export async function storeLead(input: {

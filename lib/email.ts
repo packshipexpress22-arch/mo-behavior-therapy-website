@@ -424,7 +424,12 @@ export async function sendDocumentUploadInvite(lead: LeadRecord) {
   const firstName = (d.contactName || "").split(" ")[0] || (lead.language === "es" ? "familia" : "there");
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
-  const token = createMagicLinkToken(email, DOCUMENT_INVITE_TTL_MS);
+  // lead.id scopes the resulting session to this one case — see
+  // lib/phiAuth.ts's 2026-10-12 update note. Without it, a caregiver who
+  // submits more than one intake with the same email (e.g. a second child)
+  // would see whichever case's documents happened to be newest, regardless
+  // of which invite link they actually clicked.
+  const token = createMagicLinkToken(email, DOCUMENT_INVITE_TTL_MS, lead.id);
   const link = `${siteUrl}/api/portal/verify?token=${encodeURIComponent(token)}`;
 
   const html = `
@@ -490,7 +495,13 @@ export async function sendReferralDocumentUploadInvite(lead: LeadRecord) {
   const clientFirstName = d.clientFirstName || "your patient";
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
-  const token = createMagicLinkToken(email, DOCUMENT_INVITE_TTL_MS);
+  // lead.id scopes the resulting session to THIS referral — see
+  // lib/phiAuth.ts's 2026-10-12 update note. This is the fix for a referring
+  // provider (same email for every referral they send) getting stuck on a
+  // previously-referred child's documents when they refer a new one: each
+  // referral now gets its own case-scoped link, instead of every link for
+  // that provider's email resolving to the same shared document list.
+  const token = createMagicLinkToken(email, DOCUMENT_INVITE_TTL_MS, lead.id);
   const link = `${siteUrl}/api/portal/verify?token=${encodeURIComponent(token)}`;
 
   const html = `

@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${siteUrl}/portal/login?error=expired_link`);
   }
 
-  const session = createPatientSessionToken(verified.email);
+  const session = createPatientSessionToken(verified.email, verified.leadId);
   const res = NextResponse.redirect(`${siteUrl}/portal`);
   res.cookies.set(PATIENT_COOKIE_NAME, session, {
     httpOnly: true,

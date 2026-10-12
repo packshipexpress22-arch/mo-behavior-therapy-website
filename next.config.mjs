@@ -83,24 +83,20 @@ const nextConfig = {
   // has an optional Node `canvas` fallback path that webpack otherwise
   // tries to resolve even though it's never reached in the browser bundle.
   // This is the standard fix recommended by pdfjs-dist for webpack/Next.js.
+  //
+  // Note on the worker file itself (pdf.worker.min.mjs): an earlier version
+  // of this config tried to fix a Terser build failure
+  // ("'import.meta' cannot be used outside of module code") by pushing a
+  // `type: "asset/resource"` module rule here. That did NOT work in
+  // production (confirmed by a real deploy run still failing on it) —
+  // `new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url)` is
+  // handled by webpack's built-in URL-dependency parsing before module
+  // rules like this one get a say, so Terser still minified it. The actual
+  // fix was to stop bundling the worker through webpack at all: the
+  // "prebuild" npm script (package.json) copies it into public/, and both
+  // components now point workerSrc at that plain public path instead.
   webpack: (config) => {
     config.resolve.alias.canvas = false;
-    // Both components load the worker via
-    // `new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url)`, which
-    // webpack bundles as a same-origin asset (why the CSP's worker-src
-    // allows 'self'). By default Next.js still runs that emitted chunk
-    // through its JS loader/Terser pipeline, and the worker file's own
-    // top-level `import.meta` usage (pdf.js's internal wasm/feature-detection
-    // code) makes Terser fail with "'import.meta' cannot be used outside
-    // module code" during `next build` — this doesn't surface in `next dev`
-    // since dev mode skips minification. Marking the file as a raw
-    // `asset/resource` makes webpack copy it byte-for-byte instead of
-    // parsing/minifying it, which is pdfjs-dist's own documented fix for
-    // this error under webpack 5 / Next.js production builds.
-    config.module.rules.push({
-      test: /pdf\.worker\.(min\.)?mjs$/,
-      type: "asset/resource",
-    });
     return config;
   },
  };

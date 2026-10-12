@@ -1,6 +1,11 @@
 node_modules
 .next
 out
+
+# Copied from node_modules/pdfjs-dist by the "prebuild" npm script (see
+# next.config.mjs / PdfFieldEditor.tsx / SignatureSigningClient.tsx) — never
+# committed, always regenerated from whatever pdfjs-dist version is installed.
+/public/pdf.worker.min.mjs
 .env
 .env.local
 data/leads.local.json

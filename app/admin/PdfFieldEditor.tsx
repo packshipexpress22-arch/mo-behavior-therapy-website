@@ -105,10 +105,14 @@ export default function PdfFieldEditor({
     (async () => {
       try {
         const pdfjsLib = await import("pdfjs-dist");
-        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-          "pdfjs-dist/build/pdf.worker.min.mjs",
-          import.meta.url
-        ).toString();
+        // A plain public-folder path, not `new URL(..., import.meta.url)`: that
+        // bundler-asset form made webpack/Terser try to minify this ESM-only
+        // worker file during `next build` ("'import.meta' cannot be used
+        // outside of module code") no matter how the webpack rule in
+        // next.config.mjs was tuned. The "prebuild" npm script copies the
+        // matching pdf.worker.min.mjs from node_modules/pdfjs-dist into
+        // public/ before every build, so webpack never sees this file at all.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
         const doc = await pdfjsLib.getDocument(viewUrl).promise;
         if (cancelled) return;
         pdfDocRef.current = doc;

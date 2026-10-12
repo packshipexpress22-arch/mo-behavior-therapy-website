@@ -85,9 +85,23 @@ const nextConfig = {
   // This is the standard fix recommended by pdfjs-dist for webpack/Next.js.
   webpack: (config) => {
     config.resolve.alias.canvas = false;
+    // Both components load the worker via
+    // `new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url)`, which
+    // webpack bundles as a same-origin asset (why the CSP's worker-src
+    // allows 'self'). By default Next.js still runs that emitted chunk
+    // through its JS loader/Terser pipeline, and the worker file's own
+    // top-level `import.meta` usage (pdf.js's internal wasm/feature-detection
+    // code) makes Terser fail with "'import.meta' cannot be used outside
+    // module code" during `next build` — this doesn't surface in `next dev`
+    // since dev mode skips minification. Marking the file as a raw
+    // `asset/resource` makes webpack copy it byte-for-byte instead of
+    // parsing/minifying it, which is pdfjs-dist's own documented fix for
+    // this error under webpack 5 / Next.js production builds.
+    config.module.rules.push({
+      test: /pdf\.worker\.(min\.)?mjs$/,
+      type: "asset/resource",
+    });
     return config;
   },
-};
-
-export default withNextIntl(nextConfig);
+  
 

@@ -270,6 +270,9 @@
       "message": "Gen lòt bagay ou vle nou konnen? (opsyonèl)",
       "organization": "Òganizasyon / Pratik",
       "role": "Wòl Ou",
+      "caregiverName": "Non Konplè Moun k ap Pran Swen",
+      "caregiverPhone": "Nimewo Telefòn Moun k ap Pran Swen",
+      "caregiverEmail": "Imèl Moun k ap Pran Swen (si disponib)",
       "positionAppliedFor": "Pozisyon w ap Aplike Pou",
       "resume": "Rezime / CV"
     },

@@ -17,6 +17,9 @@ type FieldState = {
   clientFirstName: string;
   clientCity: string;
   clientZip: string;
+  caregiverName: string;
+  caregiverPhone: string;
+  caregiverEmail: string;
   notes: string;
   companyWebsite: string;
 };
@@ -30,6 +33,9 @@ const initial: FieldState = {
   clientFirstName: "",
   clientCity: "",
   clientZip: "",
+  caregiverName: "",
+  caregiverPhone: "",
+  caregiverEmail: "",
   notes: "",
   companyWebsite: "",
 };
@@ -53,6 +59,10 @@ export default function ReferralForm() {
     if (!fields.professionalName) newErrors.professionalName = true;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) newErrors.email = true;
     if (!fields.phone) newErrors.phone = true;
+    if (!fields.caregiverPhone) newErrors.caregiverPhone = true;
+    if (fields.caregiverEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.caregiverEmail)) {
+      newErrors.caregiverEmail = true;
+    }
     if (!consent) newErrors.consent = true;
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -187,6 +197,48 @@ export default function ReferralForm() {
             className={inputClass}
             value={fields.clientZip}
             onChange={(e) => set("clientZip", e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Added 2026-10-12: so staff can reach the family directly, even
+          before the caregiver uploads anything through their own portal
+          link (see lib/email.ts's sendReferralDocumentUploadInvite, which
+          also now mentions caregiver contact info as something to share). */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div>
+          <label className={labelClass} htmlFor="caregiverName">
+            {t("labels.caregiverName")}
+          </label>
+          <input
+            id="caregiverName"
+            className={inputClass}
+            value={fields.caregiverName}
+            onChange={(e) => set("caregiverName", e.target.value)}
+          />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="caregiverPhone">
+            {t("labels.caregiverPhone")}
+          </label>
+          <input
+            id="caregiverPhone"
+            type="tel"
+            className={cn(inputClass, errors.caregiverPhone && "border-brand-coral")}
+            value={fields.caregiverPhone}
+            onChange={(e) => set("caregiverPhone", e.target.value)}
+          />
+        </div>
+        <div>
+          <label className={labelClass} htmlFor="caregiverEmail">
+            {t("labels.caregiverEmail")}
+          </label>
+          <input
+            id="caregiverEmail"
+            type="email"
+            className={cn(inputClass, errors.caregiverEmail && "border-brand-coral")}
+            value={fields.caregiverEmail}
+            onChange={(e) => set("caregiverEmail", e.target.value)}
           />
         </div>
       </div>

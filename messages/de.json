@@ -270,6 +270,9 @@
       "message": "Möchten Sie uns noch etwas mitteilen? (optional)",
       "organization": "Organisation / Praxis",
       "role": "Ihre Funktion",
+      "caregiverName": "Vollständiger Name der Betreuungsperson",
+      "caregiverPhone": "Telefonnummer der Betreuungsperson",
+      "caregiverEmail": "E-Mail-Adresse der Betreuungsperson (optional)",
       "positionAppliedFor": "Beworbene Position",
       "resume": "Lebenslauf"
     },

@@ -479,10 +479,17 @@ export async function sendDocumentUploadInvite(lead: LeadRecord) {
  * if the referral form ever gains a language switcher.
  *
  * The document checklist is deliberately different — and shorter — than the
- * family invite: per the client, a referring professional only ever sends
- * two things: the diagnosis document referring the child for ABA therapy,
- * and the child's insurance information. No caregiver ID, IEP, or
- * psychological evaluation is expected from this sender.
+ * family invite: per the client, a referring professional's two required
+ * items are the diagnosis document referring the child for ABA therapy, and
+ * the child's insurance information. No caregiver ID, IEP, or psychological
+ * evaluation is expected from this sender.
+ *
+ * Added 2026-10-12: the provider portal's upload page always includes an
+ * "Other" catch-all document type (app/portal/PortalDashboard.tsx), so this
+ * copy explicitly tells the provider they can use it for anything else —
+ * including the caregiver's contact info, if they'd rather share that as a
+ * document than (or in addition to) filling it into the referral form
+ * itself (components/forms/ReferralForm.tsx's new caregiver fields).
  */
 export async function sendReferralDocumentUploadInvite(lead: LeadRecord) {
   if (!isPatientPortalConfigured()) return;
@@ -512,6 +519,7 @@ export async function sendReferralDocumentUploadInvite(lead: LeadRecord) {
         <li>The diagnosis document referring ${clientFirstName} for ABA therapy</li>
         <li>${clientFirstName}'s insurance information</li>
       </ul>
+      <p style="font-size:13px;color:#475569">Have the caregiver's contact info, or anything else relevant to this referral? You're welcome to upload that too — just pick "Other" as the document type in the portal.</p>
       <p><a href="${link}" style="display:inline-block;padding:12px 24px;background:#2563EB;color:#fff;border-radius:9999px;text-decoration:none;font-weight:600">Upload documents securely</a></p>
       <p style="font-size:13px;color:#475569">This link is valid for 24 hours and can only be used by you. If it expires, just request a new one on our provider portal sign-in page using this same email address.</p>
       <p style="font-size:13px;color:#475569">Documents are encrypted and stored in our HIPAA-compliant system — they are never shared outside ${company.shortName}, and no AI tool ever has access to them.</p>
@@ -524,6 +532,7 @@ export async function sendReferralDocumentUploadInvite(lead: LeadRecord) {
     `Thank you for referring ${clientFirstName} to ${company.shortName}. To help us process this referral, please securely upload the following through our HIPAA-compliant provider portal:`,
     `- The diagnosis document referring ${clientFirstName} for ABA therapy`,
     `- ${clientFirstName}'s insurance information`,
+    `Have the caregiver's contact info, or anything else relevant to this referral? You're welcome to upload that too — just pick "Other" as the document type in the portal.`,
     `Upload documents securely: ${link}`,
     "This link is valid for 24 hours and can only be used by you. If it expires, just request a new one on our provider portal sign-in page using this same email address.",
     `Documents are encrypted and stored in our HIPAA-compliant system — they are never shared outside ${company.shortName}, and no AI tool ever has access to them.`,

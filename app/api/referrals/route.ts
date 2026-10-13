@@ -39,6 +39,22 @@ export async function POST(req: NextRequest) {
 
   const { consent, ...data } = parsed.data;
 
+  // Added 2026-10-12: fold the caregiver's contact info into `message` —
+  // the shared Lead schema (prisma/schema.prisma / lib/dynamoLeads.ts's
+  // FlatLead) has no dedicated caregiver-contact columns yet, and adding
+  // them would mean touching all three storage backends plus the admin
+  // dashboard's display just to show three extra lines. Prepending them
+  // here gets this in front of staff today, in the same place they already
+  // look (the admin dashboard's "message" field and this notification
+  // email); revisit as dedicated columns if staff ever need to filter/sort
+  // referrals by caregiver contact info specifically.
+  const caregiverContactLines = [
+    data.caregiverName && `Caregiver name: ${data.caregiverName}`,
+    `Caregiver phone: ${data.caregiverPhone}`,
+    data.caregiverEmail && `Caregiver email: ${data.caregiverEmail}`,
+  ].filter(Boolean);
+  const message = [caregiverContactLines.join("\n"), data.notes].filter(Boolean).join("\n\n");
+
   // Normalize into the shared Lead columns (see prisma/schema.prisma) so a
   // referral shows up identifiable — by contact name, city/zip — in the
   // admin dashboard, not just in this endpoint's own notification email.
@@ -51,7 +67,7 @@ export async function POST(req: NextRequest) {
     clientFirstName: data.clientFirstName,
     city: data.clientCity,
     zip: data.clientZip,
-    message: data.notes,
+    message,
   };
 
   try {

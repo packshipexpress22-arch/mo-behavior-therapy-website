@@ -270,6 +270,9 @@
       "message": "Autre chose que vous aimeriez nous dire ? (facultatif)",
       "organization": "Organisation / Cabinet",
       "role": "Votre Rôle",
+      "caregiverName": "Nom Complet de l'Aidant",
+      "caregiverPhone": "Téléphone de l'Aidant",
+      "caregiverEmail": "E-mail de l'Aidant (facultatif)",
       "positionAppliedFor": "Poste Visé",
       "resume": "CV"
     },

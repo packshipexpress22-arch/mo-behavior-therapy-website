@@ -39,12 +39,34 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "invalid_kind" }, { status: 422 });
   }
 
+  // Temporary diagnostic (2026-10-13): "Couldn't load leads" was reported
+  // in production right after the missing-secrets fix; this pins down
+  // whether dynamoLeadsConfigured() is actually true here, and surfaces the
+  // real error if listLeads() itself is what's throwing (previously
+  // uncaught, which would otherwise show up as a generic 500 with no
+  // detail in CloudWatch). Remove once the root cause is confirmed.
+  // eslint-disable-next-line no-console
+  console.error(
+    "[admin/leads] diag: dynamoLeadsConfigured=",
+    dynamoLeadsConfigured(),
+    "LEADS_TABLE set=",
+    Boolean(process.env.LEADS_TABLE),
+    "DATABASE_URL set=",
+    Boolean(process.env.DATABASE_URL)
+  );
+
   // AWS Lambda deploys: leads live in DynamoDB (see lib/dynamoLeads.ts),
   // returned in the same flat shape Prisma rows have below, so the admin
   // dashboard UI (app/admin/AdminDashboard.tsx) needs no changes.
   if (dynamoLeadsConfigured()) {
-    const leads = await listLeads({ status, kind, q, limit: 200 });
-    return NextResponse.json({ leads });
+    try {
+      const leads = await listLeads({ status, kind, q, limit: 200 });
+      return NextResponse.json({ leads });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[admin/leads] diag: listLeads() threw:", err);
+      return NextResponse.json({ error: "dynamo_error" }, { status: 500 });
+    }
   }
 
   if (!process.env.DATABASE_URL) {

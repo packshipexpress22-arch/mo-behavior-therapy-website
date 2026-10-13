@@ -270,6 +270,9 @@
       "message": "¿Algo más que quiera que sepamos? (opcional)",
       "organization": "Organización / Consultorio",
       "role": "Su Cargo",
+      "caregiverName": "Nombre Completo del Cuidador",
+      "caregiverPhone": "Teléfono del Cuidador",
+      "caregiverEmail": "Correo Electrónico del Cuidador (opcional)",
       "positionAppliedFor": "Puesto al que Aplica",
       "resume": "Currículum / CV"
     },

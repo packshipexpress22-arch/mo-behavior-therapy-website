@@ -270,6 +270,9 @@
       "message": "Anything else you'd like us to know? (optional)",
       "organization": "Organization / Practice",
       "role": "Your Role",
+      "caregiverName": "Caregiver's Full Name",
+      "caregiverPhone": "Caregiver's Phone Number",
+      "caregiverEmail": "Caregiver's Email Address (optional)",
       "positionAppliedFor": "Position Applying For",
       "resume": "Resume / CV"
     },

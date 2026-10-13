@@ -61,6 +61,14 @@ export const referralSchema = z.object({
     .regex(/^\d{5}([-\s]?\d{4})?$/)
     .optional()
     .or(z.literal("")),
+  // Added 2026-10-12: the referring professional usually already has a way
+  // to reach the caregiver — collecting it here means staff can follow up
+  // even before the caregiver uploads anything through their own portal
+  // link. Phone is required (most reliable for a quick follow-up call);
+  // name/email are nice-to-have, not blocking.
+  caregiverName: z.string().trim().max(120).optional(),
+  caregiverPhone: z.string().trim().min(7).max(20),
+  caregiverEmail: z.string().trim().email().optional().or(z.literal("")),
   notes: z.string().trim().max(1000).optional(),
   consent: z.literal(true),
   companyWebsite: z.string().max(0).optional(),

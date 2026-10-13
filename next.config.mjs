@@ -27,7 +27,19 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://challenges.cloudflare.com",
+      // https://mo-behavior-therapy-phi-documents.s3.us-east-1.amazonaws.com
+      // is the PHI S3 bucket (see sst.config.ts's phiBucketName / lib/phiStorage.ts).
+      // pdf.js (app/admin/PdfFieldEditor.tsx, app/sign/[envelopeId]/
+      // SignatureSigningClient.tsx) fetches the source PDF directly from the
+      // browser via a presigned S3 URL (pdfjsLib.getDocument(viewUrl)) —
+      // without this host here, that fetch is silently blocked by CSP and
+      // both the admin's "upload existing PDF" template preview and the
+      // parent-facing signing page fail with a generic "couldn't load the
+      // PDF" error, even though the upload itself succeeded. Missed when
+      // connect-src was first scoped down in the 2026-10-10 security pass,
+      // since the e-signature PDF-upload flow wasn't exercised against the
+      // new CSP until now.
+      "connect-src 'self' https://challenges.cloudflare.com https://mo-behavior-therapy-phi-documents.s3.us-east-1.amazonaws.com",
       // https://www.google.com is the footer's embedded Google Maps iframe
       // (components/layout/Footer.tsx, mapsEmbedSrc()).
       "frame-src https://challenges.cloudflare.com https://www.google.com",
@@ -101,5 +113,4 @@ const nextConfig = {
   },
  };
 
-export default withNextIntl(nextConfig); 
-
+export default withNextIntl(nextConfig);

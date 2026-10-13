@@ -5,9 +5,26 @@ import { PrismaClient } from "@prisma/client";
 // client per request would exhaust the database's connection limit.
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+// `new PrismaClient()` does not just build a plain object: Prisma 5's
+// LibraryEngine starts loading its query-engine binary in the background as
+// part of construction, without anyone awaiting or catching that promise.
+// On this project's AWS Lambda deploy (see sst.config.ts / lib/dynamoLeads.ts)
+// DynamoDB is the real backend, DATABASE_URL is never set, and the
+// generated Prisma client's query-engine binary doesn't match the Lambda
+// runtime's platform (built for debian-openssl-3.0.x, deployed on
+// rhel-openssl-3.0.x) — so that background load always fails. The resulting
+// unhandled promise rejection crashes the whole Node process (CloudWatch
+// shows this as `Runtime.ExitError`), even on requests that never touch
+// Prisma at all, simply because importing this module used to construct
+// the client unconditionally. Every caller of `prisma`/`ensureLeadSchema`
+// already checks `dynamoLeadsConfigured()` and then `process.env.DATABASE_URL`
+// before touching either, so it's safe to only construct the client when
+// DATABASE_URL is actually set, and never otherwise.
+export const prisma = process.env.DATABASE_URL
+  ? globalForPrisma.prisma ?? new PrismaClient()
+  : (null as unknown as PrismaClient);
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production" && process.env.DATABASE_URL) {
   globalForPrisma.prisma = prisma;
 }
 

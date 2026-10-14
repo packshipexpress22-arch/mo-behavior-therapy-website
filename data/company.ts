@@ -37,11 +37,18 @@ export const company = {
   domain: "mobehaviortherapy.com",
   npi: "1457196420",
   hours: [{ days: "Monday–Friday", hours: "8:30 AM–5:00 PM" }],
+  // Static fallback only — shown on /about when the admin-managed
+  // leadership list (lib/leadership.ts, DynamoDB-backed, editable from the
+  // admin dashboard's "Leadership" tab added 2026-10-14) is empty or not
+  // yet configured for this stage, so the page never regresses to showing
+  // nobody. Once the admin adds people through that panel, their entries
+  // take over and this array is no longer shown.
   leadership: [
     {
       name: "Mauricio Garcia Losada, M.S., BCBA",
       title: "Lead Analyst",
       bio: null, // Intentionally empty — do not invent a biography. Fill in via admin/CMS when provided.
+      photo: "/team/mauricio-garcia-losada.png",
     },
   ],
   social: {

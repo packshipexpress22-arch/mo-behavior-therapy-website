@@ -124,6 +124,25 @@ export default $config({
       ],
     });
 
+    // Clinical Leadership admin management (added 2026-10-14) — lets the
+    // admin add/edit/remove the people shown on /about's "Clinical
+    // Leadership" section (name, title, bio, photo) without a code change
+    // or redeploy, same "admin-authored content" pattern as
+    // SignatureTemplatesTable above. See lib/leadership.ts.
+    const leadershipTable = new sst.aws.Dynamo("LeadershipTable", {
+      fields: { id: "string" },
+      primaryIndex: { hashKey: "id" },
+    });
+
+    // Leadership photos are headshots meant to be shown on the public
+    // About page — unlike the PHI bucket, this one is intentionally
+    // PUBLIC-read (access: "public") so the browser can just <img src=...>
+    // the photo directly, no presigned URL needed. Never put anything
+    // containing PHI in this bucket.
+    const leadershipPhotosBucket = new sst.aws.Bucket("LeadershipPhotosBucket", {
+      access: "public",
+    });
+
     // Custom domain (Paso 7) — only attached for the "production" stage,
     // once the ACM certificate for mobehaviortherapy.com is ISSUED.
     // dns: false means SST does NOT try to manage DNS records itself
@@ -143,6 +162,8 @@ export default $config({
         signatureTemplatesTable,
         signatureEnvelopesTable,
         signatureSessionSecret,
+        leadershipTable,
+        leadershipPhotosBucket,
       ],
       domain:
         $app.stage === "production"
@@ -176,6 +197,9 @@ export default $config({
         SIGNATURE_TEMPLATES_TABLE: signatureTemplatesTable.name,
         SIGNATURE_ENVELOPES_TABLE: signatureEnvelopesTable.name,
         SIGNATURE_SESSION_SECRET: signatureSessionSecret.value,
+        LEADERSHIP_TABLE: leadershipTable.name,
+        LEADERSHIP_PHOTOS_BUCKET: leadershipPhotosBucket.name,
+        LEADERSHIP_PHOTOS_BUCKET_DOMAIN: leadershipPhotosBucket.domain,
       },
     });
 

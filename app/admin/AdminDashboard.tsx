@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import SignaturesPanel from "./SignaturesPanel";
 import StatsOverview from "./StatsOverview";
+import LeadershipPanel from "./LeadershipPanel";
 
 export type LeadKind = "family" | "referral" | "career";
 export type LeadStatus =
@@ -169,7 +170,7 @@ function formatBytes(n: number | null) {
 
 export default function AdminDashboard({ username }: { username: string }) {
   const router = useRouter();
-  const [tab, setTab] = useState<"overview" | "leads" | "documents" | "signatures">("overview");
+  const [tab, setTab] = useState<"overview" | "leads" | "documents" | "signatures" | "leadership">("overview");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -325,11 +326,12 @@ export default function AdminDashboard({ username }: { username: string }) {
     }
   }
 
-  const tabs: { id: "overview" | "leads" | "documents" | "signatures"; label: string }[] = [
+  const tabs: { id: "overview" | "leads" | "documents" | "signatures" | "leadership"; label: string }[] = [
     { id: "overview", label: "Overview" },
     { id: "leads", label: "Leads" },
     { id: "documents", label: "Documents" },
     { id: "signatures", label: "Signatures" },
+    { id: "leadership", label: "Leadership" },
   ];
 
   return (
@@ -575,6 +577,8 @@ export default function AdminDashboard({ username }: { username: string }) {
       )}
 
       {tab === "signatures" && <SignaturesPanel />}
+
+      {tab === "leadership" && <LeadershipPanel />}
       </div>
     </div>
   );

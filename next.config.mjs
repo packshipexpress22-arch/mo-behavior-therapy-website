@@ -25,7 +25,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob:",
+   "img-src 'self' data: blob: https://*.s3.amazonaws.com",
       "font-src 'self' data:",
       // https://mo-behavior-therapy-phi-documents.s3.us-east-1.amazonaws.com
       // is the PHI S3 bucket (see sst.config.ts's phiBucketName / lib/phiStorage.ts).

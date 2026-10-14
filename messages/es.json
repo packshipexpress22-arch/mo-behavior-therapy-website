@@ -205,10 +205,10 @@
       "countiesHeading": "Condados que Servimos"
     },
     "referralSources": {
-      "title": "Fuentes de Referencia",
+      "title": "Fuentes de Referidos",
       "intro": "Médicos, psicólogos, neurólogos, escuelas, gestores de casos, profesionales de seguros y trabajadores sociales pueden referir a un cliente directamente a nuestro equipo.",
       "cta": "Referir a un Cliente",
-      "note": "Nuestro formulario de referencia es independiente de la admisión familiar, y no recopilamos información de salud protegida innecesaria por correo electrónico estándar sin protección."
+      "note": "Nuestro formulario de referidos es independiente de la admisión familiar, y no recopilamos información de salud protegida innecesaria por correo electrónico estándar sin protección."
     },
     "careers": {
       "title": "Empleos",
@@ -228,7 +228,7 @@
       "title": "Política de Privacidad",
       "intro": "Esta Política de Privacidad explica, en términos generales, cómo MO Behavior Therapy LLC recopila, usa y protege la información enviada a través de este sitio web. Se proporciona con fines informativos generales y no constituye asesoría legal.",
       "sections": [
-        { "title": "Información que Recopilamos", "body": "Recopilamos la información que usted proporciona voluntariamente a través de nuestros formularios de contacto, nuestro asistente virtual y las solicitudes de referencia o empleo — como su nombre, datos de contacto, ubicación general e información general de seguro." },
+        { "title": "Información que Recopilamos", "body": "Recopilamos la información que usted proporciona voluntariamente a través de nuestros formularios de contacto, nuestro asistente virtual y las solicitudes de referidos o empleo — como su nombre, datos de contacto, ubicación general e información general de seguro." },
         { "title": "Cómo Usamos la Información", "body": "La información se utiliza para responder a consultas, evaluar posibles servicios, coordinar la atención y comunicarnos con usted sobre su solicitud. No vendemos su información." },
         { "title": "Información de Salud Protegida", "body": "Cuando la información pueda constituir información de salud protegida, aplicamos salvaguardas administrativas, técnicas y físicas apropiadas a su sensibilidad, y minimizamos lo que se recopila a través de formularios y chat públicos." },
         { "title": "Consentimiento para Contacto", "body": "Al enviar una solicitud, se le puede pedir que autorice por separado a MO Behavior Therapy a contactarlo por teléfono, mensaje de texto o correo electrónico. Este consentimiento nunca es una condición para recibir servicios y puede retirarse en cualquier momento." },
@@ -261,7 +261,7 @@
       "insurance": "Compañía de Seguro",
       "preferredSetting": "Entorno de Servicio Preferido",
       "previousAba": "¿Ha recibido servicios de ABA antes?",
-      "hasReferral": "¿Tiene actualmente una referencia?",
+      "hasReferral": "¿Tiene actualmente un referido?",
       "hasEvaluation": "¿Tiene una evaluación diagnóstica?",
       "hasIep": "¿Tiene un IEP o plan 504?",
       "preferredContactMethod": "Método de Contacto Preferido",
@@ -283,7 +283,7 @@
       "availability": ["Disponible", "No Disponible", "No Aplica", "No Estoy Seguro/a"],
       "contactMethod": ["Teléfono", "Mensaje de Texto", "Correo Electrónico"],
       "contactTime": ["Mañana", "Tarde", "Cualquier momento durante el horario de atención"],
-      "howHeard": ["Búsqueda en Google", "Redes Sociales", "Referencia de un Médico/Proveedor", "Escuela", "Amigo o Familiar", "Compañía de Seguro", "Otro"]
+      "howHeard": ["Búsqueda en Google", "Redes Sociales", "Referido de un Médico/Proveedor", "Escuela", "Amigo o Familiar", "Compañía de Seguro", "Otro"]
     },
     "consent": {
       "text": "Al marcar esta casilla y enviar mi información, autorizo a MO Behavior Therapy LLC a contactarme respecto a mi solicitud de servicios usando el número de teléfono y/o correo electrónico que proporcioné, incluyendo por llamada telefónica, mensaje de texto o correo electrónico. El consentimiento no es una condición para recibir servicios.",
@@ -326,7 +326,7 @@
       "needServices": "Necesito Servicios de ABA",
       "verifyInsurance": "Verificar Seguro",
       "checkZip": "¿Ofrecen Servicio en mi Código Postal?",
-      "haveReferral": "Tengo una Referencia",
+      "haveReferral": "Tengo un Referido",
       "amProvider": "Soy un Proveedor de Salud",
       "lookingForJob": "Busco Empleo",
       "haveQuestion": "Tengo una Pregunta"
@@ -341,7 +341,7 @@
       "setting": "¿Prefiere servicios en el hogar, en la escuela, en la comunidad, o aún no está seguro/a?",
       "insurance": "¿Qué seguro tiene?",
       "previousAba": "¿Ha recibido servicios de ABA antes?",
-      "documents": "¿Tiene actualmente alguno de estos? Una referencia, una evaluación diagnóstica, o un plan IEP/504 — todos son opcionales.",
+      "documents": "¿Tiene actualmente alguno de estos? Un referido, una evaluación diagnóstica, o un plan IEP/504 — todos son opcionales.",
       "phone": "¿Cuál es el mejor número de teléfono para comunicarnos con usted?",
       "email": "¿Y su correo electrónico?",
       "contactMethod": "¿Cómo prefiere que lo contactemos — teléfono, mensaje de texto o correo electrónico?",
@@ -386,7 +386,7 @@
     "careers": "Empleos",
     "faq": "Preguntas Frecuentes",
     "contact": "Contacto",
-    "referralSources": "Fuentes de Referencia",
+    "referralSources": "Fuentes de Referidos",
     "insurance": "Seguro",
     "privacyPolicy": "Política de Privacidad",
     "accessibility": "Accesibilidad",
@@ -452,11 +452,11 @@
       },
       "documentsNeeded": {
         "question": "¿Qué documentos pueden ser necesarios?",
-        "answer": "Esto puede variar, pero puede incluir una referencia, una evaluación diagnóstica o un plan IEP/504. Ninguno de estos es necesario para iniciar una conversación con nosotros."
+        "answer": "Esto puede variar, pero puede incluir un referido, una evaluación diagnóstica o un plan IEP/504. Ninguno de estos es necesario para iniciar una conversación con nosotros."
       },
       "pediatricianReferral": {
-        "question": "¿Puede mi pediatra enviar una referencia?",
-        "answer": "Sí — médicos, psicólogos y otros profesionales pueden referir a un cliente directamente a nuestro equipo a través de nuestro formulario de referencia."
+        "question": "¿Puede mi pediatra enviar un referido?",
+        "answer": "Sí — médicos, psicólogos y otros profesionales pueden referir a un cliente directamente a nuestro equipo a través de nuestro formulario de referidos."
       },
       "areasServed": {
         "question": "¿Qué áreas atienden?",

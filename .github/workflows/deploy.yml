@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: name: Install dependencies
+      - name: Install dependencies
         run: npm install --legacy-peer-deps
 
       - name: Configure AWS credentials

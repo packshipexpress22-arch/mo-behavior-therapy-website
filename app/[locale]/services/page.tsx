@@ -24,7 +24,10 @@ export default async function ServicesPage() {
         <h2 className="text-2xl font-bold text-ink-900">{t("categories.heading")}</h2>
         <div className="mt-6 flex flex-wrap gap-3">
           {categoryItems.map((item) => (
-            <span key={item} className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-900 shadow-card">
+            <span
+              key={item}
+              className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-900 shadow-card transition-transform duration-150 hover:-translate-y-0.5 hover:scale-105"
+            >
               {item}
             </span>
           ))}
@@ -36,11 +39,11 @@ export default async function ServicesPage() {
 
       <Section className="bg-ink-100/40">
         <div className="grid gap-8 sm:grid-cols-2">
-          <div className="rounded-xl3 border border-ink-100 bg-white p-7 shadow-card">
+          <div className="rounded-xl3 border border-ink-100 bg-white p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-soft">
             <h3 className="text-lg font-semibold text-ink-900">{t("behaviorReduction.title")}</h3>
             <p className="mt-2 leading-relaxed text-ink-700">{t("behaviorReduction.body")}</p>
           </div>
-          <div className="rounded-xl3 border border-ink-100 bg-white p-7 shadow-card">
+          <div className="rounded-xl3 border border-ink-100 bg-white p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-soft">
             <h3 className="text-lg font-semibold text-ink-900">{t("parentTraining.title")}</h3>
             <p className="mt-2 leading-relaxed text-ink-700">{t("parentTraining.body")}</p>
           </div>

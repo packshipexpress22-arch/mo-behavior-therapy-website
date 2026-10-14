@@ -18,8 +18,14 @@ export default async function AboutPage() {
         <h2 className="text-2xl font-bold text-ink-900">{t("leadershipHeading")}</h2>
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
           {company.leadership.map((person) => (
-            <div key={person.name} className="rounded-xl3 border border-ink-100 p-7 shadow-card">
-              <div className="mb-4 h-20 w-20 rounded-full bg-ink-100" aria-hidden="true" />
+            <div
+              key={person.name}
+              className="group rounded-xl3 border border-ink-100 p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-soft"
+            >
+              <div
+                className="mb-4 h-20 w-20 rounded-full bg-ink-100 transition-transform duration-200 group-hover:scale-105"
+                aria-hidden="true"
+              />
               <h3 className="text-lg font-semibold text-ink-900">{person.name}</h3>
               <p className="text-sm text-ink-500">{person.title}</p>
               {/* Bio intentionally left blank — see data/company.ts note: we

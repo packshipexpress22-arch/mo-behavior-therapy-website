@@ -85,7 +85,10 @@ export default async function CityPage({ params }: { params: { city: string } })
         <h2 className="text-center font-display text-2xl font-bold text-ink-900 sm:text-3xl">{tFaqPage("title")}</h2>
         <div className="mx-auto mt-8 max-w-2xl space-y-4">
           {cityFaqs.map((item) => (
-            <div key={item.question} className="rounded-xl2 border border-ink-100 bg-white p-5">
+            <div
+              key={item.question}
+              className="rounded-xl2 border border-ink-100 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card"
+            >
               <h3 className="text-sm font-semibold text-ink-900">{item.question}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-700">{item.answer}</p>
             </div>

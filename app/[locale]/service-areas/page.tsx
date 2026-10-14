@@ -26,7 +26,10 @@ export default async function ServiceAreasPage() {
             <h2 className="mt-8 text-xl font-bold text-ink-900">{t("countiesHeading")}</h2>
             <ul className="mt-3 grid grid-cols-2 gap-2">
               {counties.map((c) => (
-                <li key={c.id} className="rounded-lg border border-ink-100 px-3 py-2 text-sm text-ink-900">
+                <li
+                  key={c.id}
+                  className="rounded-lg border border-ink-100 px-3 py-2 text-sm text-ink-900 transition-colors hover:border-brand-blue/30 hover:bg-brand-blue-light"
+                >
                   {c.name}
                 </li>
               ))}
@@ -40,7 +43,7 @@ export default async function ServiceAreasPage() {
                 <li key={c.id}>
                   <Link
                     href={`/service-areas/${c.slug}`}
-                    className="flex items-center justify-between rounded-xl2 border border-ink-100 px-4 py-3 text-sm font-medium text-ink-900 hover:border-brand-blue hover:text-brand-blue"
+                    className="flex items-center justify-between rounded-xl2 border border-ink-100 px-4 py-3 text-sm font-medium text-ink-900 transition-all duration-150 hover:-translate-y-0.5 hover:border-brand-blue hover:text-brand-blue hover:shadow-card"
                   >
                     {c.name}
                     {c.isOfficeLocation && <span className="text-xs text-brand-gold">★ {tc("officeLocation")}</span>}

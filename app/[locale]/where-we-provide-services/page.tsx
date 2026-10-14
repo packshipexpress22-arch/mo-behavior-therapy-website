@@ -19,7 +19,10 @@ export default async function WhereWeProvidePage() {
       <Section>
         <div className="grid gap-6 sm:grid-cols-3">
           {settings.map((key) => (
-            <div key={key} className="rounded-xl3 border border-ink-100 p-7 shadow-card">
+            <div
+              key={key}
+              className="rounded-xl3 border border-ink-100 p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-soft"
+            >
               <h2 className="text-lg font-semibold text-ink-900">{t(`${key}.title`)}</h2>
               <p className="mt-2 leading-relaxed text-ink-700">{t(`${key}.body`)}</p>
             </div>

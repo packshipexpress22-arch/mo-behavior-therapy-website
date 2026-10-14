@@ -19,8 +19,8 @@ export default async function AbaTherapyPage() {
       <Section>
         <div className="mx-auto max-w-3xl space-y-10">
           {sections.map((s, i) => (
-            <div key={s.title} className="flex gap-5">
-              <span className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-blue-light text-sm font-bold text-brand-blue">
+            <div key={s.title} className="group flex gap-5">
+              <span className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-blue-light text-sm font-bold text-brand-blue transition-transform duration-200 group-hover:scale-110 group-hover:rotate-6">
                 {i + 1}
               </span>
               <div>

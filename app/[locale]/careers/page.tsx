@@ -20,7 +20,10 @@ export default async function CareersPage() {
         <div className="mx-auto max-w-2xl">
           <ul className="flex flex-wrap gap-2">
             {roles.map((role) => (
-              <li key={role} className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-900 shadow-card">
+              <li
+                key={role}
+                className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-900 shadow-card transition-transform duration-150 hover:-translate-y-0.5 hover:scale-105"
+              >
                 {role}
               </li>
             ))}

@@ -28,7 +28,7 @@ export default async function InsurancePage() {
             <Link
               key={plan.id}
               href={`/insurance/${plan.slug}`}
-              className="flex h-24 flex-col items-center justify-center rounded-xl2 border border-ink-100 bg-white px-3 text-center shadow-card transition-shadow hover:shadow-soft"
+              className="flex h-24 flex-col items-center justify-center rounded-xl2 border border-ink-100 bg-white px-3 text-center shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-soft"
             >
               <span className="text-sm font-semibold text-ink-900">{plan.name}</span>
               {plan.notes && <span className="mt-1 text-[11px] text-ink-500">{plan.notes}</span>}

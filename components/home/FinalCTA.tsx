@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
+import FloatingShapes from "@/components/ui/FloatingShapes";
 import { company } from "@/data/company";
 import { telHref } from "@/lib/utils";
 
@@ -10,8 +11,9 @@ export default function FinalCTA() {
   const t = useTranslations("home.finalCta");
 
   return (
-    <Section className="bg-brand-navy text-white">
-      <div className="mx-auto max-w-2xl text-center">
+    <Section className="relative overflow-hidden bg-brand-navy text-white">
+      <FloatingShapes variant="warm" />
+      <div className="relative mx-auto max-w-2xl text-center">
         <h2 className="font-display text-3xl font-bold sm:text-4xl">{t("heading")}</h2>
         <p className="mt-4 text-base leading-relaxed text-white/80">{t("body")}</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">

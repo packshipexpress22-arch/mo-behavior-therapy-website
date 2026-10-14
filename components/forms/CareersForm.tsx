@@ -67,14 +67,14 @@ export default function CareersForm() {
 
   if (status === "success") {
     return (
-      <div className="rounded-xl3 border border-brand-green/30 bg-brand-green-light p-8 text-center">
+      <div className="animate-pop-in rounded-xl3 border border-brand-green/30 bg-brand-green-light p-8 text-center">
         <p className="text-lg font-semibold text-ink-900">{t("validation.success")}</p>
       </div>
     );
   }
 
   const inputClass =
-    "w-full rounded-xl border border-ink-100 px-3.5 py-2.5 text-sm outline-none focus-visible:border-brand-blue";
+    "w-full rounded-xl border border-ink-100 px-3.5 py-2.5 text-sm outline-none transition-colors duration-150 focus-visible:border-brand-blue";
   const labelClass = "mb-1.5 block text-sm font-medium text-ink-900";
 
   return (
@@ -156,9 +156,9 @@ export default function CareersForm() {
 
       <Turnstile onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
 
-      {status === "error" && <p className="text-sm text-brand-coral">{t("validation.genericError")}</p>}
+      {status === "error" && <p className="animate-fade-up text-sm text-brand-coral">{t("validation.genericError")}</p>}
       {status === "captcha_error" && (
-        <p className="text-sm text-brand-coral">
+        <p className="animate-fade-up text-sm text-brand-coral">
           Please complete the verification check above and try again.
         </p>
       )}
@@ -166,7 +166,7 @@ export default function CareersForm() {
       <button
         type="submit"
         disabled={status === "sending" || (TURNSTILE_REQUIRED && !turnstileToken)}
-        className="w-full rounded-full bg-brand-blue px-6 py-3.5 text-center text-base font-semibold text-white shadow-card disabled:opacity-60 sm:w-auto"
+        className="w-full rounded-full bg-brand-blue px-6 py-3.5 text-center text-base font-semibold text-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:hover:scale-100 sm:w-auto"
       >
         {status === "sending" ? tc("loading") : tc("joinOurTeam")}
       </button>

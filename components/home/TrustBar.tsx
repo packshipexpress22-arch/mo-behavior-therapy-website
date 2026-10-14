@@ -12,8 +12,11 @@ export default function TrustBar() {
       <Container>
         <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-medium text-ink-700">
           {items.map((item) => (
-            <li key={item} className="flex items-center gap-2">
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand-green" />
+            <li key={item} className="group flex items-center gap-2 transition-colors hover:text-brand-green">
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 rounded-full bg-brand-green transition-transform duration-200 group-hover:scale-150"
+              />
               {item}
             </li>
           ))}

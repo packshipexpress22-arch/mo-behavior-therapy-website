@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildSystemPrompt } from "@/lib/chat/systemPrompt";
 import { localeNames, locales, type Locale } from "@/i18n";
 import { isEmergencyMessage } from "@/lib/chat/extract";
+import { getClientIp } from "@/lib/clientIp";
 
 export const runtime = "nodejs";
 
@@ -23,7 +24,7 @@ function rateLimited(ip: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const ip = getClientIp(req);
   if (rateLimited(ip)) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }

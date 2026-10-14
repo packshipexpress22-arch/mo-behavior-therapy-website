@@ -147,6 +147,19 @@ export async function getEnvelope(patientId: string, envelopeId: string): Promis
   return (res.Item as SignatureEnvelope) ?? null;
 }
 
+// Thrown by completeEnvelope() when the conditional write below loses a
+// race — see its own comment for why this can happen and why a plain
+// read-then-write used to let it through silently (security audit finding
+// #8, mo-security-audit.md). Callers (app/api/sign/[envelopeId]/submit/route.ts)
+// catch this and respond the same way as the existing early "already
+// completed" check (409), rather than a generic 500.
+export class EnvelopeAlreadyCompletedError extends Error {
+  constructor() {
+    super("envelope_already_completed");
+    this.name = "EnvelopeAlreadyCompletedError";
+  }
+}
+
 export async function completeEnvelope(args: {
   patientId: string;
   envelopeId: string;
@@ -174,7 +187,33 @@ export async function completeEnvelope(args: {
     pdfGenerationError: null,
     updatedAt: now,
   };
-  await c.send(new PutCommand({ TableName: TABLE_NAME, Item: updated }));
+  try {
+    // The route's own "already completed?" check (envelope.status !==
+    // "sent") is a plain read a moment earlier — it can't stop two
+    // near-simultaneous submits (double-click, a client retry on a slow
+    // response) both reading status:"sent" and both proceeding to write,
+    // with the second silently overwriting the first signature. This
+    // ConditionExpression makes the actual write atomic: it only succeeds
+    // if the item *in DynamoDB at write time* still has status "sent",
+    // so only one of the two racing writes can ever succeed.
+    await c.send(
+      new PutCommand({
+        TableName: TABLE_NAME,
+        Item: updated,
+        ConditionExpression: "#status = :expectedStatus",
+        ExpressionAttributeNames: { "#status": "status" },
+        ExpressionAttributeValues: { ":expectedStatus": "sent" },
+      })
+    );
+  } catch (err) {
+    // Duck-typed rather than imported (AWS SDK v3 exceptions are
+    // package-specific classes; checking `.name` avoids depending on
+    // exactly where the DynamoDB document client re-exports it from).
+    if (err instanceof Error && err.name === "ConditionalCheckFailedException") {
+      throw new EnvelopeAlreadyCompletedError();
+    }
+    throw err;
+  }
   return updated;
 }
 

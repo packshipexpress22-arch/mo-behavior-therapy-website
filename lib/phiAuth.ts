@@ -100,7 +100,7 @@ export function createMagicLinkToken(
 
 export function verifyMagicLinkToken(
   token: string | undefined | null
-): { email: string; leadId: string | null } | null {
+): { email: string; leadId: string | null; nonce: string } | null {
   if (!token) return null;
   const parts = token.split("|");
   if (parts.length !== 5) return null;
@@ -124,7 +124,14 @@ export function verifyMagicLinkToken(
   const expiresAt = Number(expiresAtStr);
   if (!Number.isFinite(expiresAt) || Date.now() > expiresAt) return null;
 
-  return { email, leadId: leadIdRaw || null };
+  // `nonce` is unique per token (see createMagicLinkToken) — callers use it
+  // to enforce single-use via lib/securityStore.ts's claimOnce(), since a
+  // signature + expiry check alone (everything above) lets the exact same
+  // link be redeemed any number of times within its window (security audit
+  // finding #7, mo-security-audit.md). Verification itself stays a pure,
+  // synchronous crypto check — claiming the nonce is a separate, explicit
+  // step so this function has no DB dependency of its own.
+  return { email, leadId: leadIdRaw || null, nonce };
 }
 
 export function createPatientSessionToken(email: string, leadId?: string | null): string {

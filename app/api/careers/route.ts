@@ -6,6 +6,7 @@ import { verifyTurnstileToken } from "@/lib/turnstile";
 import { company } from "@/data/company";
 import { escapeHtml } from "@/lib/utils";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { getClientIp } from "@/lib/clientIp";
 
 export const runtime = "nodejs";
 
@@ -14,7 +15,7 @@ export const runtime = "nodejs";
 const rateLimited = createRateLimiter(8);
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const ip = getClientIp(req);
   if (rateLimited(ip)) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }

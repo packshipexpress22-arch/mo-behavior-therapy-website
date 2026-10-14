@@ -4,17 +4,22 @@ import { createMagicLinkToken, isPatientPortalConfigured } from "@/lib/phiAuth";
 import { sendEmail } from "@/lib/email";
 import { company } from "@/data/company";
 import { findLatestLeadIdByEmail } from "@/lib/leadStore";
+import { getClientIp } from "@/lib/clientIp";
+import { durableRateLimit } from "@/lib/securityStore";
 
 export const runtime = "nodejs";
 
 const bodySchema = z.object({ email: z.string().trim().email() });
 
-// Same lightweight per-IP rate limiter pattern as app/api/admin/login/route.ts.
-// A second limiter keyed by the requested email caps how many links any one
-// inbox can be sent, independent of how many different IPs ask for it.
+// In-memory fallback layer — same rationale as
+// app/api/admin/login/route.ts's own comment: kept so this endpoint is
+// never less protected than before while SecurityTable rolls out (or if a
+// DynamoDB call itself hiccups). durableRateLimit() below is the actual
+// fix for the known per-Lambda-instance gap (mo-security-audit.md
+// finding #6).
 const ipAttempts = new Map<string, { count: number; resetAt: number }>();
 const emailAttempts = new Map<string, { count: number; resetAt: number }>();
-function rateLimited(map: Map<string, { count: number; resetAt: number }>, key: string, max: number) {
+function inMemoryRateLimited(map: Map<string, { count: number; resetAt: number }>, key: string, max: number) {
   const now = Date.now();
   const entry = map.get(key);
   if (!entry || now > entry.resetAt) {
@@ -26,14 +31,15 @@ function rateLimited(map: Map<string, { count: number; resetAt: number }>, key: 
 }
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const ip = getClientIp(req);
 
   // Always return the same generic response, success or not, so this
   // endpoint can't be used to enumerate which emails have been used before
   // — the UI shows "check your email" regardless (see app/portal/login).
   const genericOk = NextResponse.json({ ok: true });
 
-  if (rateLimited(ipAttempts, ip, 20)) return genericOk;
+  const ipLimited = (await durableRateLimit("portal-request-link-ip", ip, 20, 15 * 60_000)) || inMemoryRateLimited(ipAttempts, ip, 20);
+  if (ipLimited) return genericOk;
   if (!isPatientPortalConfigured()) return genericOk;
 
   const body = await req.json().catch(() => null);
@@ -41,7 +47,9 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return genericOk;
 
   const email = parsed.data.email.trim().toLowerCase();
-  if (rateLimited(emailAttempts, email, 5)) return genericOk;
+  const emailLimited =
+    (await durableRateLimit("portal-request-link-email", email, 5, 15 * 60_000)) || inMemoryRateLimited(emailAttempts, email, 5);
+  if (emailLimited) return genericOk;
 
   // Scope this link to the same case an emailed invite would have used —
   // otherwise this manual "resend my link" path is the one place left

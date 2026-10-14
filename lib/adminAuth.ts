@@ -25,6 +25,29 @@ export function hashPassword(password: string): string {
   return `scrypt$${salt.toString("hex")}$${hash.toString("hex")}`;
 }
 
+// A syntactically-valid scrypt hash of a password nobody will ever type,
+// used by app/api/admin/login/route.ts so a wrong USERNAME still pays the
+// exact same scryptSync cost as a wrong password for the right username —
+// see verifyPassword's own timingSafeEqual below, which already makes a
+// *correct* username's password check constant-time; without this, a
+// mismatched username short-circuited before scrypt ever ran, making the
+// login endpoint a free oracle for "is this username correct?" (security
+// audit finding #11, mo-security-audit.md).
+export const DUMMY_PASSWORD_HASH =
+  "scrypt$4b74105fe9556d34937e5d7c511e833b$452d5f73961521efffb641539c828677e7d7253305cf284ea27ff06b8bc9c8f50aebec4551a02335e52a1bcec745fc097ab99e4fc25814aaaf05d97d9111fcc1";
+
+/** Constant-time string equality regardless of the two strings' own
+ * lengths (hashing first normalizes length, so this doesn't leak "how many
+ * leading characters matched" via timing the way a direct timingSafeEqual
+ * on the raw strings would for unequal-length inputs). Used to compare the
+ * submitted admin username without letting that comparison's timing hint
+ * at the real one — same rationale as the dummy password hash above. */
+export function constantTimeStringEqual(a: string, b: string): boolean {
+  const ah = createHmac("sha256", "admin-username-compare").update(a).digest();
+  const bh = createHmac("sha256", "admin-username-compare").update(b).digest();
+  return timingSafeEqual(ah, bh);
+}
+
 export function verifyPassword(password: string, stored: string): boolean {
   const parts = stored.split("$");
   if (parts.length !== 3) return false;

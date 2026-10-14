@@ -5,6 +5,7 @@ import { sendInternalNotification, sendClientConfirmation, sendDocumentUploadInv
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { autoSendSignatureTemplatesForLead } from "@/lib/signatureAutoSend";
+import { getClientIp } from "@/lib/clientIp";
 
 export const runtime = "nodejs";
 
@@ -13,7 +14,7 @@ export const runtime = "nodejs";
 const rateLimited = createRateLimiter(8);
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const ip = getClientIp(req);
   if (rateLimited(ip)) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }

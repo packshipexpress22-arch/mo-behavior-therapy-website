@@ -5,11 +5,13 @@ import {
   completeEnvelope,
   setEnvelopePdfKey,
   setEnvelopePdfError,
+  EnvelopeAlreadyCompletedError,
   type SignatureValue,
 } from "@/lib/signatureEnvelopes";
 import { generateEnvelopePdf } from "@/lib/signaturePdf";
 import { signatureS3Key, uploadGeneratedPdf } from "@/lib/phiStorage";
 import { sendSignatureCompletedNotification } from "@/lib/email";
+import { getClientIp } from "@/lib/clientIp";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -96,18 +98,29 @@ export async function POST(req: NextRequest, { params }: { params: { envelopeId:
     return NextResponse.json({ error: "missing_caregiver_name" }, { status: 422 });
   }
 
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const ip = getClientIp(req);
   const userAgent = req.headers.get("user-agent") ?? "unknown";
 
-  const completed = await completeEnvelope({
-    patientId: verified.email,
-    envelopeId: params.envelopeId,
-    fieldValues,
-    caregiverName,
-    signature,
-    consentIp: process.env.LOG_IP_ADDRESSES === "true" ? ip : null,
-    consentUserAgent: userAgent,
-  });
+  let completed;
+  try {
+    completed = await completeEnvelope({
+      patientId: verified.email,
+      envelopeId: params.envelopeId,
+      fieldValues,
+      caregiverName,
+      signature,
+      consentIp: process.env.LOG_IP_ADDRESSES === "true" ? ip : null,
+      consentUserAgent: userAgent,
+    });
+  } catch (err) {
+    if (err instanceof EnvelopeAlreadyCompletedError) {
+      // Same response as the earlier status check above — this just means
+      // a concurrent request (double-click, client retry) already
+      // completed it first; see completeEnvelope()'s own comment.
+      return NextResponse.json({ error: "already_completed" }, { status: 409 });
+    }
+    throw err;
+  }
 
   try {
     const pdfBytes = await generateEnvelopePdf(completed);

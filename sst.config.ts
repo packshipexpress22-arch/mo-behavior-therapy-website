@@ -143,6 +143,19 @@ export default $config({
       access: "public",
     });
 
+    // Security hardening (2026-10-14) — a small, generic DynamoDB table
+    // backing lib/securityStore.ts: single-use magic-link enforcement
+    // (mo-security-audit.md finding #7) and a durable, cross-Lambda-instance
+    // rate limiter for admin login + patient-portal link requests (finding
+    // #6). `ttl` auto-expires every item (claimed tokens, rate-limit
+    // counters) once their short window has passed, so this table never
+    // grows unbounded.
+    const securityTable = new sst.aws.Dynamo("SecurityTable", {
+      fields: { pk: "string" },
+      primaryIndex: { hashKey: "pk" },
+      ttl: "expireAt",
+    });
+
     // Custom domain (Paso 7) — only attached for the "production" stage,
     // once the ACM certificate for mobehaviortherapy.com is ISSUED.
     // dns: false means SST does NOT try to manage DNS records itself
@@ -164,6 +177,7 @@ export default $config({
         signatureSessionSecret,
         leadershipTable,
         leadershipPhotosBucket,
+        securityTable,
       ],
       domain:
         $app.stage === "production"
@@ -200,6 +214,7 @@ export default $config({
         LEADERSHIP_TABLE: leadershipTable.name,
         LEADERSHIP_PHOTOS_BUCKET: leadershipPhotosBucket.name,
         LEADERSHIP_PHOTOS_BUCKET_DOMAIN: leadershipPhotosBucket.domain,
+        SECURITY_TABLE: securityTable.name,
       },
     });
 

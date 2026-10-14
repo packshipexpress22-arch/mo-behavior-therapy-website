@@ -7,6 +7,7 @@ import { company } from "@/data/company";
 import { escapeHtml } from "@/lib/utils";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { autoSendSignatureTemplatesForLead } from "@/lib/signatureAutoSend";
+import { getClientIp } from "@/lib/clientIp";
 
 export const runtime = "nodejs";
 
@@ -19,7 +20,7 @@ const rateLimited = createRateLimiter(8);
 // family intake, and this form collects less personal data about the
 // prospective client.
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const ip = getClientIp(req);
   if (rateLimited(ip)) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }

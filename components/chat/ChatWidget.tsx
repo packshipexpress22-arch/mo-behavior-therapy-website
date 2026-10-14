@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Locale } from "@/i18n";
 import { extractFields, isEmergencyMessage } from "@/lib/chat/extract";
 import { nextMissingSlot, type LeadDraft, type SlotKey } from "@/lib/chat/conversation";
@@ -33,6 +34,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
   const [turnstileToken, setTurnstileToken] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (open && !initialized.current) {
@@ -277,8 +279,6 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
     advance(merged);
   }
 
-  if (!open) return null;
-
   const settingOptions = tf.raw("options.settings") as string[];
   const relationshipOptions = tf.raw("options.relationship") as string[];
   const yesNoUnsure = tf.raw("options.yesNoUnsure") as string[];
@@ -287,12 +287,18 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
   const missingSlot = nextMissingSlot(draft);
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={`${t("assistantName")} — ${t("assistantSubtitle")}`}
-      className="fixed inset-x-3 bottom-[92px] z-50 flex h-[min(640px,75vh)] flex-col overflow-hidden rounded-xl3 border border-ink-100 bg-white shadow-soft sm:inset-x-auto sm:right-6 sm:bottom-24 sm:w-[380px]"
-    >
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${t("assistantName")} — ${t("assistantSubtitle")}`}
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.96 }}
+          animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.96 }}
+          transition={{ duration: reduceMotion ? 0.15 : 0.28, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed inset-x-3 bottom-[92px] z-50 flex h-[min(640px,75vh)] flex-col overflow-hidden rounded-xl3 border border-ink-100 bg-white shadow-soft sm:inset-x-auto sm:right-6 sm:bottom-24 sm:w-[380px]"
+        >
       <div className="flex items-center justify-between gap-3 border-b border-ink-100 bg-brand-navy px-4 py-3 text-white">
         <div className="flex items-center gap-2.5">
           <Logo variant="white" className="text-white" />
@@ -318,7 +324,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
           <div
             key={m.id}
             className={cn(
-              "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-snug",
+              "max-w-[85%] animate-pop-in rounded-2xl px-3.5 py-2.5 text-sm leading-snug",
               m.role === "assistant"
                 ? "bg-ink-100 text-ink-900"
                 : "ml-auto bg-brand-blue text-white"
@@ -445,7 +451,9 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
           </a>
         </div>
       )}
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useRef, useEffect, useTransition } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { locales, localeNames, type Locale } from "@/i18n";
 import { usePathname, useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ export default function LanguageSelector({ variant = "light" }: { variant?: "lig
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const ref = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -78,31 +80,40 @@ export default function LanguageSelector({ variant = "light" }: { variant?: "lig
         </svg>
       </button>
 
-      {open && (
-        <div role="listbox" aria-label={t("label")}
-          className="absolute right-0 z-50 mt-2 max-h-[70vh] w-64 overflow-y-auto rounded-xl2 border border-ink-100 bg-white py-2 shadow-soft">
-          {locales.map((l) => (
-            <button
-              key={l}
-              role="option"
-              aria-selected={l === locale}
-              disabled={isPending}
-              onClick={() => switchTo(l)}
-              className={cn(
-                "flex w-full items-center justify-between px-4 py-2.5 text-left text-sm hover:bg-brand-blue-light disabled:cursor-not-allowed disabled:opacity-60",
-                l === locale ? "font-semibold text-brand-blue" : "text-ink-900"
-              )}
-            >
-              {localeNames[l]}
-              {l === locale && <span aria-hidden="true">✓</span>}
-            </button>
-          ))}
-          <div className="mt-1 border-t border-ink-100 px-4 pt-2 text-xs text-ink-500">
-            <p className="font-medium text-ink-700">{t("moreLanguages")}</p>
-            <p>{t("moreLanguagesNote")}</p>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            role="listbox"
+            aria-label={t("label")}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: -6 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: -4 }}
+            transition={{ duration: reduceMotion ? 0.1 : 0.18, ease: "easeOut" }}
+            className="absolute right-0 z-50 mt-2 max-h-[70vh] w-64 overflow-y-auto rounded-xl2 border border-ink-100 bg-white py-2 shadow-soft"
+          >
+            {locales.map((l) => (
+              <button
+                key={l}
+                role="option"
+                aria-selected={l === locale}
+                disabled={isPending}
+                onClick={() => switchTo(l)}
+                className={cn(
+                  "flex w-full items-center justify-between px-4 py-2.5 text-left text-sm hover:bg-brand-blue-light disabled:cursor-not-allowed disabled:opacity-60",
+                  l === locale ? "font-semibold text-brand-blue" : "text-ink-900"
+                )}
+              >
+                {localeNames[l]}
+                {l === locale && <span aria-hidden="true">✓</span>}
+              </button>
+            ))}
+            <div className="mt-1 border-t border-ink-100 px-4 pt-2 text-xs text-ink-500">
+              <p className="font-medium text-ink-700">{t("moreLanguages")}</p>
+              <p>{t("moreLanguagesNote")}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link } from "@/lib/navigation";
 import { primaryNav } from "@/data/nav";
 import { company } from "@/data/company";
-import { telHref } from "@/lib/utils";
+import { cn, telHref } from "@/lib/utils";
 import Logo from "./Logo";
 import LanguageSelector from "./LanguageSelector";
 
@@ -13,11 +14,49 @@ export default function Header() {
   const t = useTranslations("nav");
   const tc = useTranslations("common");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  const mobileNavBody = (
+    <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto px-4 py-4">
+      <nav className="flex flex-col gap-1" aria-label="Mobile">
+        {primaryNav.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={() => setMobileOpen(false)}
+            className="rounded-lg px-3 py-2.5 text-base font-medium text-ink-900 hover:bg-ink-100"
+          >
+            {t(item.key)}
+          </Link>
+        ))}
+      </nav>
+      <div className="mt-4 flex flex-col gap-3 border-t border-ink-100 pt-4">
+        <LanguageSelector />
+        <a
+          href={telHref(company.phone.e164)}
+          className="rounded-full border border-ink-100 px-4 py-2.5 text-center text-sm font-semibold text-ink-900"
+        >
+          {tc("callUs")}
+        </a>
+        <Link
+          href="/contact"
+          onClick={() => setMobileOpen(false)}
+          className="rounded-full bg-brand-blue px-4 py-2.5 text-center text-sm font-semibold text-white"
+        >
+          {tc("requestServices")}
+        </Link>
+      </div>
+    </div>
+  );
 
   return (
     <header className="sticky top-0 z-40 border-b border-ink-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-        <Link href="/" className="shrink-0" aria-label={company.shortName}>
+        <Link
+          href="/"
+          className="shrink-0 transition-transform duration-200 hover:scale-105"
+          aria-label={company.shortName}
+        >
           <Logo />
         </Link>
 
@@ -26,7 +65,7 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-ink-700 transition-colors hover:text-brand-blue"
+              className="relative text-sm font-medium text-ink-700 transition-colors after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:rounded-full after:bg-brand-blue after:transition-all after:duration-200 hover:text-brand-blue hover:after:w-full"
             >
               {t(item.key)}
             </Link>
@@ -57,7 +96,14 @@ export default function Header() {
           aria-label={mobileOpen ? t("close") : t("menu")}
           onClick={() => setMobileOpen((o) => !o)}
         >
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 22 22"
+            fill="none"
+            aria-hidden="true"
+            className={cn("transition-transform duration-300", mobileOpen && "rotate-90")}
+          >
             {mobileOpen ? (
               <path d="M5 5l12 12M17 5L5 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             ) : (
@@ -67,40 +113,27 @@ export default function Header() {
         </button>
       </div>
 
-      {mobileOpen && (
-        <div
-          id="mobile-nav"
-          className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-ink-100 bg-white px-4 py-4 lg:hidden"
-        >
-          <nav className="flex flex-col gap-1" aria-label="Mobile">
-            {primaryNav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2.5 text-base font-medium text-ink-900 hover:bg-ink-100"
-              >
-                {t(item.key)}
-              </Link>
-            ))}
-          </nav>
-          <div className="mt-4 flex flex-col gap-3 border-t border-ink-100 pt-4">
-            <LanguageSelector />
-            <a
-              href={telHref(company.phone.e164)}
-              className="rounded-full border border-ink-100 px-4 py-2.5 text-center text-sm font-semibold text-ink-900"
-            >
-              {tc("callUs")}
-            </a>
-            <Link
-              href="/contact"
-              onClick={() => setMobileOpen(false)}
-              className="rounded-full bg-brand-blue px-4 py-2.5 text-center text-sm font-semibold text-white"
-            >
-              {tc("requestServices")}
-            </Link>
+      {reduceMotion ? (
+        mobileOpen && (
+          <div id="mobile-nav" className="border-t border-ink-100 bg-white lg:hidden">
+            {mobileNavBody}
           </div>
-        </div>
+        )
+      ) : (
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              id="mobile-nav"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="overflow-hidden border-t border-ink-100 bg-white lg:hidden"
+            >
+              {mobileNavBody}
+            </motion.div>
+          )}
+        </AnimatePresence>
       )}
     </header>
   );

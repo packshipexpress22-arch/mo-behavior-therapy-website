@@ -16,7 +16,7 @@ export default function MobileStickyBar({ onChatClick }: { onChatClick: () => vo
     >
       <a
         href={telHref(company.phone.e164)}
-        className="flex flex-col items-center justify-center gap-0.5 py-2.5 text-xs font-semibold text-ink-900 active:bg-ink-100"
+        className="flex flex-col items-center justify-center gap-0.5 py-2.5 text-xs font-semibold text-ink-900 transition-transform active:scale-95 active:bg-ink-100"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path
@@ -29,7 +29,7 @@ export default function MobileStickyBar({ onChatClick }: { onChatClick: () => vo
       </a>
       <Link
         href="/contact"
-        className="flex flex-col items-center justify-center gap-0.5 border-x border-ink-100 bg-brand-blue py-2.5 text-xs font-semibold text-white"
+        className="flex flex-col items-center justify-center gap-0.5 border-x border-ink-100 bg-brand-blue py-2.5 text-xs font-semibold text-white transition-transform active:scale-95"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -39,7 +39,7 @@ export default function MobileStickyBar({ onChatClick }: { onChatClick: () => vo
       <button
         type="button"
         onClick={onChatClick}
-        className="flex flex-col items-center justify-center gap-0.5 py-2.5 text-xs font-semibold text-ink-900 active:bg-ink-100"
+        className="flex flex-col items-center justify-center gap-0.5 py-2.5 text-xs font-semibold text-ink-900 transition-transform active:scale-95 active:bg-ink-100"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path

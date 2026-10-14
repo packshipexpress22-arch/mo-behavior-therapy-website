@@ -48,12 +48,19 @@ export default function Hero() {
           </div>
 
           <div className="relative z-0 animate-fade-up [animation-delay:150ms]">
-            <div className="aspect-[4/3] w-full overflow-hidden rounded-xl3 border border-white/60 bg-gradient-to-br from-brand-blue-light via-white to-brand-green-light shadow-soft">
-              <img
-                src="/hero-illustration.svg"
-                alt="Illustration of a caregiver and child smiling together under a rainbow"
-                className="h-full w-full object-cover"
-              />
+            {/* Two nested wrappers on purpose: the outer handles the hover
+                scale (a CSS transition on `transform`), the inner handles
+                the idle float (a CSS `animation` also on `transform`) —
+                putting both on one element would have the running
+                animation mask the hover transition every frame. */}
+            <div className="transition-transform duration-300 hover:scale-[1.02]">
+              <div className="aspect-[4/3] w-full animate-float-slow overflow-hidden rounded-xl3 border border-white/60 bg-gradient-to-br from-brand-blue-light via-white to-brand-green-light shadow-soft">
+                <img
+                  src="/hero-illustration.svg"
+                  alt="Illustration of a caregiver and child smiling together under a rainbow"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>

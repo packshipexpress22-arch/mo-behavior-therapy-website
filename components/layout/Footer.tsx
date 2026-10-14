@@ -4,6 +4,7 @@ import { footerNav } from "@/data/nav";
 import { company } from "@/data/company";
 import { telHref, mailHref, mapsHref, mapsEmbedSrc } from "@/lib/utils";
 import Logo from "./Logo";
+import Reveal from "@/components/ui/Reveal";
 
 export default function Footer() {
   const t = useTranslations("footer");
@@ -20,6 +21,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-ink-100 bg-ink-100/40">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <Reveal>
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2">
             <Logo />
@@ -47,7 +49,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={t("followOnInstagram")}
-                className="mt-4 inline-flex items-center gap-2 text-sm text-ink-700 hover:text-brand-blue"
+                className="mt-4 inline-flex items-center gap-2 text-sm text-ink-700 transition-transform hover:-translate-y-0.5 hover:text-brand-blue"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -72,7 +74,10 @@ export default function Footer() {
             <ul className="mt-3 space-y-2">
               {footerNav.services.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-sm text-ink-700 hover:text-brand-blue">
+                  <Link
+                    href={item.href}
+                    className="inline-block text-sm text-ink-700 transition-transform duration-150 hover:translate-x-0.5 hover:text-brand-blue"
+                  >
                     {t(item.key)}
                   </Link>
                 </li>
@@ -85,7 +90,10 @@ export default function Footer() {
             <ul className="mt-3 space-y-2">
               {footerNav.company.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-sm text-ink-700 hover:text-brand-blue">
+                  <Link
+                    href={item.href}
+                    className="inline-block text-sm text-ink-700 transition-transform duration-150 hover:translate-x-0.5 hover:text-brand-blue"
+                  >
                     {t(item.key)}
                   </Link>
                 </li>
@@ -98,7 +106,10 @@ export default function Footer() {
             <ul className="mt-3 space-y-2">
               {footerNav.forProfessionals.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-sm text-ink-700 hover:text-brand-blue">
+                  <Link
+                    href={item.href}
+                    className="inline-block text-sm text-ink-700 transition-transform duration-150 hover:translate-x-0.5 hover:text-brand-blue"
+                  >
                     {t(item.key)}
                   </Link>
                 </li>
@@ -111,7 +122,10 @@ export default function Footer() {
             <ul className="mt-3 space-y-2">
               {footerNav.legal.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-sm text-ink-700 hover:text-brand-blue">
+                  <Link
+                    href={item.href}
+                    className="inline-block text-sm text-ink-700 transition-transform duration-150 hover:translate-x-0.5 hover:text-brand-blue"
+                  >
                     {t(item.key)}
                   </Link>
                 </li>
@@ -119,7 +133,9 @@ export default function Footer() {
             </ul>
           </nav>
         </div>
+        </Reveal>
 
+        <Reveal delay={0.1}>
         <div className="mt-10 overflow-hidden rounded-xl2 border border-ink-100 shadow-card">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink-100 bg-white px-5 py-3.5">
             <h2 className="text-sm font-semibold text-ink-900">{tc("officeLocation")}</h2>
@@ -127,7 +143,7 @@ export default function Footer() {
               href={mapsHref()}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-semibold text-brand-blue hover:underline"
+              className="text-sm font-semibold text-brand-blue transition-transform hover:-translate-y-0.5 hover:underline"
             >
               {t("getDirections")}
             </a>
@@ -140,6 +156,7 @@ export default function Footer() {
             className="h-72 w-full border-0 sm:h-80"
           />
         </div>
+        </Reveal>
 
         <div className="mt-10 border-t border-ink-100 pt-6 text-xs text-ink-500">
           {t("copyright", { year })}

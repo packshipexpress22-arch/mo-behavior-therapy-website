@@ -14,12 +14,17 @@ import { sendSignatureRequestInvite } from "./email";
 // app/api/admin/signature-envelopes/route.ts, whose createEnvelope +
 // signing-link + sendSignatureRequestInvite steps are mirrored below).
 //
-// Called from app/api/leads/route.ts and app/api/referrals/route.ts right
-// after their existing document-upload-invite email, using the exact same
-// best-effort pattern those routes already use for every other email they
-// send: never let a signature-related failure (one template, or all of
-// them) cost the lead that's already safely stored, and never block the
-// response the visitor is waiting on.
+// Called from app/api/leads/route.ts and app/api/referrals/route.ts at the
+// same time as (not chained after) their existing document-upload-invite
+// email — both fire immediately the moment the lead/referral is stored, so
+// the family/provider isn't waiting on anything else first. Changed
+// 2026-10-14: this used to run only after the document-upload-invite email
+// finished sending, which made auto-send feel delayed even though nothing
+// about it actually depended on that email. Uses the exact same best-effort
+// pattern those routes already use for every other email they send: never
+// let a signature-related failure (one template, or all of them) cost the
+// lead that's already safely stored, and never block the response the
+// visitor is waiting on.
 export async function autoSendSignatureTemplatesForLead(
   lead: LeadRecord,
   kind: "family" | "referral"

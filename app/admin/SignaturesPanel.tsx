@@ -783,7 +783,7 @@ export default function SignaturesPanel() {
                   onChange={(e) => setDraft((d) => ({ ...d, autoSendOnFamilyLead: e.target.checked }))}
                   className="mt-0.5 h-4 w-4 rounded border-ink-100"
                 />
-                Enviar automáticamente a nuevos leads de familia (justo después del email de subir documentos)
+                Enviar automáticamente al cliente/familia en cuanto llega su formulario (inmediato, igual que el email para subir documentos)
               </label>
               <label className="flex items-start gap-2 text-sm text-ink-700">
                 <input
@@ -792,7 +792,7 @@ export default function SignaturesPanel() {
                   onChange={(e) => setDraft((d) => ({ ...d, autoSendOnReferral: e.target.checked }))}
                   className="mt-0.5 h-4 w-4 rounded border-ink-100"
                 />
-                Enviar automáticamente a nuevos referidos de proveedores (justo después del email de subir documentos)
+                Enviar automáticamente al proveedor que refiere en cuanto llega el referido (inmediato, igual que el email para subir documentos)
               </label>
             </div>
 

@@ -81,20 +81,17 @@ export async function POST(req: NextRequest) {
     });
 
     // Internal notification + the professional's own document-upload invite
-    // are both best-effort: a failure here never costs the already-stored
-    // referral. sendReferralDocumentUploadInvite() no-ops gracefully if the
+    // + signature auto-send are all best-effort and all fire immediately,
+    // independently of each other, the moment the referral is stored — a
+    // failure in any one never costs the already-stored referral.
+    // sendReferralDocumentUploadInvite() no-ops gracefully if the
     // patient/provider portal isn't configured for this stage.
     //
-    // documentInviteThenAutoSend chains rather than firing in parallel —
-    // same ordering rationale as app/api/leads/route.ts: the referring
-    // professional should receive the document-upload invite before any
-    // auto-sent signature template. See lib/signatureAutoSend.ts.
-    const documentInviteThenAutoSend = sendReferralDocumentUploadInvite(lead)
-      .catch((err) => {
-        console.error(`[referrals] email step "document_upload_invite" failed for ${lead.id}:`, err);
-      })
-      .then(() => autoSendSignatureTemplatesForLead(lead, "referral"));
-
+    // Changed 2026-10-14: signature auto-send used to be chained after the
+    // document-upload-invite email finished sending (same change as
+    // app/api/leads/route.ts) — there was never an actual dependency
+    // between the two, so it now fires at the same time as the rest. See
+    // lib/signatureAutoSend.ts.
     const emailSteps = [
       ["internal_notification", sendEmail({
         to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
@@ -106,7 +103,8 @@ export async function POST(req: NextRequest) {
         text: `New referral from ${data.professionalName}\n${JSON.stringify(data, null, 2)}\nLead ID: ${lead.id}`,
         replyTo: data.email,
       })],
-      ["document_upload_invite_then_signature_auto_send", documentInviteThenAutoSend],
+      ["document_upload_invite", sendReferralDocumentUploadInvite(lead)],
+      ["signature_auto_send", autoSendSignatureTemplatesForLead(lead, "referral")],
     ] as const;
     const results = await Promise.allSettled(emailSteps.map(([, p]) => p));
     results.forEach((r, i) => {

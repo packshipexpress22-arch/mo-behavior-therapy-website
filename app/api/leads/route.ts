@@ -63,31 +63,25 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Notification + confirmation + document-upload-invite emails are all
-    // best-effort: log failures but never fail the request the visitor is
-    // waiting on, and never discard the lead that's already safely stored.
-    // sendDocumentUploadInvite() no-ops gracefully if the patient portal
-    // isn't configured for this stage (see lib/phiAuth.ts's
-    // isPatientPortalConfigured()), so this is safe to always include.
-    //
-    // documentInviteThenAutoSend deliberately chains rather than firing in
-    // parallel with the rest: the family should receive the "please upload
-    // your documents" email before any auto-sent signature template, not in
-    // some unpredictable order — see lib/signatureAutoSend.ts. The .catch()
-    // means a failed document-upload-invite still lets the (independent)
-    // signature auto-send attempt run; its own failure is logged inside
-    // autoSendSignatureTemplatesForLead() and never rejects this chain.
-    const documentInviteThenAutoSend = sendDocumentUploadInvite(lead)
-      .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.error(`[leads] email step "document_upload_invite" failed for ${lead.id}:`, err);
-      })
-      .then(() => autoSendSignatureTemplatesForLead(lead, "family"));
-
+    // Notification + confirmation + document-upload-invite + signature
+    // auto-send are all best-effort and all fire immediately, independently
+    // of each other, the moment the lead is stored: log failures but never
+    // fail the request the visitor is waiting on, and never discard the
+    // lead that's already safely stored. sendDocumentUploadInvite() no-ops
+    // gracefully if the patient portal isn't configured for this stage (see
+    // lib/phiAuth.ts's isPatientPortalConfigured()), so it's safe to always
+    // include. Changed 2026-10-14: signature auto-send used to be chained
+    // after the document-upload-invite email finished sending — the family
+    // reported it felt like it was "waiting" for something. There was never
+    // an actual dependency between the two (auto-send doesn't need the
+    // invite email's content or the client having uploaded anything), so
+    // it now fires at the same time as the rest, same as every other email
+    // here — see lib/signatureAutoSend.ts.
     const emailSteps = [
       ["internal_notification", sendInternalNotification(lead)],
       ["client_confirmation", sendClientConfirmation(lead)],
-      ["document_upload_invite_then_signature_auto_send", documentInviteThenAutoSend],
+      ["document_upload_invite", sendDocumentUploadInvite(lead)],
+      ["signature_auto_send", autoSendSignatureTemplatesForLead(lead, "family")],
     ] as const;
     const results = await Promise.allSettled(emailSteps.map(([, p]) => p));
     results.forEach((r, i) => {

@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import SignaturesPanel from "./SignaturesPanel";
+import StatsOverview from "./StatsOverview";
 
-type LeadKind = "family" | "referral" | "career";
-type LeadStatus =
+export type LeadKind = "family" | "referral" | "career";
+export type LeadStatus =
   | "NEW"
   | "CONTACT_ATTEMPTED"
   | "CONTACTED"
@@ -20,7 +21,7 @@ type LeadStatus =
 
 // Mirrors prisma/schema.prisma's Lead model as returned by GET
 // /api/admin/leads (dates arrive as ISO strings over JSON).
-type Lead = {
+export type Lead = {
   id: string;
   kind: LeadKind;
   status: LeadStatus;
@@ -60,7 +61,7 @@ type Lead = {
   updatedAt: string;
 };
 
-const STATUSES: LeadStatus[] = [
+export const STATUSES: LeadStatus[] = [
   "NEW",
   "CONTACT_ATTEMPTED",
   "CONTACTED",
@@ -73,10 +74,32 @@ const STATUSES: LeadStatus[] = [
   "CLOSED",
 ];
 
-const KIND_LABEL: Record<LeadKind, string> = {
+export const KIND_LABEL: Record<LeadKind, string> = {
   family: "Family",
   referral: "Referral",
   career: "Career",
+};
+
+export const KIND_COLOR: Record<LeadKind, string> = {
+  family: "#1F6FEB",
+  referral: "#2FAE66",
+  career: "#F5B400",
+};
+
+// Hex equivalents of STATUS_STYLE below, for the SVG/CSS-background charts
+// in StatsOverview.tsx (those can't take a Tailwind class — they need an
+// actual color value). Keep the two in sync when adding a status.
+export const STATUS_COLOR: Record<LeadStatus, string> = {
+  NEW: "#1F6FEB",
+  CONTACT_ATTEMPTED: "#A7B7C7",
+  CONTACTED: "#5B7086",
+  INSURANCE_VERIFICATION: "#F5B400",
+  DOCUMENTS_NEEDED: "#F47C20",
+  ASSESSMENT_PENDING: "#7C5CFC",
+  WAITLIST: "#F0554A",
+  SERVICES_STARTED: "#2FAE66",
+  NOT_ELIGIBLE_OUTSIDE_AREA: "#A7B7C7",
+  CLOSED: "#5B7086",
 };
 
 const STATUS_STYLE: Record<LeadStatus, string> = {
@@ -146,7 +169,7 @@ function formatBytes(n: number | null) {
 
 export default function AdminDashboard({ username }: { username: string }) {
   const router = useRouter();
-  const [tab, setTab] = useState<"leads" | "documents" | "signatures">("leads");
+  const [tab, setTab] = useState<"overview" | "leads" | "documents" | "signatures">("overview");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -302,58 +325,57 @@ export default function AdminDashboard({ username }: { username: string }) {
     }
   }
 
+  const tabs: { id: "overview" | "leads" | "documents" | "signatures"; label: string }[] = [
+    { id: "overview", label: "Overview" },
+    { id: "leads", label: "Leads" },
+    { id: "documents", label: "Documents" },
+    { id: "signatures", label: "Signatures" },
+  ];
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-ink-900">Admin dashboard</h1>
-          <p className="text-sm text-ink-500">Signed in as {username}</p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => router.push("/admin/change-password")}
-            className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
-          >
-            Change password
-          </button>
-          <button
-            onClick={handleLogout}
-            className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue"
-          >
-            Sign out
-          </button>
+    <div className="min-h-screen">
+      <div className="border-b border-ink-100 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="font-display text-xl font-bold text-ink-900">Admin dashboard</h1>
+              <p className="text-sm text-ink-500">Signed in as {username}</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => router.push("/admin/change-password")}
+                className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-700 transition-colors duration-150 hover:border-brand-blue hover:text-brand-blue"
+              >
+                Change password
+              </button>
+              <button
+                onClick={handleLogout}
+                className="rounded-full border border-ink-100 bg-white px-4 py-2 text-sm font-medium text-ink-700 transition-colors duration-150 hover:border-brand-blue hover:text-brand-blue"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-5 flex gap-1 rounded-full bg-ink-100 p-1">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  "flex-1 rounded-full px-3 py-2 text-sm font-medium transition-all duration-200 sm:flex-none sm:px-5",
+                  tab === t.id ? "bg-white text-brand-blue shadow-card" : "text-ink-500 hover:text-ink-900"
+                )}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="mb-6 flex gap-2 border-b border-ink-100">
-        <button
-          onClick={() => setTab("leads")}
-          className={cn(
-            "border-b-2 px-3 pb-2 text-sm font-medium",
-            tab === "leads" ? "border-brand-blue text-brand-blue" : "border-transparent text-ink-500 hover:text-ink-900"
-          )}
-        >
-          Leads
-        </button>
-        <button
-          onClick={() => setTab("documents")}
-          className={cn(
-            "border-b-2 px-3 pb-2 text-sm font-medium",
-            tab === "documents" ? "border-brand-blue text-brand-blue" : "border-transparent text-ink-500 hover:text-ink-900"
-          )}
-        >
-          Documents
-        </button>
-        <button
-          onClick={() => setTab("signatures")}
-          className={cn(
-            "border-b-2 px-3 pb-2 text-sm font-medium",
-            tab === "signatures" ? "border-brand-blue text-brand-blue" : "border-transparent text-ink-500 hover:text-ink-900"
-          )}
-        >
-          Signatures
-        </button>
-      </div>
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        {tab === "overview" && <StatsOverview leads={leads} loading={loading} loadError={loadError} />}
 
       {tab === "leads" && (
         <>
@@ -553,6 +575,7 @@ export default function AdminDashboard({ username }: { username: string }) {
       )}
 
       {tab === "signatures" && <SignaturesPanel />}
+      </div>
     </div>
   );
 }

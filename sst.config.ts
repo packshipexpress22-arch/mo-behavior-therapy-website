@@ -98,7 +98,11 @@ export default $config({
       properties: { bucketName: phiBucketName },
       include: [
         sst.aws.permission({
-          actions: ["s3:PutObject", "s3:GetObject", "s3:HeadObject"],
+          // "DeleteObject" added 2026-10-14 for the document trash/restore
+          // feature's purge sweep (lib/phiStorage.ts's deleteObject(),
+          // called by lib/phiDocuments.ts's sweepExpired() once a
+          // soft-deleted document's 30-day retention window has passed).
+          actions: ["s3:PutObject", "s3:GetObject", "s3:HeadObject", "s3:DeleteObject"],
           resources: [`arn:aws:s3:::${phiBucketName}/*`],
         }),
       ],
@@ -118,6 +122,14 @@ export default $config({
             // Scan throws AccessDeniedException and the tab shows
             // "Couldn't load documents." (found + fixed 2026-10-02).
             "dynamodb:Scan",
+            // "DeleteItem" added 2026-10-14 for the document trash/restore
+            // feature's purge sweep (lib/phiDocuments.ts's
+            // hardDeleteDocument(), called by sweepExpired() once a
+            // soft-deleted document's 30-day retention window has passed).
+            // Soft-delete/restore themselves only ever use UpdateItem
+            // (already granted above) - this is solely for the final,
+            // permanent purge.
+            "dynamodb:DeleteItem",
           ],
           resources: [`arn:aws:dynamodb:${awsRegion}:${awsAccountId}:table/${phiTableName}`],
         }),

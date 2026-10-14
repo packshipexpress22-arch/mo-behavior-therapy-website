@@ -148,7 +148,18 @@ type PhiDocument = {
   sizeBytes: number | null;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 };
+
+// Mirrors lib/phiDocuments.ts's TRASH_RETENTION_DAYS — display copy only;
+// the server decides when a trashed document actually gets purged.
+const TRASH_RETENTION_DAYS = 30;
+
+function daysLeftInTrash(deletedAt: string): number {
+  const ageMs = Date.now() - new Date(deletedAt).getTime();
+  const daysElapsed = Math.floor(ageMs / (24 * 60 * 60 * 1000));
+  return Math.max(0, TRASH_RETENTION_DAYS - daysElapsed);
+}
 
 // Mirrors app/portal/PortalDashboard.tsx's DOCUMENT_TYPE_LABELS and
 // lib/email.ts's ADMIN_DOCUMENT_TYPE_LABELS.
@@ -189,6 +200,15 @@ export default function AdminDashboard({ username }: { username: string }) {
   const [docsLoaded, setDocsLoaded] = useState(false);
   const [docsError, setDocsError] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [confirmRemoveDoc, setConfirmRemoveDoc] = useState<string | null>(null);
+  const [removingDocId, setRemovingDocId] = useState<string | null>(null);
+  const [restoringDocId, setRestoringDocId] = useState<string | null>(null);
+
+  const [showDocsTrash, setShowDocsTrash] = useState(false);
+  const [trashDocuments, setTrashDocuments] = useState<PhiDocument[]>([]);
+  const [trashDocsLoading, setTrashDocsLoading] = useState(false);
+  const [trashDocsLoaded, setTrashDocsLoaded] = useState(false);
+  const [trashDocsError, setTrashDocsError] = useState<string | null>(null);
 
   const fetchLeads = useCallback(async () => {
     setLoading(true);
@@ -302,6 +322,85 @@ export default function AdminDashboard({ username }: { username: string }) {
       void fetchDocuments();
     }
   }, [tab, docsLoaded, fetchDocuments]);
+
+  const fetchTrashDocuments = useCallback(async () => {
+    setTrashDocsLoading(true);
+    setTrashDocsError(null);
+    try {
+      const res = await fetch("/api/admin/documents/trash");
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (res.status === 503) {
+        setTrashDocsError("PHI document storage isn't configured for this stage yet.");
+        setTrashDocuments([]);
+        return;
+      }
+      if (!res.ok) {
+        setTrashDocsError("Couldn't load the trash. Please try again.");
+        return;
+      }
+      const data = (await res.json()) as { documents: PhiDocument[] };
+      setTrashDocuments(data.documents);
+    } catch {
+      setTrashDocsError("Couldn't load the trash. Please check your connection and try again.");
+    } finally {
+      setTrashDocsLoading(false);
+      setTrashDocsLoaded(true);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (showDocsTrash && !trashDocsLoaded) {
+      void fetchTrashDocuments();
+    }
+  }, [showDocsTrash, trashDocsLoaded, fetchTrashDocuments]);
+
+  async function removeDocument(doc: PhiDocument) {
+    setRemovingDocId(doc.documentId);
+    try {
+      const res = await fetch(
+        `/api/admin/documents/${doc.documentId}?patientId=${encodeURIComponent(doc.patientId)}`,
+        { method: "DELETE" }
+      );
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (!res.ok) {
+        setDocsError("Couldn't remove that document. Please try again.");
+        return;
+      }
+      setConfirmRemoveDoc(null);
+      await fetchDocuments();
+      if (trashDocsLoaded) await fetchTrashDocuments();
+    } finally {
+      setRemovingDocId(null);
+    }
+  }
+
+  async function restoreDocument(doc: PhiDocument) {
+    setRestoringDocId(doc.documentId);
+    try {
+      const res = await fetch(
+        `/api/admin/documents/${doc.documentId}/restore?patientId=${encodeURIComponent(doc.patientId)}`,
+        { method: "POST" }
+      );
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (!res.ok) {
+        setTrashDocsError("Couldn't restore that document. Please try again.");
+        return;
+      }
+      await fetchTrashDocuments();
+      await fetchDocuments();
+    } finally {
+      setRestoringDocId(null);
+    }
+  }
 
   async function downloadDocument(doc: PhiDocument) {
     setDownloadingId(doc.documentId);
@@ -559,13 +658,40 @@ export default function AdminDashboard({ username }: { username: string }) {
                       </td>
                       <td className="px-4 py-3 text-ink-500">{formatBytes(doc.sizeBytes)}</td>
                       <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={() => downloadDocument(doc)}
-                          disabled={downloadingId === doc.documentId}
-                          className="rounded-full border border-ink-100 px-3 py-1.5 text-xs font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue disabled:opacity-60"
-                        >
-                          {downloadingId === doc.documentId ? "Opening…" : "Download"}
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => downloadDocument(doc)}
+                            disabled={downloadingId === doc.documentId}
+                            className="rounded-full border border-ink-100 px-3 py-1.5 text-xs font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue disabled:opacity-60"
+                          >
+                            {downloadingId === doc.documentId ? "Opening…" : "Download"}
+                          </button>
+                          {confirmRemoveDoc === doc.documentId ? (
+                            <>
+                              <button
+                                onClick={() => removeDocument(doc)}
+                                disabled={removingDocId === doc.documentId}
+                                className="rounded-full bg-brand-coral px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
+                              >
+                                {removingDocId === doc.documentId ? "Removing…" : "Confirm"}
+                              </button>
+                              <button
+                                onClick={() => setConfirmRemoveDoc(null)}
+                                disabled={removingDocId === doc.documentId}
+                                className="rounded-full border border-ink-100 px-3 py-1.5 text-xs font-medium text-ink-700"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmRemoveDoc(doc.documentId)}
+                              className="rounded-full border border-ink-100 px-3 py-1.5 text-xs font-medium text-ink-500 hover:border-brand-coral hover:text-brand-coral"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -573,6 +699,78 @@ export default function AdminDashboard({ username }: { username: string }) {
               </table>
             </div>
           )}
+
+          <div className="mt-8">
+            <button
+              onClick={() => setShowDocsTrash((v) => !v)}
+              className="mb-3 text-sm font-semibold text-ink-900 underline-offset-2 hover:underline"
+            >
+              {showDocsTrash ? "Hide trash" : "Trash"}
+              {trashDocsLoaded && trashDocuments.length > 0 ? ` (${trashDocuments.length})` : ""}
+            </button>
+
+            {showDocsTrash && (
+              <div>
+                <p className="mb-3 text-sm text-ink-500">
+                  Documents removed by a family or by an admin stay here for {TRASH_RETENTION_DAYS}{" "}
+                  days in case of a mistake, then they're deleted for good (file included).
+                </p>
+
+                {trashDocsError && (
+                  <div className="mb-4 rounded-xl border border-brand-coral/30 bg-brand-coral/10 p-3 text-sm text-brand-coral">
+                    {trashDocsError}
+                  </div>
+                )}
+
+                {trashDocsLoading && !trashDocsError && <p className="text-sm text-ink-500">Loading…</p>}
+
+                {!trashDocsLoading && !trashDocsError && trashDocuments.length === 0 && (
+                  <p className="text-sm text-ink-500">Trash is empty.</p>
+                )}
+
+                {!trashDocsLoading && trashDocuments.length > 0 && (
+                  <div className="overflow-hidden rounded-xl3 border border-ink-100 bg-white">
+                    <table className="w-full text-left text-sm">
+                      <thead className="border-b border-ink-100 bg-ink-100/50 text-xs uppercase tracking-wide text-ink-500">
+                        <tr>
+                          <th className="px-4 py-3 font-medium">Patient email</th>
+                          <th className="px-4 py-3 font-medium">Document type</th>
+                          <th className="px-4 py-3 font-medium">Auto-deletes in</th>
+                          <th className="px-4 py-3 font-medium" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {trashDocuments.map((doc) => (
+                          <tr
+                            key={`${doc.patientId}:${doc.documentId}`}
+                            className="border-b border-ink-100 last:border-0"
+                          >
+                            <td className="px-4 py-3 text-ink-900">{doc.patientId}</td>
+                            <td className="px-4 py-3 text-ink-900">
+                              {DOCUMENT_TYPE_LABELS[doc.documentType] ?? DOCUMENT_TYPE_LABELS.other}
+                            </td>
+                            <td className="px-4 py-3 text-ink-500">
+                              {doc.deletedAt ? daysLeftInTrash(doc.deletedAt) : TRASH_RETENTION_DAYS} day
+                              {doc.deletedAt && daysLeftInTrash(doc.deletedAt) === 1 ? "" : "s"}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <button
+                                onClick={() => restoreDocument(doc)}
+                                disabled={restoringDocId === doc.documentId}
+                                className="rounded-full border border-ink-100 px-3 py-1.5 text-xs font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue disabled:opacity-60"
+                              >
+                                {restoringDocId === doc.documentId ? "Restoring…" : "Restore"}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, HeadObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, HeadObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // PHI file storage — S3 only, accessed exclusively via short-lived
@@ -193,4 +193,17 @@ export async function headUploadedObject(s3Key: string): Promise<{ sizeBytes: nu
   } catch {
     return null;
   }
+}
+
+/**
+ * Permanently deletes an object — used by lib/phiDocuments.ts's purge
+ * sweep once a soft-deleted document's 30-day trash retention has passed.
+ * Unlike lib/leadershipPhotos.ts's deleteLeadershipPhoto, this is allowed
+ * to throw: the caller (sweepExpired) decides what to do about a failed
+ * delete, since silently treating a PHI file as gone when it wasn't would
+ * be a real data-retention bug, not something to swallow here.
+ */
+export async function deleteObject(s3Key: string): Promise<void> {
+  const c = requireClient();
+  await c.send(new DeleteObjectCommand({ Bucket: BUCKET_NAME, Key: s3Key }));
 }

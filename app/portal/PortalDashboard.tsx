@@ -23,19 +23,7 @@ type PhiDocument = {
   sizeBytes: number | null;
   createdAt: string;
   updatedAt: string;
-  deletedAt?: string | null;
 };
-
-// Mirrors lib/phiDocuments.ts's TRASH_RETENTION_DAYS — used here only to
-// show "auto-deletes in N days" copy, not to decide anything itself (the
-// server is the source of truth for when a document actually gets purged).
-const TRASH_RETENTION_DAYS = 30;
-
-function daysLeftInTrash(deletedAt: string): number {
-  const ageMs = Date.now() - new Date(deletedAt).getTime();
-  const daysElapsed = Math.floor(ageMs / (24 * 60 * 60 * 1000));
-  return Math.max(0, TRASH_RETENTION_DAYS - daysElapsed);
-}
 
 const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
   caregiver_id: "Caregiver photo ID",
@@ -82,15 +70,6 @@ export default function PortalDashboard({ email }: { email: string }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
-  const [removingId, setRemovingId] = useState<string | null>(null);
-  const [restoringId, setRestoringId] = useState<string | null>(null);
-
-  const [showTrash, setShowTrash] = useState(false);
-  const [trashDocuments, setTrashDocuments] = useState<PhiDocument[]>([]);
-  const [trashLoaded, setTrashLoaded] = useState(false);
-  const [trashLoading, setTrashLoading] = useState(false);
-
   const loadDocuments = useCallback(async () => {
     setLoadingList(true);
     try {
@@ -106,71 +85,9 @@ export default function PortalDashboard({ email }: { email: string }) {
     }
   }, [router]);
 
-  const loadTrash = useCallback(async () => {
-    setTrashLoading(true);
-    try {
-      const res = await fetch("/api/portal/documents/trash");
-      if (res.status === 401) {
-        router.push("/portal/login");
-        return;
-      }
-      const body = await res.json();
-      setTrashDocuments(body.documents ?? []);
-    } finally {
-      setTrashLoading(false);
-      setTrashLoaded(true);
-    }
-  }, [router]);
-
   useEffect(() => {
     loadDocuments();
   }, [loadDocuments]);
-
-  useEffect(() => {
-    if (showTrash && !trashLoaded) {
-      void loadTrash();
-    }
-  }, [showTrash, trashLoaded, loadTrash]);
-
-  async function removeDocument(doc: PhiDocument) {
-    setRemovingId(doc.documentId);
-    try {
-      const res = await fetch(`/api/portal/documents/${doc.documentId}`, { method: "DELETE" });
-      if (res.status === 401) {
-        router.push("/portal/login");
-        return;
-      }
-      if (!res.ok) {
-        setError("Couldn't remove that document. Please try again.");
-        return;
-      }
-      setConfirmRemoveId(null);
-      await loadDocuments();
-      // Keep the trash list in sync if it's already been loaded/opened.
-      if (trashLoaded) await loadTrash();
-    } finally {
-      setRemovingId(null);
-    }
-  }
-
-  async function restoreFromTrash(doc: PhiDocument) {
-    setRestoringId(doc.documentId);
-    try {
-      const res = await fetch(`/api/portal/documents/${doc.documentId}/restore`, { method: "POST" });
-      if (res.status === 401) {
-        router.push("/portal/login");
-        return;
-      }
-      if (!res.ok) {
-        setError("Couldn't restore that document. Please try again.");
-        return;
-      }
-      await loadTrash();
-      await loadDocuments();
-    } finally {
-      setRestoringId(null);
-    }
-  }
 
   async function handleFileSelected(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -321,7 +238,7 @@ export default function PortalDashboard({ email }: { email: string }) {
         {uploading && <p className="mt-3 text-sm text-ink-500">Uploading…</p>}
       </section>
 
-      <section className="mb-8">
+      <section>
         <h2 className="mb-3 text-sm font-semibold text-ink-900">Your documents</h2>
         {loadingList ? (
           <p className="text-sm text-ink-500">Loading…</p>
@@ -332,7 +249,7 @@ export default function PortalDashboard({ email }: { email: string }) {
             {documents.map((doc) => (
               <li
                 key={doc.documentId}
-                className="flex items-center justify-between gap-3 rounded-xl border border-ink-100 bg-white p-4 shadow-card"
+                className="flex items-center justify-between rounded-xl border border-ink-100 bg-white p-4 shadow-card"
               >
                 <div>
                   <p className="text-sm font-medium text-ink-900">{doc.fileName}</p>
@@ -341,94 +258,18 @@ export default function PortalDashboard({ email }: { email: string }) {
                     {doc.sizeBytes ? ` · ${formatBytes(doc.sizeBytes)}` : ""}
                   </p>
                 </div>
-                <div className="flex flex-none items-center gap-2">
-                  <span
-                    className={
-                      doc.status === "uploaded"
-                        ? "rounded-full bg-brand-green-light px-3 py-1 text-xs font-medium text-brand-green"
-                        : "rounded-full bg-ink-100 px-3 py-1 text-xs font-medium text-ink-500"
-                    }
-                  >
-                    {doc.status === "uploaded" ? "Uploaded" : "Pending"}
-                  </span>
-                  {confirmRemoveId === doc.documentId ? (
-                    <span className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => removeDocument(doc)}
-                        disabled={removingId === doc.documentId}
-                        className="rounded-full bg-brand-coral px-3 py-1 text-xs font-medium text-white disabled:opacity-60"
-                      >
-                        {removingId === doc.documentId ? "Removing…" : "Confirm"}
-                      </button>
-                      <button
-                        onClick={() => setConfirmRemoveId(null)}
-                        disabled={removingId === doc.documentId}
-                        className="rounded-full border border-ink-100 px-3 py-1 text-xs font-medium text-ink-700"
-                      >
-                        Cancel
-                      </button>
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => setConfirmRemoveId(doc.documentId)}
-                      className="rounded-full border border-ink-100 px-3 py-1 text-xs font-medium text-ink-500 hover:border-brand-coral hover:text-brand-coral"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
+                <span
+                  className={
+                    doc.status === "uploaded"
+                      ? "rounded-full bg-brand-green-light px-3 py-1 text-xs font-medium text-brand-green"
+                      : "rounded-full bg-ink-100 px-3 py-1 text-xs font-medium text-ink-500"
+                  }
+                >
+                  {doc.status === "uploaded" ? "Uploaded" : "Pending"}
+                </span>
               </li>
             ))}
           </ul>
-        )}
-      </section>
-
-      <section>
-        <button
-          onClick={() => setShowTrash((v) => !v)}
-          className="mb-3 text-sm font-semibold text-ink-900 underline-offset-2 hover:underline"
-        >
-          {showTrash ? "Hide trash" : "Trash"}
-          {trashLoaded && trashDocuments.length > 0 ? ` (${trashDocuments.length})` : ""}
-        </button>
-
-        {showTrash && (
-          <div>
-            <p className="mb-3 text-sm text-ink-500">
-              Removed documents stay here for {TRASH_RETENTION_DAYS} days in case you removed one by
-              mistake, then they're deleted for good.
-            </p>
-            {trashLoading ? (
-              <p className="text-sm text-ink-500">Loading…</p>
-            ) : trashDocuments.length === 0 ? (
-              <p className="text-sm text-ink-500">Trash is empty.</p>
-            ) : (
-              <ul className="space-y-2">
-                {trashDocuments.map((doc) => (
-                  <li
-                    key={doc.documentId}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-ink-100 bg-ink-50 p-4"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-ink-900">{doc.fileName}</p>
-                      <p className="text-xs text-ink-500">
-                        {labelFor(doc.documentType)} · auto-deletes in{" "}
-                        {doc.deletedAt ? daysLeftInTrash(doc.deletedAt) : TRASH_RETENTION_DAYS} day
-                        {doc.deletedAt && daysLeftInTrash(doc.deletedAt) === 1 ? "" : "s"}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => restoreFromTrash(doc)}
-                      disabled={restoringId === doc.documentId}
-                      className="flex-none rounded-full border border-ink-100 bg-white px-3 py-1.5 text-xs font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue disabled:opacity-60"
-                    >
-                      {restoringId === doc.documentId ? "Restoring…" : "Restore"}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
         )}
       </section>
     </main>

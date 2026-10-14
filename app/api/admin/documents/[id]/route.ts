@@ -6,12 +6,12 @@ import { getDocument, softDeleteDocument } from "@/lib/phiDocuments";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Admin-side soft-delete for the document trash/restore feature (added
-// 2026-10-14) — see app/api/portal/documents/[id]/route.ts for the
-// family-portal equivalent and lib/phiDocuments.ts for the shared
-// trash/restore/purge mechanics. patientId is required as a query param
-// for the same reason as [id]/download/route.ts: the PHI documents
-// table's key is composite (patientId + documentId).
+// Admin-only soft-delete for the document trash/restore feature (added
+// 2026-10-14, deliberately admin-only — the family portal has no
+// delete/remove capability at all, by design). See lib/phiDocuments.ts
+// for the shared trash/restore/purge mechanics. patientId is required as
+// a query param for the same reason as [id]/download/route.ts: the PHI
+// documents table's key is composite (patientId + documentId).
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const token = cookies().get(ADMIN_COOKIE_NAME)?.value;
   const session = verifySessionToken(token);

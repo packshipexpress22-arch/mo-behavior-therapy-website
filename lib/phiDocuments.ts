@@ -188,32 +188,6 @@ export async function listDocumentsForPatient(
 }
 
 /**
- * Same scoping as listDocumentsForPatient (one case, via leadId), but
- * returns only this patient's TRASHED documents — for the "Trash" view in
- * app/portal/PortalDashboard.tsx. Sweeps (purges) anything past its 30-day
- * retention window before returning, so what's shown is always actually
- * restorable.
- */
-export async function listTrashedDocumentsForPatient(
-    patientId: string,
-    leadId: string | null
-): Promise<PhiDocument[]> {
-    const c = requireClient();
-    const res = await c.send(
-          new QueryCommand({
-                  TableName: TABLE_NAME,
-                  KeyConditionExpression: "patientId = :pid",
-                  ExpressionAttributeValues: { ":pid": patientId },
-                  ScanIndexForward: false,
-          })
-        );
-    let items = (res.Items as PhiDocument[]) ?? [];
-    items = leadId === null ? [] : items.filter((d) => d.leadId === leadId && Boolean(d.deletedAt));
-    items = await sweepExpired(items);
-    return items.sort((a, b) => ((a.deletedAt ?? "") < (b.deletedAt ?? "") ? 1 : -1));
-}
-
-/**
  * Admin-only: lists every uploaded document across all patients, for the
  * admin dashboard's "Documents" tab (see app/api/admin/documents/route.ts).
  * A full table Scan is acceptable here - this table only ever holds one
@@ -287,12 +261,10 @@ export async function markDocumentUploaded(
 
 /**
  * Moves a document to the trash (see TRASH_RETENTION_DAYS above) — used by
- * both the family-portal and admin-side "remove" actions
- * (app/api/portal/documents/[id]/route.ts and
- * app/api/admin/documents/[id]/route.ts). The S3 object is left untouched;
- * only the DynamoDB row is marked. Callers are responsible for their own
- * ownership check (session.patientId for the family side, the patientId
- * query param for the admin side) before calling this.
+ * the admin "remove" action (see app/api/admin/documents/[id]/route.ts).
+ * Deliberately admin-only: the family portal has no delete/remove
+ * capability at all (by design — see app/portal/PortalDashboard.tsx). The
+ * S3 object is left untouched; only the DynamoDB row is marked.
  */
 export async function softDeleteDocument(patientId: string, documentId: string): Promise<PhiDocument> {
     const c = requireClient();

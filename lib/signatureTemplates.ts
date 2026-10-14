@@ -95,6 +95,16 @@ export type SignatureTemplate = {
   fields: PositionedField[]; // kind === "pdf"
   signatureLabel: string; // e.g. "Parent/Guardian Signature"
   active: boolean;
+  // Added 2026-10-13: when true, this template is sent automatically right
+  // after a new lead's document-upload-invite email, with no admin needing
+  // to click "Send" manually (see lib/signatureAutoSend.ts). The two are
+  // independent — a template can auto-send to family intake leads
+  // (app/api/leads/route.ts), to provider referrals (app/api/referrals/route.ts),
+  // both, or neither — because the practice runs separate sets of standard
+  // paperwork for each ("hay automaticos para familia y automaticos para
+  // proveedores").
+  autoSendOnFamilyLead: boolean;
+  autoSendOnReferral: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -116,6 +126,8 @@ function normalizeTemplate(item: Record<string, unknown>): SignatureTemplate {
     fields: Array.isArray(item.fields) ? (item.fields as PositionedField[]) : [],
     signatureLabel: (item.signatureLabel as string) || "Signature",
     active: Boolean(item.active),
+    autoSendOnFamilyLead: Boolean(item.autoSendOnFamilyLead),
+    autoSendOnReferral: Boolean(item.autoSendOnReferral),
     createdAt: (item.createdAt as string) ?? new Date().toISOString(),
     updatedAt: (item.updatedAt as string) ?? new Date().toISOString(),
   };
@@ -143,6 +155,8 @@ export async function createTemplate(args: {
   pageCount?: number | null;
   fields?: PositionedField[];
   signatureLabel: string;
+  autoSendOnFamilyLead?: boolean;
+  autoSendOnReferral?: boolean;
 }): Promise<SignatureTemplate> {
   const c = requireClient();
   const now = new Date().toISOString();
@@ -159,6 +173,8 @@ export async function createTemplate(args: {
     fields: args.kind === "pdf" ? args.fields ?? [] : [],
     signatureLabel: args.signatureLabel || "Signature",
     active: true,
+    autoSendOnFamilyLead: Boolean(args.autoSendOnFamilyLead),
+    autoSendOnReferral: Boolean(args.autoSendOnReferral),
     createdAt: now,
     updatedAt: now,
   };
@@ -188,6 +204,8 @@ export async function updateTemplate(
       | "fields"
       | "signatureLabel"
       | "active"
+      | "autoSendOnFamilyLead"
+      | "autoSendOnReferral"
     >
   >
 ): Promise<SignatureTemplate | null> {
@@ -226,4 +244,18 @@ export async function listTemplates(): Promise<SignatureTemplate[]> {
   } while (ExclusiveStartKey);
 
   return items.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+}
+
+/**
+ * Which active templates should be auto-sent the moment a new lead of this
+ * kind comes in — see lib/signatureAutoSend.ts, called from
+ * app/api/leads/route.ts ("family") and app/api/referrals/route.ts
+ * ("referral") right after their existing document-upload-invite email.
+ * Reuses listTemplates()'s full Scan (same tiny-table justification) rather
+ * than a GSI — this only ever runs once per lead submission, not on a hot
+ * path that needs to scale.
+ */
+export async function listAutoSendTemplates(kind: "family" | "referral"): Promise<SignatureTemplate[]> {
+  const all = await listTemplates();
+  return all.filter((t) => t.active && (kind === "family" ? t.autoSendOnFamilyLead : t.autoSendOnReferral));
 }

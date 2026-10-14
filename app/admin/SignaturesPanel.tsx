@@ -27,6 +27,10 @@ type SignatureTemplate = {
   fields: PositionedField[];
   signatureLabel: string;
   active: boolean;
+  // Independent per-kind auto-send flags — see lib/signatureTemplates.ts's
+  // same-named fields and lib/signatureAutoSend.ts.
+  autoSendOnFamilyLead: boolean;
+  autoSendOnReferral: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -40,6 +44,10 @@ type SignatureEnvelope = {
   templateSnapshot: { title: string };
   clientName: string;
   clientEmail: string;
+  // The caregiver's own confirmed printed name, captured as a mandatory
+  // field on the signing page itself — set only once status is
+  // "completed" (see lib/signatureEnvelopes.ts).
+  caregiverName: string | null;
   status: EnvelopeStatus;
   sentAt: string;
   completedAt: string | null;
@@ -83,6 +91,8 @@ function emptyTemplateDraft(): Omit<SignatureTemplate, "id" | "active" | "create
     pageCount: null,
     fields: [],
     signatureLabel: "Signature",
+    autoSendOnFamilyLead: false,
+    autoSendOnReferral: false,
   };
 }
 
@@ -207,6 +217,8 @@ export default function SignaturesPanel() {
       pageCount: t.pageCount,
       fields: t.fields,
       signatureLabel: t.signatureLabel,
+      autoSendOnFamilyLead: t.autoSendOnFamilyLead,
+      autoSendOnReferral: t.autoSendOnReferral,
     });
     setUploadError(null);
     setPdfViewUrl(null);
@@ -500,6 +512,16 @@ export default function SignaturesPanel() {
                       >
                         {t.active ? "Active" : "Inactive"}
                       </span>
+                      {t.autoSendOnFamilyLead && (
+                        <span className="rounded-full bg-brand-blue/10 px-2 py-0.5 text-[11px] font-medium text-brand-blue">
+                          Auto: familia
+                        </span>
+                      )}
+                      {t.autoSendOnReferral && (
+                        <span className="rounded-full bg-brand-blue/10 px-2 py-0.5 text-[11px] font-medium text-brand-blue">
+                          Auto: referidos
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-ink-500">
                       {t.documentType} ·{" "}
@@ -576,6 +598,9 @@ export default function SignaturesPanel() {
                       <td className="px-4 py-3 text-ink-700">
                         <div>{e.clientName}</div>
                         <div className="text-xs text-ink-500">{e.clientEmail}</div>
+                        {e.status === "completed" && e.caregiverName && (
+                          <div className="text-xs text-ink-500">Signed by: {e.caregiverName}</div>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <span className={cn("rounded-full px-2.5 py-1 text-xs font-medium", STATUS_STYLE[e.status])}>
@@ -683,6 +708,28 @@ export default function SignaturesPanel() {
                 placeholder="e.g. Parent/Guardian Signature"
                 className="w-full rounded-xl border border-ink-100 px-3 py-2 text-sm outline-none focus-visible:border-brand-blue"
               />
+            </div>
+
+            <div className="mb-4 rounded-xl border border-ink-100 bg-ink-100/30 p-3">
+              <label className="mb-2 block text-xs font-medium text-ink-500">Envío automático</label>
+              <label className="mb-2 flex items-start gap-2 text-sm text-ink-700">
+                <input
+                  type="checkbox"
+                  checked={draft.autoSendOnFamilyLead}
+                  onChange={(e) => setDraft((d) => ({ ...d, autoSendOnFamilyLead: e.target.checked }))}
+                  className="mt-0.5 h-4 w-4 rounded border-ink-100"
+                />
+                Enviar automáticamente a nuevos leads de familia (justo después del email de subir documentos)
+              </label>
+              <label className="flex items-start gap-2 text-sm text-ink-700">
+                <input
+                  type="checkbox"
+                  checked={draft.autoSendOnReferral}
+                  onChange={(e) => setDraft((d) => ({ ...d, autoSendOnReferral: e.target.checked }))}
+                  className="mt-0.5 h-4 w-4 rounded border-ink-100"
+                />
+                Enviar automáticamente a nuevos referidos de proveedores (justo después del email de subir documentos)
+              </label>
             </div>
 
             {draft.kind === "pdf" ? (

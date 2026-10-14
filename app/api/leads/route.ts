@@ -4,6 +4,7 @@ import { storeLead } from "@/lib/leadStore";
 import { sendInternalNotification, sendClientConfirmation, sendDocumentUploadInvite } from "@/lib/email";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { autoSendSignatureTemplatesForLead } from "@/lib/signatureAutoSend";
 
 export const runtime = "nodejs";
 
@@ -68,10 +69,25 @@ export async function POST(req: NextRequest) {
     // sendDocumentUploadInvite() no-ops gracefully if the patient portal
     // isn't configured for this stage (see lib/phiAuth.ts's
     // isPatientPortalConfigured()), so this is safe to always include.
+    //
+    // documentInviteThenAutoSend deliberately chains rather than firing in
+    // parallel with the rest: the family should receive the "please upload
+    // your documents" email before any auto-sent signature template, not in
+    // some unpredictable order — see lib/signatureAutoSend.ts. The .catch()
+    // means a failed document-upload-invite still lets the (independent)
+    // signature auto-send attempt run; its own failure is logged inside
+    // autoSendSignatureTemplatesForLead() and never rejects this chain.
+    const documentInviteThenAutoSend = sendDocumentUploadInvite(lead)
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error(`[leads] email step "document_upload_invite" failed for ${lead.id}:`, err);
+      })
+      .then(() => autoSendSignatureTemplatesForLead(lead, "family"));
+
     const emailSteps = [
       ["internal_notification", sendInternalNotification(lead)],
       ["client_confirmation", sendClientConfirmation(lead)],
-      ["document_upload_invite", sendDocumentUploadInvite(lead)],
+      ["document_upload_invite_then_signature_auto_send", documentInviteThenAutoSend],
     ] as const;
     const results = await Promise.allSettled(emailSteps.map(([, p]) => p));
     results.forEach((r, i) => {

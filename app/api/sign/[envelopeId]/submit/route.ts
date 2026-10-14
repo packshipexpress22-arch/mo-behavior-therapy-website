@@ -82,6 +82,14 @@ export async function POST(req: NextRequest, { params }: { params: { envelopeId:
     return NextResponse.json({ error: "missing_signature" }, { status: 422 });
   }
 
+  // Mandatory regardless of signature mode (drawn or typed) — never trust
+  // the client-side `required` check alone in
+  // app/sign/[envelopeId]/SignatureSigningClient.tsx.
+  const caregiverName = typeof body?.caregiverName === "string" ? body.caregiverName.trim() : "";
+  if (!caregiverName) {
+    return NextResponse.json({ error: "missing_caregiver_name" }, { status: 422 });
+  }
+
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
   const userAgent = req.headers.get("user-agent") ?? "unknown";
 
@@ -89,6 +97,7 @@ export async function POST(req: NextRequest, { params }: { params: { envelopeId:
     patientId: verified.email,
     envelopeId: params.envelopeId,
     fieldValues,
+    caregiverName,
     signature,
     consentIp: process.env.LOG_IP_ADDRESSES === "true" ? ip : null,
     consentUserAgent: userAgent,
@@ -112,6 +121,7 @@ export async function POST(req: NextRequest, { params }: { params: { envelopeId:
     await sendSignatureCompletedNotification({
       clientEmail: completed.clientEmail,
       documentTitle: completed.templateSnapshot.title,
+      caregiverName: completed.caregiverName,
     });
   } catch (err) {
     // eslint-disable-next-line no-console

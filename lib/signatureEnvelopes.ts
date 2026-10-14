@@ -68,6 +68,14 @@ export type SignatureEnvelope = {
   clientEmail: string;
   status: EnvelopeStatus;
   fieldValues: Record<string, string>;
+  // Added 2026-10-13: the printed name of the caregiver who actually signs,
+  // captured as its own mandatory field on the signing page (see
+  // app/sign/[envelopeId]/SignatureSigningClient.tsx) — distinct from
+  // `clientName` above, which is just whoever the envelope was addressed to
+  // (typed by admin, or by the auto-send feature from the lead's own
+  // contact name) and isn't confirmed by the actual signer. Null until the
+  // envelope is completed.
+  caregiverName: string | null;
   signature: SignatureValue | null;
   consentIp: string | null;
   consentTimestamp: string | null;
@@ -105,6 +113,7 @@ export async function createEnvelope(args: {
     clientEmail: args.clientEmail.trim().toLowerCase(),
     status: "sent",
     fieldValues: {},
+    caregiverName: null,
     signature: null,
     consentIp: null,
     consentTimestamp: null,
@@ -132,6 +141,8 @@ export async function completeEnvelope(args: {
   patientId: string;
   envelopeId: string;
   fieldValues: Record<string, string>;
+  // Required — see the caregiverName field note on SignatureEnvelope above.
+  caregiverName: string;
   signature: SignatureValue;
   consentIp: string | null;
   consentUserAgent: string | null;
@@ -144,6 +155,7 @@ export async function completeEnvelope(args: {
     ...existing,
     status: "completed",
     fieldValues: args.fieldValues,
+    caregiverName: args.caregiverName,
     signature: args.signature,
     consentIp: args.consentIp,
     consentUserAgent: args.consentUserAgent,

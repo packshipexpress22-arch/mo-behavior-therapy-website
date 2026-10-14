@@ -6,6 +6,7 @@ import { verifyTurnstileToken } from "@/lib/turnstile";
 import { company } from "@/data/company";
 import { escapeHtml } from "@/lib/utils";
 import { createRateLimiter } from "@/lib/rateLimit";
+import { autoSendSignatureTemplatesForLead } from "@/lib/signatureAutoSend";
 
 export const runtime = "nodejs";
 
@@ -83,6 +84,17 @@ export async function POST(req: NextRequest) {
     // are both best-effort: a failure here never costs the already-stored
     // referral. sendReferralDocumentUploadInvite() no-ops gracefully if the
     // patient/provider portal isn't configured for this stage.
+    //
+    // documentInviteThenAutoSend chains rather than firing in parallel —
+    // same ordering rationale as app/api/leads/route.ts: the referring
+    // professional should receive the document-upload invite before any
+    // auto-sent signature template. See lib/signatureAutoSend.ts.
+    const documentInviteThenAutoSend = sendReferralDocumentUploadInvite(lead)
+      .catch((err) => {
+        console.error(`[referrals] email step "document_upload_invite" failed for ${lead.id}:`, err);
+      })
+      .then(() => autoSendSignatureTemplatesForLead(lead, "referral"));
+
     const emailSteps = [
       ["internal_notification", sendEmail({
         to: process.env.COMPANY_NOTIFICATION_EMAIL || company.email,
@@ -94,7 +106,7 @@ export async function POST(req: NextRequest) {
         text: `New referral from ${data.professionalName}\n${JSON.stringify(data, null, 2)}\nLead ID: ${lead.id}`,
         replyTo: data.email,
       })],
-      ["document_upload_invite", sendReferralDocumentUploadInvite(lead)],
+      ["document_upload_invite_then_signature_auto_send", documentInviteThenAutoSend],
     ] as const;
     const results = await Promise.allSettled(emailSteps.map(([, p]) => p));
     results.forEach((r, i) => {

@@ -136,6 +136,8 @@ export async function POST(req: NextRequest) {
       typeof body.signatureLabel === "string" && body.signatureLabel.trim()
         ? body.signatureLabel.trim()
         : "Signature",
+    autoSendOnFamilyLead: Boolean(body.autoSendOnFamilyLead),
+    autoSendOnReferral: Boolean(body.autoSendOnReferral),
   });
 
   return NextResponse.json({ template });

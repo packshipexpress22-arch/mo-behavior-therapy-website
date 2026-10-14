@@ -105,6 +105,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (typeof body.documentType === "string") patch.documentType = body.documentType.trim();
   if (typeof body.signatureLabel === "string") patch.signatureLabel = body.signatureLabel.trim();
   if (typeof body.active === "boolean") patch.active = body.active;
+  if (typeof body.autoSendOnFamilyLead === "boolean") patch.autoSendOnFamilyLead = body.autoSendOnFamilyLead;
+  if (typeof body.autoSendOnReferral === "boolean") patch.autoSendOnReferral = body.autoSendOnReferral;
   if (body.kind === "blocks" || body.kind === "pdf") patch.kind = body.kind;
   if (body.blocks !== undefined) patch.blocks = sanitizeBlocks(body.blocks);
   if (typeof body.sourcePdfKey === "string") {

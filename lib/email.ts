@@ -757,6 +757,10 @@ export async function sendSignatureRequestInvite(args: {
 export async function sendSignatureCompletedNotification(args: {
   clientEmail: string;
   documentTitle: string;
+  // Added 2026-10-13 — the caregiver's own confirmed printed name, now a
+  // mandatory field on the signing page itself. Optional here so older
+  // call sites (and the TS signature) don't need to change together.
+  caregiverName?: string | null;
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mobehaviortherapy.com";
   const adminLink = `${siteUrl}/admin`;
@@ -767,8 +771,9 @@ export async function sendSignatureCompletedNotification(args: {
     <div style="font-family:sans-serif;font-size:15px;line-height:1.6;color:#0F1B2B">
       <p>A client has completed and signed a document.</p>
       <table cellpadding="4" cellspacing="0" style="font-size:14px">
-        <tr><td style="font-weight:600;padding-right:12px">Client email</td><td>${args.clientEmail}</td></tr>
-        <tr><td style="font-weight:600;padding-right:12px">Document</td><td>${args.documentTitle}</td></tr>
+        <tr><td style="font-weight:600;padding-right:12px">Client email</td><td>${escapeHtml(args.clientEmail)}</td></tr>
+        <tr><td style="font-weight:600;padding-right:12px">Document</td><td>${escapeHtml(args.documentTitle)}</td></tr>
+        ${args.caregiverName ? `<tr><td style="font-weight:600;padding-right:12px">Signed by</td><td>${escapeHtml(args.caregiverName)}</td></tr>` : ""}
       </table>
       <p><a href="${adminLink}" style="display:inline-block;padding:10px 20px;background:#2563EB;color:#fff;border-radius:9999px;text-decoration:none;font-weight:600">Open admin dashboard</a></p>
       <p style="font-size:13px;color:#475569">Sign in and open the "Signatures" tab to securely view or download the signed PDF. This email never carries the document itself.</p>
@@ -779,6 +784,7 @@ export async function sendSignatureCompletedNotification(args: {
     "A client has completed and signed a document.",
     `Client email: ${args.clientEmail}`,
     `Document: ${args.documentTitle}`,
+    ...(args.caregiverName ? [`Signed by: ${args.caregiverName}`] : []),
     `Open admin dashboard: ${adminLink}`,
   ].join("\n");
 

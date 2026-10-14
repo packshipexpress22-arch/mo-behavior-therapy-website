@@ -182,6 +182,18 @@ export async function generateSignedPdf(envelope: SignatureEnvelope): Promise<Ui
     cursor = { page: cursor.page, y: cursor.y - 22 - 8 };
   }
 
+  if (envelope.caregiverName) {
+    cursor = ensureSpace(cursor, 16);
+    cursor.page.drawText(`Printed name: ${envelope.caregiverName}`, {
+      x: MARGIN,
+      y: cursor.y,
+      size: 10,
+      font: regular,
+      color: rgb(0.3, 0.35, 0.42),
+    });
+    cursor = { page: cursor.page, y: cursor.y - 10 - 10 };
+  }
+
   // Audit footer
   cursor = ensureSpace(cursor, 60);
   cursor = { page: cursor.page, y: cursor.y - 8 };
@@ -336,7 +348,7 @@ export async function generateStampedPdf(envelope: SignatureEnvelope): Promise<U
   }
 
   const signedAt = envelope.consentTimestamp ? new Date(envelope.consentTimestamp) : new Date();
-  const footer = `Signed electronically · Envelope ${envelope.envelopeId} · ${signedAt.toLocaleString("en-US", { dateStyle: "short", timeStyle: "short" })} · IP ${envelope.consentIp || "unknown"}`;
+  const footer = `Signed electronically by ${envelope.caregiverName || "—"} · Envelope ${envelope.envelopeId} · ${signedAt.toLocaleString("en-US", { dateStyle: "short", timeStyle: "short" })} · IP ${envelope.consentIp || "unknown"}`;
   for (let i = 0; i < pageCount; i++) {
     const page = doc.getPage(i);
     page.drawText(footer, { x: 24, y: 10, size: 6.5, font: italic, color: rgb(0.55, 0.58, 0.63) });

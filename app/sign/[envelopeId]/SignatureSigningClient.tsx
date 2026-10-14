@@ -310,6 +310,12 @@ export default function SignatureSigningClient({ envelopeId, token }: { envelope
   const [signatureMode, setSignatureMode] = useState<"draw" | "type">("draw");
   const [drawnDataUrl, setDrawnDataUrl] = useState<string | null>(null);
   const [typedName, setTypedName] = useState("");
+  // Mandatory regardless of draw/type signature mode — the printed name of
+  // the caregiver actually signing, confirmed by them rather than just
+  // whatever name the envelope happened to be addressed to. Prefilled from
+  // the envelope's own clientName as a convenience once it loads, but stays
+  // editable and required.
+  const [caregiverName, setCaregiverName] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -328,6 +334,7 @@ export default function SignatureSigningClient({ envelopeId, token }: { envelope
       }
       const data = (await res.json()) as EnvelopeResponse;
       setEnvelope(data);
+      setCaregiverName((prev) => prev || data.clientName || "");
       if (data.status === "completed") setSubmitted(true);
     } catch {
       setLoadError("Couldn't load this document. Please check your connection and try again.");
@@ -367,6 +374,11 @@ export default function SignatureSigningClient({ envelopeId, token }: { envelope
       return;
     }
 
+    if (!caregiverName.trim()) {
+      setSubmitError("Please enter the caregiver's full name.");
+      return;
+    }
+
     const signature =
       signatureMode === "draw"
         ? drawnDataUrl
@@ -388,7 +400,7 @@ export default function SignatureSigningClient({ envelopeId, token }: { envelope
       const res = await fetch(`/api/sign/${envelopeId}/submit`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ token, fieldValues, signature }),
+        body: JSON.stringify({ token, fieldValues, caregiverName: caregiverName.trim(), signature }),
       });
       if (!res.ok) {
         setSubmitError("Something went wrong submitting your signature. Please try again.");
@@ -524,6 +536,22 @@ export default function SignatureSigningClient({ envelopeId, token }: { envelope
         })}
 
         <div className="rounded-xl3 border border-ink-100 bg-white p-4 shadow-card">
+          <div className="mb-4">
+            <label className="mb-1.5 block text-sm font-medium text-ink-900" htmlFor="caregiver-name">
+              Caregiver's full name
+              <span className="text-brand-coral"> *</span>
+            </label>
+            <input
+              id="caregiver-name"
+              type="text"
+              required
+              placeholder="Full name of the parent/caregiver signing"
+              value={caregiverName}
+              onChange={(e) => setCaregiverName(e.target.value)}
+              className="w-full rounded-xl border border-ink-100 bg-white px-3.5 py-2.5 text-sm outline-none focus-visible:border-brand-blue"
+            />
+          </div>
+
           <div className="mb-3 flex items-center justify-between">
             <label className="text-sm font-medium text-ink-900">{envelope.template.signatureLabel}</label>
             <div className="flex gap-1 rounded-full bg-ink-100 p-1 text-xs font-medium">

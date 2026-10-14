@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifySignatureAccessToken } from "@/lib/signatureAuth";
-import { getEnvelope, completeEnvelope, setEnvelopePdfKey, type SignatureValue } from "@/lib/signatureEnvelopes";
+import {
+  getEnvelope,
+  completeEnvelope,
+  setEnvelopePdfKey,
+  setEnvelopePdfError,
+  type SignatureValue,
+} from "@/lib/signatureEnvelopes";
 import { generateEnvelopePdf } from "@/lib/signaturePdf";
 import { signatureS3Key, uploadGeneratedPdf } from "@/lib/phiStorage";
 import { sendSignatureCompletedNotification } from "@/lib/email";
@@ -111,10 +117,14 @@ export async function POST(req: NextRequest, { params }: { params: { envelopeId:
   } catch (err) {
     // The signature/consent/field data is already durably saved above —
     // a PDF-rendering hiccup never loses the client's completed envelope.
-    // An admin can see it's "completed" with no PDF yet and this can be
-    // regenerated later if needed.
+    // An admin can see it's "completed" with no PDF yet (with the reason
+    // why, via pdfGenerationError) and retry from the Signatures tab's
+    // "Retry PDF" button, which calls
+    // app/api/admin/signature-envelopes/[id]/regenerate-pdf.
+    const message = err instanceof Error ? err.message : String(err);
     // eslint-disable-next-line no-console
     console.error(`[sign] failed to generate/upload PDF for ${completed.envelopeId}:`, err);
+    await setEnvelopePdfError(completed.patientId, completed.envelopeId, message);
   }
 
   try {

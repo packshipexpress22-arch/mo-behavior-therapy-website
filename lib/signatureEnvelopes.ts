@@ -81,6 +81,15 @@ export type SignatureEnvelope = {
   consentTimestamp: string | null;
   consentUserAgent: string | null;
   pdfS3Key: string | null;
+  // Set when the signed-PDF render/upload step (see
+  // app/api/sign/[envelopeId]/submit/route.ts and, for a retry, the admin's
+  // regenerate-pdf route) throws — the envelope still completes either way
+  // (the signature/consent data is the source of truth), but this is what
+  // lets the admin dashboard explain *why* the Download button is missing
+  // instead of just not showing it, and gives them something to act on
+  // (e.g. "has no sourcePdfKey" means the template's source PDF is gone).
+  // Cleared back to null whenever pdfS3Key is successfully set.
+  pdfGenerationError: string | null;
   sentBy: string; // admin username who sent it
   sentAt: string;
   completedAt: string | null;
@@ -119,6 +128,7 @@ export async function createEnvelope(args: {
     consentTimestamp: null,
     consentUserAgent: null,
     pdfS3Key: null,
+    pdfGenerationError: null,
     sentBy: args.sentBy,
     sentAt: now,
     completedAt: null,
@@ -161,12 +171,15 @@ export async function completeEnvelope(args: {
     consentUserAgent: args.consentUserAgent,
     consentTimestamp: now,
     completedAt: now,
+    pdfGenerationError: null,
     updatedAt: now,
   };
   await c.send(new PutCommand({ TableName: TABLE_NAME, Item: updated }));
   return updated;
 }
 
+/** Called on a successful PDF render+upload — stores the key and clears any
+ * previous pdfGenerationError (e.g. after an admin-triggered retry). */
 export async function setEnvelopePdfKey(
   patientId: string,
   envelopeId: string,
@@ -178,9 +191,34 @@ export async function setEnvelopePdfKey(
   await c.send(
     new PutCommand({
       TableName: TABLE_NAME,
-      Item: { ...existing, pdfS3Key, updatedAt: new Date().toISOString() },
+      Item: { ...existing, pdfS3Key, pdfGenerationError: null, updatedAt: new Date().toISOString() },
     })
   );
+}
+
+/** Called when the PDF render/upload step throws — see the
+ * pdfGenerationError field note on SignatureEnvelope above. Never throws
+ * itself: this runs from inside an already-caught error path, and losing
+ * the diagnostic message is worse than losing this write. */
+export async function setEnvelopePdfError(
+  patientId: string,
+  envelopeId: string,
+  message: string
+): Promise<void> {
+  try {
+    const c = requireClient();
+    const existing = await getEnvelope(patientId, envelopeId);
+    if (!existing) return;
+    await c.send(
+      new PutCommand({
+        TableName: TABLE_NAME,
+        Item: { ...existing, pdfGenerationError: message.slice(0, 500), updatedAt: new Date().toISOString() },
+      })
+    );
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(`[signatureEnvelopes] failed to record pdfGenerationError for ${envelopeId}:`, err);
+  }
 }
 
 /**

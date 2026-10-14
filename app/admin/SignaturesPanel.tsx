@@ -52,6 +52,11 @@ type SignatureEnvelope = {
   sentAt: string;
   completedAt: string | null;
   pdfS3Key: string | null;
+  // Why pdfS3Key is still null for a "completed" envelope, if it is — see
+  // lib/signatureEnvelopes.ts. Surfaced as a tooltip on the "Retry PDF"
+  // button below rather than its own column, since it's only ever
+  // meaningful in that one state.
+  pdfGenerationError: string | null;
 };
 
 function formatDate(iso: string | null) {
@@ -131,6 +136,9 @@ export default function SignaturesPanel() {
   const [sendError, setSendError] = useState<string | null>(null);
 
   const [actionBusyId, setActionBusyId] = useState<string | null>(null);
+  // Per-row action feedback for download/retry failures — keyed by
+  // envelopeId so one row's error never bleeds into another's.
+  const [rowError, setRowError] = useState<{ id: string; message: string } | null>(null);
 
   const fetchTemplates = useCallback(async () => {
     setTemplatesLoading(true);
@@ -430,6 +438,7 @@ export default function SignaturesPanel() {
 
   async function downloadSignedPdf(e: SignatureEnvelope) {
     setActionBusyId(e.envelopeId);
+    setRowError(null);
     try {
       const res = await fetch(
         `/api/admin/signature-envelopes/${e.envelopeId}/download?patientId=${encodeURIComponent(e.patientId)}`
@@ -438,9 +447,47 @@ export default function SignaturesPanel() {
         router.push("/admin/login");
         return;
       }
-      if (!res.ok) return;
+      if (!res.ok) {
+        setRowError({ id: e.envelopeId, message: "Couldn't get a download link. Please try again." });
+        return;
+      }
       const data = (await res.json()) as { url: string };
       window.open(data.url, "_blank", "noopener,noreferrer");
+    } catch {
+      setRowError({ id: e.envelopeId, message: "Couldn't get a download link. Please check your connection." });
+    } finally {
+      setActionBusyId(null);
+    }
+  }
+
+  // Retries the PDF render/upload for a "completed" envelope that has no
+  // pdfS3Key yet (see pdfGenerationError note on the SignatureEnvelope
+  // type) — the one recovery path for "it says completed but won't let me
+  // download it".
+  async function regeneratePdf(e: SignatureEnvelope) {
+    setActionBusyId(e.envelopeId);
+    setRowError(null);
+    try {
+      const res = await fetch(`/api/admin/signature-envelopes/${e.envelopeId}/regenerate-pdf`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ patientId: e.patientId }),
+      });
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { message?: string } | null;
+        setRowError({
+          id: e.envelopeId,
+          message: data?.message ? `Still failing: ${data.message}` : "Still couldn't generate the PDF. Please try again.",
+        });
+        return;
+      }
+      await fetchEnvelopes();
+    } catch {
+      setRowError({ id: e.envelopeId, message: "Couldn't reach the server. Please check your connection." });
     } finally {
       setActionBusyId(null);
     }
@@ -625,6 +672,23 @@ export default function SignaturesPanel() {
                           >
                             Download PDF
                           </button>
+                        )}
+                        {e.status === "completed" && !e.pdfS3Key && (
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="text-xs text-brand-coral" title={e.pdfGenerationError || undefined}>
+                              PDF failed to generate
+                            </span>
+                            <button
+                              onClick={() => regeneratePdf(e)}
+                              disabled={actionBusyId === e.envelopeId}
+                              className="rounded-full border border-ink-100 px-3 py-1.5 text-xs font-medium text-ink-700 hover:border-brand-blue hover:text-brand-blue disabled:opacity-60"
+                            >
+                              {actionBusyId === e.envelopeId ? "Retrying…" : "Retry PDF"}
+                            </button>
+                          </div>
+                        )}
+                        {rowError && rowError.id === e.envelopeId && (
+                          <div className="mt-1.5 max-w-[220px] text-right text-xs text-brand-coral">{rowError.message}</div>
                         )}
                       </td>
                     </tr>

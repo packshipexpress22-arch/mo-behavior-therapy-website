@@ -321,6 +321,7 @@
     "assistantName": "Milo",
     "assistantSubtitle": "Asistan MO Behavior Therapy",
     "disclosure": "Asistan vityèl — se pa yon klinisyen",
+    "bubbleGreeting": "Bonjou! 👋 Mwen se Milo. Mwen la pou ede ou nenpòt lè.",
     "greeting": "Bonjou! 👋 Mwen se asistan vityèl MO Behavior Therapy. Mwen ka ede ou aprann sou sèvis ABA nou yo, verifye zòn sèvis ou oswa asirans ou, epi ede ekip nou an kontakte ou. Kijan m ka ede ou?",
     "quickActions": {
       "needServices": "Mwen Bezwen Sèvis ABA",

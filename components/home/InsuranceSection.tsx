@@ -30,7 +30,7 @@ export default function InsuranceSection() {
         {primaryPlans.map((plan) => (
           <div
             key={plan.id}
-            className="flex h-24 items-center justify-center rounded-xl2 border border-ink-100 bg-white px-4 text-center shadow-card"
+            className="flex h-24 items-center justify-center rounded-xl2 border border-ink-100 bg-white px-4 text-center shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-brand-blue/30 hover:shadow-soft"
           >
             <span className="text-sm font-semibold text-ink-900">{plan.name}</span>
           </div>

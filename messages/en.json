@@ -321,6 +321,7 @@
     "assistantName": "Milo",
     "assistantSubtitle": "MO Behavior Therapy Assistant",
     "disclosure": "Virtual assistant — not a clinician",
+    "bubbleGreeting": "Hi! 👋 I'm Milo. I'm here to help whenever you're ready.",
     "greeting": "Hi! 👋 I'm MO Behavior Therapy's virtual assistant. I can help you learn about ABA services, check your service area or insurance, and help our team contact you. How can I help?",
     "quickActions": {
       "needServices": "I Need ABA Services",

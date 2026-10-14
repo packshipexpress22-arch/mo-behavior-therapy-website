@@ -30,7 +30,10 @@ export default function ServiceAreaSection() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-500">{tc("serviceAreaLabel")}</h3>
           <div className="mt-3 flex flex-wrap gap-2">
             {counties.map((c) => (
-              <span key={c.id} className="rounded-full border border-ink-100 bg-white px-3.5 py-1.5 text-sm font-medium text-ink-900">
+              <span
+                key={c.id}
+                className="rounded-full border border-ink-100 bg-white px-3.5 py-1.5 text-sm font-medium text-ink-900 transition-transform duration-150 hover:-translate-y-0.5 hover:scale-105"
+              >
                 {c.name}
               </span>
             ))}
@@ -39,7 +42,7 @@ export default function ServiceAreaSection() {
             {cities.map((c) => (
               <span
                 key={c.id}
-                className="rounded-full bg-brand-blue-light px-3.5 py-1.5 text-sm font-medium text-brand-blue"
+                className="rounded-full bg-brand-blue-light px-3.5 py-1.5 text-sm font-medium text-brand-blue transition-transform duration-150 hover:-translate-y-0.5 hover:scale-105"
               >
                 {c.name}
                 {c.isOfficeLocation && " ★"}

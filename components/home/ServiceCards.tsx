@@ -24,7 +24,10 @@ export default function ServiceCards() {
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
-          <div key={card.title} className="rounded-xl3 border border-ink-100 p-6 shadow-card">
+          <div
+            key={card.title}
+            className="rounded-xl3 border border-ink-100 p-6 shadow-card transition-all duration-200 hover:-translate-y-1.5 hover:border-brand-blue/20 hover:shadow-soft"
+          >
             <h3 className="text-base font-semibold text-ink-900">{card.title}</h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-700">{card.body}</p>
           </div>

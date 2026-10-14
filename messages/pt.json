@@ -321,6 +321,7 @@
     "assistantName": "Milo",
     "assistantSubtitle": "Assistente da MO Behavior Therapy",
     "disclosure": "Assistente virtual — não é um profissional clínico",
+    "bubbleGreeting": "Olá! 👋 Eu sou o Milo. Estou aqui para ajudar você quando precisar.",
     "greeting": "Olá! 👋 Sou o assistente virtual da MO Behavior Therapy. Posso ajudá-lo a saber mais sobre nossos serviços de ABA, verificar sua área de atendimento ou seguro, e ajudar nossa equipe a entrar em contato com você. Como posso ajudar?",
     "quickActions": {
       "needServices": "Preciso de Serviços de ABA",

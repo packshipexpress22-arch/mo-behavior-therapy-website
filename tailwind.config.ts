@@ -50,10 +50,41 @@ const config: Config = {
           "0%, 100%": { transform: "translateX(0)" },
           "50%": { transform: "translateX(-2%)" },
         },
+        "float-slow": {
+          "0%, 100%": { transform: "translateY(0) translateX(0)" },
+          "50%": { transform: "translateY(-10px) translateX(4px)" },
+        },
+        "bounce-gentle": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-6px)" },
+        },
+        wiggle: {
+          "0%, 100%": { transform: "rotate(0deg)" },
+          "25%": { transform: "rotate(-4deg)" },
+          "75%": { transform: "rotate(4deg)" },
+        },
+        "pop-in": {
+          "0%": { opacity: "0", transform: "scale(0.85) translateY(6px)" },
+          "100%": { opacity: "1", transform: "scale(1) translateY(0)" },
+        },
+        blink: {
+          "0%, 92%, 100%": { transform: "scaleY(1)" },
+          "96%": { transform: "scaleY(0.08)" },
+        },
+        "pulse-soft": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.6" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.6s ease-out both",
         "wave-drift": "wave-drift 12s ease-in-out infinite",
+        "float-slow": "float-slow 7s ease-in-out infinite",
+        "bounce-gentle": "bounce-gentle 2.4s ease-in-out infinite",
+        wiggle: "wiggle 0.5s ease-in-out",
+        "pop-in": "pop-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both",
+        blink: "blink 4.5s ease-in-out infinite",
+        "pulse-soft": "pulse-soft 2.5s ease-in-out infinite",
       },
     },
   },

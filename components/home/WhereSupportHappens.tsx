@@ -36,8 +36,11 @@ export default function WhereSupportHappens() {
       <h2 className="text-center font-display text-3xl font-bold text-ink-900 sm:text-4xl">{t("heading")}</h2>
       <div className="mt-10 grid gap-6 sm:grid-cols-3">
         {keys.map((key) => (
-          <div key={key} className="rounded-xl3 border border-ink-100 bg-white p-7 shadow-card">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-light text-brand-blue">
+          <div
+            key={key}
+            className="group rounded-xl3 border border-ink-100 bg-white p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-soft"
+          >
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-light text-brand-blue transition-transform duration-200 group-hover:scale-110">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 {icons[key]}
               </svg>

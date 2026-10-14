@@ -11,15 +11,15 @@ type Props = {
 } & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">;
 
 const variants: Record<NonNullable<Props["variant"]>, string> = {
-  primary: "bg-brand-blue text-white hover:-translate-y-0.5 shadow-card",
-  secondary: "bg-white text-brand-blue border border-brand-blue/30 hover:bg-brand-blue-light",
-  ghost: "text-ink-900 border border-ink-100 hover:bg-ink-100",
-  white: "bg-white text-brand-navy hover:-translate-y-0.5 shadow-card",
+  primary: "bg-brand-blue text-white hover:-translate-y-0.5 hover:shadow-soft shadow-card",
+  secondary: "bg-white text-brand-blue border border-brand-blue/30 hover:bg-brand-blue-light hover:-translate-y-0.5",
+  ghost: "text-ink-900 border border-ink-100 hover:bg-ink-100 hover:-translate-y-0.5",
+  white: "bg-white text-brand-navy hover:-translate-y-0.5 hover:shadow-soft shadow-card",
 };
 
 export default function Button({ href, children, variant = "primary", external, className, ...rest }: Props) {
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all",
+    "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-200 hover:scale-[1.03] active:scale-95",
     variants[variant],
     className
   );

@@ -33,7 +33,7 @@ export default function FAQAccordion({ limit }: { limit?: number }) {
                   onClick={() => setOpenId(isOpen ? null : id)}
                   aria-expanded={isOpen}
                   aria-controls={`faq-panel-${id}`}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-semibold text-ink-900 sm:text-base"
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-semibold text-ink-900 transition-colors hover:bg-brand-blue-light/40 sm:text-base"
                 >
                   {t(`${id}.question`)}
                   <svg
@@ -49,7 +49,7 @@ export default function FAQAccordion({ limit }: { limit?: number }) {
                 </button>
               </h3>
               {isOpen && (
-                <div id={`faq-panel-${id}`} className="px-5 pb-4 text-sm leading-relaxed text-ink-700">
+                <div id={`faq-panel-${id}`} className="animate-fade-up px-5 pb-4 text-sm leading-relaxed text-ink-700">
                   {t(`${id}.answer`)}
                 </div>
               )}

@@ -23,5 +23,5 @@ export function getClientIp(req: NextRequest): string {
   const header = req.headers.get("x-forwarded-for");
   if (!header) return "unknown";
   const hops = header.split(",").map((h) => h.trim()).filter(Boolean);
-  return hops.length > 0 ? hops[hops.length - 1] : "unknown";
+ return hops.at(-1) ?? "unknown";
 }

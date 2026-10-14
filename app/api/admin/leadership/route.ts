@@ -51,8 +51,9 @@ export async function POST(req: NextRequest) {
     if (!isValidLeadershipPhotoKey(body.photoKey)) {
       return NextResponse.json({ error: "invalid_photo_key" }, { status: 422 });
     }
-    photoKey = body.photoKey;
-    photoUrl = leadershipPhotoUrl(photoKey);
+      const key: string = body.photoKey;
+   photoKey = key;
+   photoUrl = leadershipPhotoUrl(key);
   }
 
   const person = await createPerson({

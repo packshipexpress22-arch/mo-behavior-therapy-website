@@ -18,3 +18,9 @@ sst-env.d.ts
 
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+# Secrets — never commit (only the blank template is tracked)
+.env*
+!.env.example
+*.pem
+*.key

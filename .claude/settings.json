@@ -1,3 +1,25 @@
 {
-  "includeCoAuthoredBy": false
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./.env.*.local)",
+      "Read(./.env.production)",
+      "Read(./.env.development)",
+      "Read(./data/leads.local.json)",
+      "Read(./.sst/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(~/.aws/**)",
+      "Read(~/.ssh/**)",
+      "Edit(./.env)",
+      "Edit(./.env.local)",
+      "Bash(cat .env*)",
+      "Bash(npx sst secret list:*)",
+      "Bash(sst secret list:*)",
+      "Bash(printenv:*)",
+      "Bash(env)"
+    ]
+  }
 }
